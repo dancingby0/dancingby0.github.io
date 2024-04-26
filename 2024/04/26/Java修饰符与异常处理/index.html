@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8" />
-    <title>dancingby&#39;s home</title>
+    <title>Java修饰符与异常处理 | dancingby&#39;s home</title>
     <meta name="author" content="dancingby" />
     <meta name="description" content="" />
     <meta name="keywords" content="blog" />
@@ -36,7 +36,9 @@
 
 
 
-<script src="/dancingby.github.io/js/lib/home.js"></script>
+
+
+
 
 <link rel="stylesheet" href="/dancingby.github.io/css/main.css" />
 
@@ -146,32 +148,11 @@
 </transition>
 
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
-            <div id="home-head">
-    <div id="home-background" ref="homeBackground" data-images="/dancingby.github.io/images/background.jpg"></div>
-    <div id="home-info" @click="homeClick">
-        <span class="loop"></span>
-        <span class="loop"></span>
-        <span class="loop"></span>
-        <span class="loop"></span>
-        <span class="info">
-            <div class="wrap">
-                <h1>dancingby&#39;s home</h1>
-                <h3>dancingbyのblogs</h3>
-                <h5></h5>
-            </div>
-        </span>
+            <div class="article">
+    <div>
+        <h1>Java修饰符与异常处理</h1>
     </div>
-</div>
-<div id="home-posts-wrap" true ref="homePostsWrap">
-    <div id="home-posts">
-        
-
-<div class="post">
-    <a href="/dancingby.github.io/2024/04/26/Java%E4%BF%AE%E9%A5%B0%E7%AC%A6%E4%B8%8E%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/">
-        <h2 class="post-title">Java修饰符与异常处理</h2>
-    </a>
-    <div class="category-and-date">
-        
+    <div class="info">
         <span class="date">
             <span class="icon">
                 <i class="fa-solid fa-calendar fa-fw"></i>
@@ -181,10 +162,9 @@
         
         
     </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <h1 id="修饰符"><a href="#修饰符" class="headerlink" title="修饰符"></a>修饰符</h1><p>两类: 访问修饰符 与 非访问修饰符</p>
+    
+    <div class="content" v-pre>
+        <h1 id="修饰符"><a href="#修饰符" class="headerlink" title="修饰符"></a>修饰符</h1><p>两类: 访问修饰符 与 非访问修饰符</p>
 <h2 id="访问修饰符"><a href="#访问修饰符" class="headerlink" title="访问修饰符"></a>访问修饰符</h2><h3 id="public"><a href="#public" class="headerlink" title="public:"></a>public:</h3><p>公有,任何其他类可以访问<br>适用对象:(类,字段,方法,接口)</p>
 <h6 id="1-修饰类"><a href="#1-修饰类" class="headerlink" title="1.修饰类:"></a>1.修饰类:</h6><p>一个文件中只能有一个public类,并且该文件名必须与该类名相同(编译器在链接时,public 类会作为该文件的入口)</p>
 <h3 id="private"><a href="#private" class="headerlink" title="private:"></a>private:</h3><p>私有,仅该类被调用<br>适用对象:字段,方法</p>
@@ -248,101 +228,13 @@ class Animal&#123;
     &#125;
 </code></pre>
 
-            
-        </div>
     </div>
-    <div class="post-tags">
-        
-        
-        
-    </div>
-    <a href="/dancingby.github.io/2024/04/26/Java%E4%BF%AE%E9%A5%B0%E7%AC%A6%E4%B8%8E%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/dancingby.github.io/2024/04/25/hello-world/">
-        <h2 class="post-title">Hello World</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/4/25
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <p>This is my first blog.</p>
-<p>我精通五种编程语言</p>
-<p>的hello world.</p>
-<h3 id="c"><a href="#c" class="headerlink" title="c"></a>c</h3><pre><code class="c">printf(&quot;hello world!&quot;);
-</code></pre>
-<h3 id="cpp"><a href="#cpp" class="headerlink" title="cpp"></a>cpp</h3><pre><code class="cpp">std::cout&lt;&lt; &quot;hello world!&quot;;
-</code></pre>
-<h3 id="java"><a href="#java" class="headerlink" title="java"></a>java</h3><pre><code class="java">system.out.println(&quot;hello world!&quot;);
-</code></pre>
-<h3 id="python"><a href="#python" class="headerlink" title="python"></a>python</h3><pre><code class="python">print(&quot;hello world!&quot;)
-</code></pre>
-<h3 id="csharp"><a href="#csharp" class="headerlink" title="csharp"></a>csharp</h3><pre><code class="csharp">Console.Writeline(&quot;hello world!&quot;);
-</code></pre>
-
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        
-        
-    </div>
-    <a href="/dancingby.github.io/2024/04/25/hello-world/" class="go-post">阅读全文</a>
-</div>
-
-
-        <div class="page-current">
     
-    <span class="current">1</span>
     
     
     
     
-</div>
-
-    </div>
     
-    <div id="home-card">
-        <div id="card-style">
-    <div id="card-div">
-        <div class="avatar">
-            <img src="/dancingby.github.io/images/avatar.jpg" alt="avatar" />
-        </div>
-        <div class="name">dancingby</div>
-        <div class="description">
-            <p>Description<br>dancingbyです！</p>
-
-        </div>
-        
-        
-        <div class="friend-links">
-            
-            <div class="friend-link">
-                <a target="_blank" rel="noopener" href="https://github.com/dancingby0">github</a>
-            </div>
-            
-            <div class="friend-link">
-                <a target="_blank" rel="noopener" href="https://argvchs.github.io">Argvchs</a>
-            </div>
-            
-        </div>
-        
-    </div>
-</div>
-
-    </div>
     
 </div>
 
@@ -374,6 +266,12 @@ class Animal&#123;
         
     </div>
     <script src="/dancingby.github.io/js/main.js"></script>
+    
+    
+
+
+
+
     
 </body>
 </html>
