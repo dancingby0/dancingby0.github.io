@@ -8,7 +8,7 @@
     <meta name="description" content="" />
     <meta name="keywords" content="blog" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-    <link rel="icon" href="/dancingby.github.io/images/avatar.jpg" />
+    <link rel="icon" href="/images/avatar.jpg" />
     <link rel="preconnect" href="https://s4.zstatic.net" />
 <script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
 <link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
@@ -26,17 +26,19 @@
     rel="stylesheet"
     href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
 />
-<script src="/dancingby.github.io/js/lib/highlight.js"></script>
+<script src="/js/lib/highlight.js"></script>
 
 
 
-<script src="/dancingby.github.io/js/lib/preview.js"></script>
+<script src="/js/lib/preview.js"></script>
 
 
 
+<script src="/js/lib/search.js"></script>
 
 
-<link rel="stylesheet" href="/dancingby.github.io/css/main.css" />
+
+<link rel="stylesheet" href="/css/main.css" />
 
 <meta name="generator" content="Hexo 7.2.0"></head>
 <body>
@@ -46,37 +48,37 @@
                 <div id="loading-circle">
                     <h2>LOADING</h2>
                     <p>加载过慢请开启缓存 浏览器默认开启</p>
-                    <img src="/dancingby.github.io/images/loading.gif" />
+                    <img src="/images/loading.gif" />
                 </div>
             </div>
         </transition>
         <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
     <nav id="desktop-menu">
-        <a class="title" href="/dancingby.github.io/">
+        <a class="title" href="/">
             <span>DANCINGBY&#39;S HOME</span>
         </a>
         
-        <a href="/dancingby.github.io/">
+        <a href="/">
             <i class="fa-solid fa-house fa-fw"></i>
             <span>&ensp;Home</span>
         </a>
         
-        <a href="/dancingby.github.io/about">
+        <a href="/about">
             <i class="fa-solid fa-id-card fa-fw"></i>
             <span>&ensp;About</span>
         </a>
         
-        <a href="/dancingby.github.io/archives">
+        <a href="/archives">
             <i class="fa-solid fa-box-archive fa-fw"></i>
             <span>&ensp;Archives</span>
         </a>
         
-        <a href="/dancingby.github.io/categories">
+        <a href="/categories">
             <i class="fa-solid fa-bookmark fa-fw"></i>
             <span>&ensp;Categories</span>
         </a>
         
-        <a href="/dancingby.github.io/tags">
+        <a href="/tags">
             <i class="fa-solid fa-tags fa-fw"></i>
             <span>&ensp;Tags</span>
         </a>
@@ -90,7 +92,7 @@
         <transition name="slide">
             <div class="items" v-show="showMenuItems">
                 
-                <a href="/dancingby.github.io/">
+                <a href="/">
                     <div class="item">
                         <div style="min-width: 20px; max-width: 50px; width: 10%">
                             <i class="fa-solid fa-house fa-fw"></i>
@@ -99,7 +101,7 @@
                     </div>
                 </a>
                 
-                <a href="/dancingby.github.io/about">
+                <a href="/about">
                     <div class="item">
                         <div style="min-width: 20px; max-width: 50px; width: 10%">
                             <i class="fa-solid fa-id-card fa-fw"></i>
@@ -108,7 +110,7 @@
                     </div>
                 </a>
                 
-                <a href="/dancingby.github.io/archives">
+                <a href="/archives">
                     <div class="item">
                         <div style="min-width: 20px; max-width: 50px; width: 10%">
                             <i class="fa-solid fa-box-archive fa-fw"></i>
@@ -117,7 +119,7 @@
                     </div>
                 </a>
                 
-                <a href="/dancingby.github.io/categories">
+                <a href="/categories">
                     <div class="item">
                         <div style="min-width: 20px; max-width: 50px; width: 10%">
                             <i class="fa-solid fa-bookmark fa-fw"></i>
@@ -126,7 +128,7 @@
                     </div>
                 </a>
                 
-                <a href="/dancingby.github.io/tags">
+                <a href="/tags">
                     <div class="item">
                         <div style="min-width: 20px; max-width: 50px; width: 10%">
                             <i class="fa-solid fa-tags fa-fw"></i>
@@ -147,13 +149,15 @@
             
 <div id="archives">
     
+    <input id="search-bar" class="input" placeholder="搜索" v-model="rawSearch" />
+    
     <div id="timeline-wrap" ref="timeline">
         
         <div class="timeline" data-title="helloworld">
             <div class="timeline-tail"></div>
             <div class="timeline-content">
                 <div class="item-time">2024/4/25</div>
-                <a href="/dancingby.github.io/2024/04/25/hello-world/">
+                <a href="/2024/04/25/hello-world/">
                     <h3>Hello World</h3>
                 </a>
                 <div class="info">
@@ -167,8 +171,22 @@
             <div class="timeline-tail"></div>
             <div class="timeline-content">
                 <div class="item-time">2024/4/26</div>
-                <a href="/dancingby.github.io/2024/04/26/Java%E4%BF%AE%E9%A5%B0%E7%AC%A6%E4%B8%8E%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/">
+                <a href="/2024/04/26/Java%E4%BF%AE%E9%A5%B0%E7%AC%A6%E4%B8%8E%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/">
                     <h3>Java修饰符与异常处理</h3>
+                </a>
+                <div class="info">
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="timeline" data-title="java面向对象">
+            <div class="timeline-tail"></div>
+            <div class="timeline-content">
+                <div class="item-time">2024/4/27</div>
+                <a href="/2024/04/27/Java%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/">
+                    <h3>Java面向对象</h3>
                 </a>
                 <div class="info">
                     
@@ -207,7 +225,7 @@
         </transition>
         
     </div>
-    <script src="/dancingby.github.io/js/main.js"></script>
+    <script src="/js/main.js"></script>
     
 </body>
 </html>
