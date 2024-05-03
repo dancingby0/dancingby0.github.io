@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8" />
-    <title>Java面向对象 | dancingby&#39;s home</title>
+    <title>HTML学习(一) | dancingby&#39;s home</title>
     <meta name="author" content="dancingby" />
     <meta name="description" content="" />
     <meta name="keywords" content="blog" />
@@ -150,14 +150,14 @@
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
             <div class="article">
     <div>
-        <h1>Java面向对象</h1>
+        <h1>HTML学习(一)</h1>
     </div>
     <div class="info">
         <span class="date">
             <span class="icon">
                 <i class="fa-solid fa-calendar fa-fw"></i>
             </span>
-            2024/4/27
+            2024/5/3
         </span>
         
         
@@ -169,7 +169,12 @@
             
             <span class="tag">
                 
-                <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="color: #00bcd4">Java,面向对象</a>
+                <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #03a9f4">前端</a>
+            </span>
+            
+            <span class="tag">
+                
+                <a href="/tags/HTML/" style="color: #ffa2c4">HTML</a>
             </span>
             
         </span>
@@ -177,95 +182,24 @@
     </div>
     
     <div class="content" v-pre>
-        <h3 id="构造器"><a href="#构造器" class="headerlink" title="构造器"></a>构造器</h3><p>语法:<br>[修饰器] &lt;类名&gt;(参数列表){方法体}<br>用于构造对象时执行.<br>默认的类是有无参构造器的,但是如果一个类设定了一个构造器,比如:</p>
-<pre><code class="java">package cn.dancingby;
+        <h1 id="什么是HTML"><a href="#什么是HTML" class="headerlink" title="什么是HTML?"></a>什么是HTML?</h1><p>HTML(Hyper Text Markup Language) 超文本标记语言<br>非编程语言,而是标记语言</p>
+<h1 id="基本格式"><a href="#基本格式" class="headerlink" title="基本格式"></a>基本格式</h1><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;!-- 声明为HTML5文档 --&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;这里是标题&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- 这是注释 --&gt;
+    &lt;!-- body标签表示页面的主要内容--&gt;
+    &lt;p&gt;这里是段落&lt;/p&gt;
 
-public class C &#123;
-    C(String A)&#123;
-        ;
-    &#125;
-&#125;
+&lt;/body&gt;
+&lt;!-- 注意,所有标签尽可能用/关闭--&gt;
+&lt;/html&gt;
 </code></pre>
-<p>那么这个C类就不会拥有一个无参构造器了.<br>比如<br>C a &#x3D; new C();是错误的.<br>继承后的类如果没有显式调用其父类的构造函数,则会某人调用其父类的无参构造函数.<br>因此,如下是错误的.</p>
-<pre><code class="java">public class C &#123;
-    C(String A)&#123;
-        ;
-    &#125;
-&#125;
-
-class D extends C&#123;&#125;
-</code></pre>
-<p>因为C类没有默认构造器,而D类的默认构造器需要调用其C类的构造器,因此会出现编译错误.<br>多个构造器的要求是其函数签名不得相同.<br># 函数签名:即public A(String a){}的”A(String a)”这一部分.不包括返回值和方法体.</p>
-<h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><p>使用extends关键字继承<br>能够使子类拥有父类使用protected&#x2F;public修饰的字段,</p>
-<h3 id="内部类"><a href="#内部类" class="headerlink" title="内部类"></a>内部类</h3><p>类里面可以再定义一个类<br>内部类有成员内部类,静态内部类和局部内部类</p>
-<h4 id="成员内部类"><a href="#成员内部类" class="headerlink" title="成员内部类"></a>成员内部类</h4><p>成员内部类相当于类的成员,可以用default,private,public修饰<br>成员内部类可以用static修饰.(因此被static修饰的类一定是内部类)<br>示例:</p>
-<pre><code class="java">class Outer &#123;
-    private int x;
-
-    class Inner &#123;
-        void display() &#123;
-            System.out.println(&quot;Value of x: &quot; + x); // 内部类直接访问外部类的私有字段
-        &#125;
-    &#125;
-&#125;
-</code></pre>
-<h5 id="静态成员内部类"><a href="#静态成员内部类" class="headerlink" title="静态成员内部类"></a>静态成员内部类</h5><p>使用static修饰的成员内部类<br>1.因为拥有static修饰符,因此不需要通过创建对象即可使用该类.<br>2.该类不得访问其外部类的非静态成员<br>3.该类可以创建static成员(也可以创建非静态成员)</p>
-<h5 id="非静态成员内部类"><a href="#非静态成员内部类" class="headerlink" title="非静态成员内部类"></a>非静态成员内部类</h5><p>不使用static修饰的成员内部类.<br>与静态成员内部类正好相反,它:<br>1.必须通过创建外部类的对象才可使用该类<br>2.可以访问其外部类的所有成员<br>3.不得创建static成员</p>
-<p>如果内部类的成员与外部类的成员重名,则外部类的成员会被隐藏,如果要访问它,就必须使用<br>外部类名.this.成员<br>进行访问,示例:</p>
-<pre><code class="java">public class Outer &#123;
-    private int x = 10;
-
-    class Inner &#123;
-        private int x = 20;
-
-        void display() &#123;
-            System.out.println(&quot;Inner x: &quot; + x); // 输出 Inner x: 20
-            System.out.println(&quot;Outer x: &quot; + Outer.this.x); // 输出 Outer x: 10
-        &#125;
-    &#125;
-
-    public static void main(String[] args) &#123;
-        Outer outer = new Outer();
-        Inner inner = outer.new Inner();
-        inner.display();
-    &#125;
-&#125;
-</code></pre>
-<p>Q:为什么不是super.成员?<br>A:不是继承.</p>
-<h5 id="成员类的访问"><a href="#成员类的访问" class="headerlink" title="成员类的访问"></a>成员类的访问</h5><p>对于静态成员类,如果仅访问其静态成员,只需要<br>外部类名.静态成员类名.静态成员名<br>即可<br>如果是非静态成员,则必须通过该类的实例来访问其成员.<br>示例:</p>
-<pre><code class="java">/**
- * @author dancingby
- */
-
-package cn.dancingby;
-
-public class Outer &#123;
-    static class StaticNestedClass &#123;
-        static void display() &#123;
-            System.out.println(&quot;Inside static nested class(Static method)&quot;);
-        &#125;
-        void display2()&#123;
-            System.out.println(&quot;Inside static nested class(Non-static method)&quot;);
-        &#125;
-    &#125;
-
-&#125;
-</code></pre>
-<pre><code class="java">package cn.dancingby;
-
-public class main &#123;
-    public static void main(String[] args)&#123;
-
-        Outer outer = new Outer();
-        Outer.StaticNestedClass nestedClass = new Outer.StaticNestedClass();
-        Outer.StaticNestedClass.display();
-        nestedClass.display();
-        nestedClass.display2();
-
-    &#125;
-&#125;
-</code></pre>
-<p>输出:<br>    Inside static nested class(Static method)<br>    Inside static nested class(Static method)<br>    Inside static nested class(Non-static method)</p>
+<p>一些标签<br>&lt;p&gt;段落标签,表示一段<br>&lt;h1&gt;-&lt;h6&gt;表示标题<br>&lt;a href&#x3D;”链接”&gt;链接文本&lt;&#x2F;a&gt;<br>&lt;b&gt;表示加粗<br>&lt;s&gt;表示删除线<br>&lt;u&gt;表示下划线<br>&lt;i&gt;表示斜体<br>&lt;sup&gt;表示上标<br>&lt;sub&gt;表示下标<br>&lt;pre&gt;表示以源格式输出<br>&lt;em&gt;表示强调<br>&lt;strong&gt;表示加重语气<br>&lt;q&gt;表示内联引用<br>&lt;blockquote&gt;表示块引用<br>&lt;hr&gt;表示分割线<br>&lt;br&gt;表示换行<br>&lt;span&gt;表示范围内生效(用css)<br>&lt;ul&gt;表示无序列表<br>&lt;ol&gt;表示有序列表<br>&lt;li&gt;表示列表中的元素<br>列表可以嵌套<br>&lt;div&gt;表示分割,并不会表示任何内容,更用于组织内容,如使用css或id等.<br>&lt;section&gt;表示部分<br>应当注意的是,一篇网页应当只有一个main,不同章节用section分割,更小的部分用div.</p>
+<p>&lt;html&gt;头内可以有lang属性,标识网页的语言.</p>
 
     </div>
     

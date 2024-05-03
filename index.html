@@ -167,6 +167,165 @@
         
 
 <div class="post">
+    <a href="/2024/05/03/HTML%E5%AD%A6%E4%B9%A0-%E4%B8%80/">
+        <h2 class="post-title">HTML学习(一)</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/5/3
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h1 id="什么是HTML"><a href="#什么是HTML" class="headerlink" title="什么是HTML?"></a>什么是HTML?</h1><p>HTML(Hyper Text Markup Language) 超文本标记语言<br>非编程语言,而是标记语言</p>
+<h1 id="基本格式"><a href="#基本格式" class="headerlink" title="基本格式"></a>基本格式</h1><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;!-- 声明为HTML5文档 --&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;这里是标题&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- 这是注释 --&gt;
+    &lt;!-- body标签表示页面的主要内容--&gt;
+    &lt;p&gt;这里是段落&lt;/p&gt;
+
+&lt;/body&gt;
+&lt;!-- 注意,所有标签尽可能用/关闭--&gt;
+&lt;/html&gt;
+</code></pre>
+<p>一些标签<br>&lt;p&gt;段落标签,表示一段<br>&lt;h1&gt;-&lt;h6&gt;表示标题<br>&lt;a href&#x3D;”链接”&gt;链接文本&lt;&#x2F;a&gt;<br>&lt;b&gt;表示加粗<br>&lt;s&gt;表示删除线<br>&lt;u&gt;表示下划线<br>&lt;i&gt;表示斜体<br>&lt;sup&gt;表示上标<br>&lt;sub&gt;表示下标<br>&lt;pre&gt;表示以源格式输出<br>&lt;em&gt;表示强调<br>&lt;strong&gt;表示加重语气<br>&lt;q&gt;表示内联引用<br>&lt;blockquote&gt;表示块引用<br>&lt;hr&gt;表示分割线<br>&lt;br&gt;表示换行<br>&lt;span&gt;表示范围内生效(用css)<br>&lt;ul&gt;表示无序列表<br>&lt;ol&gt;表示有序列表<br>&lt;li&gt;表示列表中的元素<br>列表可以嵌套<br>&lt;div&gt;表示分割,并不会表示任何内容,更用于组织内容,如使用css或id等.<br>&lt;section&gt;表示部分<br>应当注意的是,一篇网页应当只有一个main,不同章节用section分割,更小的部分用div.</p>
+<p>&lt;html&gt;头内可以有lang属性,标识网页的语言.</p>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ff7d73">前端</a>
+        </span>
+        
+        <span class="tag">
+            
+            <a href="/tags/HTML/" style="color: #00a596">HTML</a>
+        </span>
+        
+    </div>
+    <a href="/2024/05/03/HTML%E5%AD%A6%E4%B9%A0-%E4%B8%80/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2024/05/03/HTML%E5%AD%A6%E4%B9%A0-%E4%BA%8C/">
+        <h2 class="post-title">HTML学习(二)</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/5/3
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h1 id="html元"><a href="#html元" class="headerlink" title="html元"></a>html元</h1><p>使用&lt;meta&gt;标签<br>示例:</p>
+<pre><code class="html">&lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;!-- charset属性用于设定文字编码 --&gt;
+    &lt;meta name=&quot;author&quot; contents=&quot;dancingby&quot; /&gt;
+    &lt;meta name=&quot;description&quot; contents=&quot;here is the description of the website&quot; /&gt;
+    &lt;meta name=&quot;keywords&quot; contents=&quot;html&quot; /&gt;
+    &lt;!-- 这里是一些自定的网页的表述,同时,元里可以添加其他平台可解析的属性(如twitter与Facebook的) --&gt;
+&lt;/head&gt;
+</code></pre>
+<h1 id="网页架构"><a href="#网页架构" class="headerlink" title="网页架构"></a>网页架构</h1><p>有&lt;header&gt;(页眉),&lt;nav&gt;(导航栏),&lt;article&gt;文章,&lt;main&gt;主要内容,&lt;aside&gt;侧边栏&lt;footer&gt;页尾部分.<br>示例:</p>
+<pre><code class="html">&lt;body&gt;
+    &lt;header&gt;&lt;h1&gt;
+        This is header.
+        &lt;/h1&gt;&lt;/header&gt;
+    &lt;nav&gt;
+    &lt;ul&gt;
+        &lt;li&gt;
+        主页&lt;/li&gt;
+        &lt;li&gt;
+        文章&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;form&gt;
+            &lt;input type=&quot;search&quot; name = &quot;s&quot; placeholder = &quot;Pleace type to search&quot; /&gt;
+            &lt;input type = &quot;submit&quot; value=&quot;search&quot; /&gt;
+        &lt;/form&gt;
+    &lt;/nav&gt;
+    &lt;main&gt;
+    &lt;article&gt;
+        文章主要内容
+        &lt;/article&gt;
+        &lt;aside&gt;
+        &lt;h2&gt;
+            相关链接
+            &lt;/h2&gt;
+        &lt;ul&gt;
+            &lt;li&gt;
+            &lt;a href=&quot;https://www.baidu.com&quot;&gt;百度&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;
+            &lt;a href = &quot;https://dancingby0.github.io&quot;&gt;
+                dancingby&#39;s blog.
+                &lt;/a&gt;
+            &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/aside&gt;
+    &lt;/main&gt;
+    &lt;footer&gt;
+    &lt;p&gt;
+        
+        all rights reserved.
+        &lt;/p&gt;&lt;/footer&gt;
+&lt;/body&gt;
+</code></pre>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ff7d73">前端</a>
+        </span>
+        
+        <span class="tag">
+            
+            <a href="/tags/HTML/" style="color: #00a596">HTML</a>
+        </span>
+        
+    </div>
+    <a href="/2024/05/03/HTML%E5%AD%A6%E4%B9%A0-%E4%BA%8C/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/2024/04/27/Java%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/">
         <h2 class="post-title">Java面向对象</h2>
     </a>
@@ -279,7 +438,16 @@ public class main &#123;
     </div>
     <div class="post-tags">
         
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
         
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="color: #00bcd4">Java,面向对象</a>
+        </span>
         
     </div>
     <a href="/2024/04/27/Java%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" class="go-post">阅读全文</a>
