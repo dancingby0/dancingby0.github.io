@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8" />
-    <title>tmpb | dancingby&#39;s home</title>
+    <title>SQL学习(一) | dancingby&#39;s home</title>
     <meta name="author" content="dancingby" />
     <meta name="description" content="" />
     <meta name="keywords" content="blog" />
@@ -150,7 +150,7 @@
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
             <div class="article">
     <div>
-        <h1>tmpb</h1>
+        <h1>SQL学习(一)</h1>
     </div>
     <div class="info">
         <span class="date">
@@ -164,7 +164,48 @@
     </div>
     
     <div class="content" v-pre>
-        <p><img src="/images/tmpaaa.jpg" alt="图片" title="甘雨"><br><img src="/images/tmp1.png" alt="图片" title="甘雨"><br><img src="/images/tmp2.png" alt="图片" title="甘雨"><br><img src="/images/tmp3.png" alt="图片" title="甘雨"><br><img src="/images/tmp4.png" alt="图片" title="甘雨"><br><img src="/images/tmp5.png" alt="图片" title="甘雨"><br><img src="/images/tmp6.png" alt="图片" title="甘雨"><br><img src="/images/tmp7.png" alt="图片" title="甘雨"><br><img src="/images/tmp8.png" alt="图片" title="甘雨"></p>
+        <h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><p>分为DDL,DML,DQL,DCL<br>注释:</p>
+<pre><code class="sql">-- 注释
+# mysql注释
+/*
+多行注释
+*/
+</code></pre>
+<h2 id="DDL-Data-Definition-Language"><a href="#DDL-Data-Definition-Language" class="headerlink" title="DDL(Data Definition Language)"></a>DDL(Data Definition Language)</h2><p>负责对库进行操作</p>
+<p>查询:</p>
+<pre><code class="sql">SHOW DATABASES;
+SELECT DATABASE(); -- 查询当前选定的数据库
+</code></pre>
+<p>创建</p>
+<pre><code class="sql">CREATE DATABASE [IF NOT EXISTS] 数据库名 [DEFAULT CHARSET 字符集] [COLLATE 排序规则];
+</code></pre>
+<p>删除</p>
+<pre><code class="sql">DROP DATABASE [IF EXISTS] 数据库名;
+</code></pre>
+<p>使用</p>
+<pre><code class="sql">USE 数据库名;
+</code></pre>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">CREATE DATABASE IF NOT EXISTS test DEFAULT CHARSET utf8mb4; -- 创建test数据库(如果不存在的话),并以utf8mb4存储(最多4字节)
+
+DROP DATABASE IF EXISTS test -- 删除test数据库(如果存在的话)
+</code></pre>
+<h2 id="DML-Data-Manipulation-Language"><a href="#DML-Data-Manipulation-Language" class="headerlink" title="DML(Data Manipulation Language)"></a>DML(Data Manipulation Language)</h2><p>负责数据的增删改</p>
+<p>查询当前数据库中所有表</p>
+<pre><code class="sql">SHOW TABLES;
+</code></pre>
+<p>查询表结构</p>
+<pre><code class="sql">DESC 表名称;
+</code></pre>
+<p>查询指定表的建表语句</p>
+<pre><code class="sql">SHOW CREATE TABLE 表名;
+</code></pre>
+<p>创建表:</p>
+<pre><code class="sql">CREATE 表名(
+    字段名 字段类型 [COMMENT 字段注释]
+    字段名 字段类型 [COMMEBT 字段注释]
+...
+)[COMMENT 表注释];
+</code></pre>
 
     </div>
     
