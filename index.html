@@ -205,27 +205,271 @@ SELECT DATABASE(); -- 查询当前选定的数据库
 <p>使用</p>
 <pre><code class="sql">USE 数据库名;
 </code></pre>
-<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">CREATE DATABASE IF NOT EXISTS test DEFAULT CHARSET utf8mb4; -- 创建test数据库(如果不存在的话),并以utf8mb4存储(最多4字节)
-
-DROP DATABASE IF EXISTS test -- 删除test数据库(如果存在的话)
-</code></pre>
-<h2 id="DML-Data-Manipulation-Language"><a href="#DML-Data-Manipulation-Language" class="headerlink" title="DML(Data Manipulation Language)"></a>DML(Data Manipulation Language)</h2><p>负责数据的增删改</p>
 <p>查询当前数据库中所有表</p>
 <pre><code class="sql">SHOW TABLES;
 </code></pre>
 <p>查询表结构</p>
-<pre><code class="sql">DESC 表名称;
+<pre><code class="sql">DESC 表名称; --- describe
 </code></pre>
 <p>查询指定表的建表语句</p>
 <pre><code class="sql">SHOW CREATE TABLE 表名;
 </code></pre>
 <p>创建表:</p>
-<pre><code class="sql">CREATE 表名(
-    字段名 字段类型 [COMMENT 字段注释]
-    字段名 字段类型 [COMMEBT 字段注释]
+<pre><code class="sql">CREATE TABLE 表名(
+    字段名 字段类型 [COMMENT 字段注释],
+    字段名 字段类型 [COMMEBT 字段注释],
 ...
 )[COMMENT 表注释];
 </code></pre>
+<p>添加字段</p>
+<pre><code class="sql">ALTER TABLE 表名 ADD 字段名 类型(长度) [COMMENT 注释] [约束];
+</code></pre>
+<p>修改字段</p>
+<p>修改数据类型</p>
+<pre><code class="sql">ALTER TABLE 表名 MODIFY 字段名 新数据类型(长度);
+</code></pre>
+<p>修改字段名和字段类型</p>
+<pre><code class="sql">ALTER TABLE 表名 CHANGE 旧字段名 新字段名 类型(长度) [COMMENT 注释] [约束];
+</code></pre>
+<p>删除字段</p>
+<pre><code class="sql">ALTER TABLE 表名 DROP 字段名;
+</code></pre>
+<p>修改表名</p>
+<pre><code class="sql">ALTER TABLE 表名 RENAME TO 表名;
+</code></pre>
+<p>删除表</p>
+<pre><code class="sql">DROP TABLE [IF EXISTS] 表名;
+TRUNCATE TABLE 表名; -- 删除指定表,并重新创建该表(清空数据) truncate截短,去尾
+</code></pre>
+<h5 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h5><pre><code class="sql">CREATE DATABASE IF NOT EXISTS test DEFAULT CHARSET utf8mb4; -- 创建test数据库(如果不存在的话),并以utf8mb4存储(最多4字节)
+
+DROP DATABASE IF EXISTS test; -- 删除test数据库(如果存在的话)
+</code></pre>
+<p>案例:<br>设计一张员工信息表,要求如下:</p>
+<p>1.编号 纯数字</p>
+<p>2.员工工号 字符串 长度不超过10位</p>
+<p>3.员工姓名 字符串 长度不超10位</p>
+<p>4.性别 男&#x2F;女 一个汉字</p>
+<p>5.年龄</p>
+<p>6.身份证号</p>
+<p>7.入职时间 年月日</p>
+<pre><code class="sql">CREATE TABLE employee_information(
+    id int comment &#39;编号&#39;,
+    work_number char(10) comment &#39;工号&#39;,
+    name varchar(10) comment &#39;姓名&#39;,
+    gender char(1) comment &#39;性别&#39;,
+    age tinyint unsigned comment &#39;年龄&#39;,
+    id_card char(18) comment &#39;身份证号&#39;,
+    entry_date date comment &#39;入职时间&#39;
+)comment &#39;员工表&#39;;
+</code></pre>
+<p>案例</p>
+<p>emp表添加字段’昵称’为nickname,varchar(20)</p>
+<pre><code class="sql">ALTER TABLE emp ADD nickname varchar(20) comment &#39;昵称&#39;
+</code></pre>
+<p>案例:</p>
+<p>将emp表的nickname字段修改为uername,类型为varchar(30)</p>
+<pre><code class="sql">ALTER TABLE emp CHANGE nickname username varchar(30) comment &#39;用户名&#39;
+desc emp;
+</code></pre>
+<p>案例:</p>
+<p>将emp表的username字段删除</p>
+<pre><code class="sql">ALTER TABLE emp DROP username;
+</code></pre>
+<p>案例:</p>
+<p>将emp表的表名修改为employee</p>
+<pre><code class="sql">ALTER TABLE emp RENAME TO employee
+</code></pre>
+<h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><p>mysql中主要分为三类: 数值类型, 字符串类型, 日期时间类型</p>
+<h3 id="数值类型"><a href="#数值类型" class="headerlink" title="数值类型"></a>数值类型</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th align="right">大小</th>
+<th align="center">有符号范围</th>
+<th align="center">无符号范围</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TINYINT</td>
+<td align="right">1byte</td>
+<td align="center">$$(-2^7,2^7-1)$$</td>
+<td align="center">$$(0,2^8-1)$$</td>
+<td align="center">小整数值</td>
+</tr>
+<tr>
+<td>SMALLINT</td>
+<td align="right">2byte</td>
+<td align="center">$$(-2^15,2^15-1)$$</td>
+<td align="center">$$(0,2^16-1)$$</td>
+<td align="center">大整数值</td>
+</tr>
+<tr>
+<td>MEDIUMINT</td>
+<td align="right">3byte</td>
+<td align="center">$$(-2^23,2^23-1)$$</td>
+<td align="center">$$(0,2^24-1)$$</td>
+<td align="center">大整数值</td>
+</tr>
+<tr>
+<td>INT &#x2F; INTEGER</td>
+<td align="right">4byte</td>
+<td align="center">$$(-2^31,2^31-1)$$</td>
+<td align="center">$$(0,2^32-1)$$</td>
+<td align="center">大整数值</td>
+</tr>
+<tr>
+<td>BIGINT</td>
+<td align="right">8byte</td>
+<td align="center">$$(-2^63,2^63-1)$$</td>
+<td align="center">$$(0,2^64-1)$$</td>
+<td align="center">极大整数值</td>
+</tr>
+<tr>
+<td>FLOAT</td>
+<td align="right">4byte</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td align="center">单精度浮点数</td>
+</tr>
+<tr>
+<td>DOUBLE</td>
+<td align="right">8byte</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td align="center">双精度浮点数</td>
+</tr>
+<tr>
+<td>DECIMAL</td>
+<td align="right">-</td>
+<td align="center">依赖于M(精度)和D(标度)的值</td>
+<td align="center">依赖于M(精度)和D(标度)的值</td>
+<td align="center">小数值(精确定点数)</td>
+</tr>
+</tbody></table>
+<h5 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h5><p>DECIMAL: 如123.45,则精度M为整个长度,即5;D表小数位数,即2</p>
+<p>age TINYINT UNSIGNED</p>
+<p>score DOUBLE(4,1) –  4代表整体长度,1代表小数位数 (已经不推荐)</p>
+<h5 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h5><p>TINYINT 枚举变量</p>
+<p>SMALLINT 较小数据的统计量,如工厂固定资产的统计数量</p>
+<p>MEDIUMINT 较大数据的统计量,如车站每日客流量</p>
+<p>INT,INTEGER 足够大了,一般不需要考虑超值问题,如商品编号</p>
+<p>BIGINT 需要处理特别大的数据时使用,如大型网站点击量,双十一交易量等</p>
+<p>浮点类型不建议使用UNSIGNED或SIGNED,和float(M,D)等等</p>
+<h3 id="字符串类型"><a href="#字符串类型" class="headerlink" title="字符串类型"></a>字符串类型</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>大小</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CHAR</td>
+<td>$$(0,2^8-1)$$</td>
+<td>定长字符串</td>
+</tr>
+<tr>
+<td>VARCHAR</td>
+<td>$$(0,2^16-1)$$</td>
+<td>变长字符串</td>
+</tr>
+<tr>
+<td>TINYBLOB</td>
+<td>$$(0,2^8-1)$$</td>
+<td>二进制数据</td>
+</tr>
+<tr>
+<td>TINYTEXT</td>
+<td>$$(0,2^8-1)$$</td>
+<td>短文本数据</td>
+</tr>
+<tr>
+<td>BLOB</td>
+<td>$$(0,2^16-1)$$</td>
+<td>二进制数据</td>
+</tr>
+<tr>
+<td>TEXT</td>
+<td>$$(0,2^16-1)$$</td>
+<td>长文本数据</td>
+</tr>
+<tr>
+<td>MEDIUMBLOB</td>
+<td>$$(0,2^24-1)$$</td>
+<td>二进制数据</td>
+</tr>
+<tr>
+<td>MEDIUMTEXT</td>
+<td>$$(0,2^24-1)$$</td>
+<td>中等长度文本数据</td>
+</tr>
+<tr>
+<td>LONGBLOB</td>
+<td>$$(0,2^36-1)$$</td>
+<td>二进制数据</td>
+</tr>
+<tr>
+<td>LONGTEXT</td>
+<td>$$(0,2^36-1)$$</td>
+<td>超大文本&#96;数据</td>
+</tr>
+</tbody></table>
+<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">char(10)
+varchar(50) -- 最多五十位
+</code></pre>
+<h4 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a>注意事项</h4><p>BLOB 表二进制数据,但一般不用(性能不高,不方便管理),对于二进制数据处理一般采用专门的文件服务器处理</p>
+<p>TEXT表示长文本数据</p>
+<p>变长: 表大小可变,但是代价是消耗性能多 (如用户名)</p>
+<p>定长:大小不变,更快  (如性别)</p>
+<h3 id="日期类型"><a href="#日期类型" class="headerlink" title="日期类型"></a>日期类型</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>大小</th>
+<th>范围</th>
+<th>格式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DATE</td>
+<td>3</td>
+<td>1000-01-01 , 9999-12-31</td>
+<td>YYYY-MM-DD</td>
+<td>日期值</td>
+</tr>
+<tr>
+<td>TIME</td>
+<td>3</td>
+<td>-838:59:59 , 838:59:59</td>
+<td>HH:MM:SS</td>
+<td>时间值</td>
+</tr>
+<tr>
+<td>YEAR</td>
+<td>1</td>
+<td>1901-2155</td>
+<td>YYYY</td>
+<td>年份</td>
+</tr>
+<tr>
+<td>DATETIME</td>
+<td>8</td>
+<td>1000-01-01 00:00:00 , 9999-12-31 23:59:59</td>
+<td>YYYY-MM-DD HH:MM:DD</td>
+<td>混合日期与时间值</td>
+</tr>
+<tr>
+<td>TIMESTAMP</td>
+<td>4</td>
+<td>1970-01-01 00:00:01 , 2038-01-19 03:14:07</td>
+<td>YYYY-MM-DD HH:MM:DD</td>
+<td>混合日期与时间值,时间戳</td>
+</tr>
+</tbody></table>
+<h4 id="注意事项-2"><a href="#注意事项-2" class="headerlink" title="注意事项"></a>注意事项</h4><p>一般用DATE,TIME,DATETIME更多</p>
 
             
         </div>
@@ -288,12 +532,12 @@ DROP DATABASE IF EXISTS test -- 删除test数据库(如果存在的话)
         
         <span class="tag">
             
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ffa2c4">前端</a>
+            <a href="/tags/HTML/" style="color: #ff7d73">HTML</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/HTML/" style="color: #00a596">HTML</a>
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #03a9f4">前端</a>
         </span>
         
     </div>
@@ -385,12 +629,12 @@ DROP DATABASE IF EXISTS test -- 删除test数据库(如果存在的话)
         
         <span class="tag">
             
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ff7d73">前端</a>
+            <a href="/tags/HTML/" style="color: #ffa2c4">HTML</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/HTML/" style="color: #03a9f4">HTML</a>
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #03a9f4">前端</a>
         </span>
         
     </div>
@@ -518,7 +762,7 @@ public class main &#123;
         
         <span class="tag">
             
-            <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="color: #00a596">Java,面向对象</a>
+            <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="color: #00bcd4">Java,面向对象</a>
         </span>
         
     </div>
