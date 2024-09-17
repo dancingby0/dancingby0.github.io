@@ -161,6 +161,19 @@
         </span>
         
         
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #00bcd4">sql,后端</a>
+            </span>
+            
+        </span>
+        
     </div>
     
     <div class="content" v-pre>
@@ -242,6 +255,7 @@ SELECT * FROM 表名;
 <pre><code class="sql">select distinct 字段列表 from 表名; -- 对查询结果去重
 </code></pre>
 <h4 id="注意事项-3"><a href="#注意事项-3" class="headerlink" title="注意事项"></a>注意事项</h4><p>在开发中,尽量不写*,因为不直观,会影响效率</p>
+<p>别名可以加引号,也可以不加引号,推荐加引号;后面使用别名时,则不能加引号</p>
 <h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><ol>
 <li>查询指定字段name,workno,age返回</li>
 </ol>
@@ -367,6 +381,13 @@ select address &#39;工作地址&#39; from emp;
 </ol>
 <p>执行顺序: where-&gt;聚合函数-&gt;having</p>
 <p>分组后,查询的字段为聚合函数或分组字段,查询其他字段无任何意义</p>
+<p>如果在sql模式中启用了ONLY_FULL_GROUP_BY,则select不允许查询group by中没有的字段,或没有使用聚合函数进行处理,如</p>
+<pre><code class="sql">select gender,name from emp group by gender; --Error!
+</code></pre>
+<p>是错误的,而如果使用聚合函数进行处理,则</p>
+<pre><code class="sql">select gender,count(*) from emp group by gender; -- Correct!
+</code></pre>
+<p>则可以执行</p>
 <h4 id="示例-6"><a href="#示例-6" class="headerlink" title="示例"></a>示例</h4><ol>
 <li>根据性别分组, 统计男性员工和女性员工数量</li>
 </ol>
@@ -452,8 +473,10 @@ select work_address,count(*) address_count from emp where age&lt;45 group by wor
 </ol>
 <pre><code class="sql">select * from emp where gender = &#39;男&#39; and age between 20 and 40 order by age asc, entry_date asc limit 5;
 </code></pre>
-<h3 id="DQL执行顺序"><a href="#DQL执行顺序" class="headerlink" title="DQL执行顺序"></a>DQL执行顺序</h3><p>执行顺序: FROM-&gt;WHERE-&gt;GROUP BY-&gt;SELECT-&gt;ORDER BY-&gt;LIMIT</p>
+<h3 id="DQL执行顺序"><a href="#DQL执行顺序" class="headerlink" title="DQL执行顺序"></a>DQL执行顺序</h3><p>执行顺序: FROM-&gt;WHERE-&gt;GROUP BY,HAVING-&gt;SELECT-&gt;ORDER BY-&gt;LIMIT</p>
 <p>编写顺序: SELECT-&gt;FROM-&gt;WHERE-&gt;GROUP BY-&gt;HAVING-&gt;ORDER BY-&gt;LIMIT</p>
+<h4 id="注意事项-8"><a href="#注意事项-8" class="headerlink" title="注意事项"></a>注意事项</h4><p>虽然SELECT 在 GROUP BY 后执行,但GROUP BY 依然可以使用别名(mysql进行了优化)</p>
+<p>WHERE 不可以使用select的别名</p>
 
     </div>
     

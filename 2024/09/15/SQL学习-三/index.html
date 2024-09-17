@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <title>SQL学习(三) | dancingby&#39;s home</title>
+    <meta name="author" content="dancingby" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="blog" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.loli.net" />
+<link rel="preconnect" href="https://gstatic.loli.net" crossorigin />
+<link rel="stylesheet" href="https://fonts.loli.net/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" />
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.2.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>DANCINGBY&#39;S HOME</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;Home</span>
+        </a>
+        
+        <a href="/about">
+            <i class="fa-solid fa-id-card fa-fw"></i>
+            <span>&ensp;About</span>
+        </a>
+        
+        <a href="/archives">
+            <i class="fa-solid fa-box-archive fa-fw"></i>
+            <span>&ensp;Archives</span>
+        </a>
+        
+        <a href="/categories">
+            <i class="fa-solid fa-bookmark fa-fw"></i>
+            <span>&ensp;Categories</span>
+        </a>
+        
+        <a href="/tags">
+            <i class="fa-solid fa-tags fa-fw"></i>
+            <span>&ensp;Tags</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;DANCINGBY&#39;S HOME</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Home</div>
+                    </div>
+                </a>
+                
+                <a href="/about">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-id-card fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">About</div>
+                    </div>
+                </a>
+                
+                <a href="/archives">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-box-archive fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Archives</div>
+                    </div>
+                </a>
+                
+                <a href="/categories">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-bookmark fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Categories</div>
+                    </div>
+                </a>
+                
+                <a href="/tags">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-tags fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Tags</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>SQL学习(三)</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/15
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #ff7d73">sql,后端</a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <h2 id="DCL语句"><a href="#DCL语句" class="headerlink" title="DCL语句"></a>DCL语句</h2><p>DCL, Data Control Language,用于管理数据库用户,访问权限</p>
+<h3 id="管理用户"><a href="#管理用户" class="headerlink" title="管理用户"></a>管理用户</h3><h4 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h4><ol>
+<li>查询用户</li>
+</ol>
+<pre><code class="sql">USE mysql; -- 系统数据库
+SELECT * FROM user; -- 用户表
+</code></pre>
+<ol start="2">
+<li>创建用户</li>
+</ol>
+<pre><code class="sql">CREATE USER &#39;用户名&#39;@&#39;主机名&#39; IDENTIFIED BY &#39;密码&#39;;
+</code></pre>
+<ol start="3">
+<li>修改用户密码</li>
+</ol>
+<pre><code class="sql">ALTER USER &#39;用户名&#39;@&#39;主机名&#39; IDENTIFIED WITH mysql_native_password BY &#39;新密码&#39;;
+</code></pre>
+<ol start="4">
+<li>删除用户</li>
+</ol>
+<pre><code class="sql">DROP USER &#39;用户名&#39;@&#39;主机名&#39;;
+</code></pre>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>创建用户itcast,只能在当前主机localhost访问,密码123456</p>
+<pre><code class="sql">use mysql;
+select * from user;
+create user &#39;itcast&#39;@&#39;localhost&#39; identified by &#39;123456&#39;;
+</code></pre>
+<p>创建用户heima,可在任意主机上访问数据库,密码123456</p>
+<pre><code class="sql">use mysql;
+select * from user;
+create user &#39;heima&#39;@&#39;%&#39; identified by &#39;123456&#39;;
+</code></pre>
+<p>修改用户heima的访问密码为1234</p>
+<pre><code class="sql">use mysql;
+select * from user;
+alter user &#39;heima&#39;@&#39;%&#39; identified with mysql_native_password &#39;1234&#39;;
+</code></pre>
+<p>删除itcast的localhost主机用户</p>
+<pre><code class="sql">use mysql;
+select * from user;
+drop user &#39;itcast&#39;@&#39;localhost&#39;;
+</code></pre>
+<h3 id="权限控制"><a href="#权限控制" class="headerlink" title="权限控制"></a>权限控制</h3><p>ALL,ALL PRIVILEGES 所有权限</p>
+<p>SELECT 查</p>
+<p>INSERT 插</p>
+<p>UPDATE 修改数据</p>
+<p>DELETE 删</p>
+<p>ALTER 修改表</p>
+<p>DROP 删库,表,视图</p>
+<p>CREATE 创</p>
+<h4 id="用法-1"><a href="#用法-1" class="headerlink" title="用法"></a>用法</h4><ol>
+<li>查询权限</li>
+</ol>
+<pre><code class="sql">SHOW GRANTS FOR &#39;用户名&#39;@&#39;主机名&#39;;
+</code></pre>
+<ol start="2">
+<li>授予权限</li>
+</ol>
+<pre><code class="sql">GRANT 权限列表 ON 数据库名.表名 TO &#39;用户名&#39;@&#39;主机名&#39;;
+</code></pre>
+<ol start="3">
+<li>撤销权限</li>
+</ol>
+<pre><code class="sql">REVOKE 权限列表 ON 数据库名.表名 FROM &#39;用户名&#39;@&#39;主机名&#39;;
+</code></pre>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>多个权限用逗号隔开</p>
+<p>数据库名,表名可以用*表示</p>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">GRANT SELECT ON itcast.* TO &#39;heima&#39;@&#39;%&#39;;
+</code></pre>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><h3 id="字符串函数"><a href="#字符串函数" class="headerlink" title="字符串函数"></a>字符串函数</h3><pre><code class="sql">CONCAT(s1,s2..) -- 拼接字符串
+LOWER(str) -- 将str中全部转为小写
+UPPER(str) -- 将str中全部转为大写
+LPAD(str,n,pad) -- 左填充,用字符串pad对str左侧进行填充,直到达到n字符串长度
+RPAD(str,n,pad) -- 右填充
+TRIM(str) -- 去掉字符串头尾空格
+SUBSTRING(str,start,len) -- 返回从start起len长度的字符串
+</code></pre>
+<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><ol>
+<li>企业员工工号统一为5位数,不是五位数的前面补0</li>
+</ol>
+<pre><code class="sql">update emp set work_number = LPAD(work_number,5,&#39;0&#39;);
+</code></pre>
+<h3 id="数值函数"><a href="#数值函数" class="headerlink" title="数值函数"></a>数值函数</h3><pre><code class="sql">SEIL(x) -- 向上取整
+FLOOR(x) -- 向下取整
+MOD(x,y) -- 返回x/y的模
+RAND() -- 返回0-1的随机数
+ROUND(x,y) -- 求参数x的四舍五入值,保留y位小数
+</code></pre>
+<h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><p>生成六位数的随机验证码</p>
+<pre><code class="sql">select LPAD(round(rand()*1000000,0),6,0); -- 若不足六位,补0
+</code></pre>
+<h3 id="日期函数"><a href="#日期函数" class="headerlink" title="日期函数"></a>日期函数</h3><pre><code class="sql">CURDATE() -- 当前日期,current date
+CURTIME() -- 当前时间
+NOW() -- 当前日期时间
+YEAR(date) -- 获取指定date年
+MONTH(date)
+DAY(date)
+DATE_ADD(date,INTERVAL expr type) -- 返回一个日期/时间 加上时间间隔expr后的时间值
+DATEDIFF(date1,date2) -- 返回date1-date2的天数
+</code></pre>
+<h4 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h4><p>date_add</p>
+<pre><code class="sql">select date_add(now(),INTERVAL 70 day); -- 第二个参数写法固定为 interval value 类型
+select date_add(now(),interval 70 year);
+</code></pre>
+<p>datediff</p>
+<pre><code class="sql">select datediff(&#39;2012-01-01&#39;,&#39;2021-10-01&#39;);
+</code></pre>
+<p>查询所有员工入职天数,并倒序排序</p>
+<pre><code class="sql">select name,datediff(CURDATE(),entry_date) &#39;entry_days&#39; from emp order by entry_days desc; -- 别名的字符串可以省略,后面order by则不能加引号
+</code></pre>
+<h3 id="流程控制函数"><a href="#流程控制函数" class="headerlink" title="流程控制函数"></a>流程控制函数</h3><p>实现条件筛选</p>
+<pre><code class="sql">IF(condition,t,f) -- 如果condition为true,则返回t,否则f
+IFNULL(value1,value2) -- 如果value1为空,则返回value2,否则返回value1
+CASE WHEN [val1] THEN [res1] ... ELSE [default] END -- 如果val1为true,返回res1,... 否则返回default默认值
+CASE [expr] WHEN [val1] THEN [res1],... ELSE[default] END -- 如果expr的值与val1相等,返回res1,..否则返回default
+</code></pre>
+<h4 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h4><p>查询emp表姓名和工作地址(北京,上海)一线,其他二线</p>
+<pre><code class="sql">select name,case when address in(&#39;北京&#39;,&#39;上海&#39;) THEN &#39;一线&#39; ELSE &#39;二线&#39; &#39;工作地址&#39; from emp;
+select name, case address when &#39;北京&#39; then &#39;一线&#39; when &#39;上海&#39; then &#39;一线&#39; else &#39;二线&#39; as &#39;工作地址&#39; from emp;
+</code></pre>
+<p>统计各个学员成绩,</p>
+<p>&gt;&#x3D;85 优秀</p>
+<p>&gt;&#x3D;60 及格</p>
+<p>否则不及格</p>
+<pre><code class="sql">select name,case when score &gt;= 85 then &#39;优秀&#39; when score &gt;= 60 then &#39;及格&#39; else &#39;不及格&#39; from emp
+</code></pre>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2024 - 2024 dancingby&#39;s home
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;dancingby
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+</body>
+</html>
