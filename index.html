@@ -184,13 +184,249 @@
     <div class="description">
         <div class="content" v-pre>
             
-            
+            <h2 id="多表查询"><a href="#多表查询" class="headerlink" title="多表查询"></a>多表查询</h2><p>属于data query language</p>
+<h3 id="多表关系"><a href="#多表关系" class="headerlink" title="多表关系"></a>多表关系</h3><p>多个表关系:</p>
+<p>一对多(多对一)</p>
+<p>多对多</p>
+<p>一对一</p>
+<h4 id="一对多"><a href="#一对多" class="headerlink" title="一对多"></a>一对多</h4><p>案例:部门与员工关系</p>
+<p>关系:一:部门 多:员工</p>
+<p>实现:多的一方建立外键,指向一的一方</p>
+<h4 id="多对多"><a href="#多对多" class="headerlink" title="多对多"></a>多对多</h4><p>案例:学生与课程关系</p>
+<p>关系: 多:学生 多:课程</p>
+<p>实现:</p>
+<p>建立一张中间表,至少包含两个外键,分别关联两方主键</p>
+<h4 id="一对一"><a href="#一对一" class="headerlink" title="一对一"></a>一对一</h4><p>案例: 用户与用户详情的关系</p>
+<p>关系: 一对一关系,多用于单表拆分,将基础字段放在一张表中,详情字段放在另一张中,以提升操作效率</p>
+<p>实现:</p>
+<p>在任意一方加入外键,关联另一方主键,设置外键为唯一的(UNIQUE)</p>
+<p>多表查询:</p>
+<p>从多表中查询数据</p>
+<h4 id="分类"><a href="#分类" class="headerlink" title="分类:"></a>分类:</h4><ul>
+<li>连接查询<ul>
+<li>内连接:查询A,B交集部分数据</li>
+<li>外连接:<ul>
+<li>左外连接: 查询左表所有数据,以及两表交集</li>
+<li>右外连接: 查询右表所有数据,以及交集</li>
+</ul>
+</li>
+<li>自连接: 当前表与自身连接查询,子链接必须使用表别名</li>
+</ul>
+</li>
+<li>子查询</li>
+</ul>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>设有emp表10个数据,dept表5个数据</p>
+<pre><code class="sql">select * from emp,dept; -- 多表查询,会得到10*5=50条数据,每一个对应进行穷举得到,即笛卡尔积,即A集合与B集合所有组合情况
+
+select * from emp,dept where emp.dept_id = dept.id;
+</code></pre>
+<h3 id="内连接"><a href="#内连接" class="headerlink" title="内连接"></a>内连接</h3><p>查询交集部分</p>
+<p>隐式内连接</p>
+<pre><code class="sql">SELECT 字段列表 FROM 表1,表2 WHERE 条件;
+</code></pre>
+<p>显式内连接</p>
+<pre><code class="sql">SELECT 字段列表 FROM 表1 [INNER] JOIN 表2 ON 连接条件;
+</code></pre>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><ol>
+<li>查询每一个员工姓名以及关联部门名称</li>
+</ol>
+<pre><code class="sql">select emp.name,dept.name from emp,dept where emp.dept_id = dept.id;-- 隐式内连接
+select e.name,d.name from emp e,dept d where e.dept_id = d.id; -- 如果为表起了别名,则不可以使用原名
+
+select emp.name,dept.name from emp e inner join dept d on e.dept_id = d.id; -- 显式外连接
+</code></pre>
+<h3 id="外连接"><a href="#外连接" class="headerlink" title="外连接"></a>外连接</h3><p>包含一张表所有内容以及交集部分</p>
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT field_list FROM table1 LEFT [OUTER] JOIN table2 ON condition...; -- 左外连接
+
+SELECT field_list FROM table1 RIGHT [OUTER] JOIN table2 ON condition...; -- 右外连接
+</code></pre>
+<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><p>查询emp表所有数据和相对应部门信息</p>
+<pre><code class="sql">select e.*, d.name from emp e left outer join dept d on e.dept = d.id; -- 左外查询(包含未分配部门的信息)
+
+select e.*,d.name from emp e right outer join dept d on e.dept = d.id; -- 右外查询(包含未分配员工的部门的信息)
+</code></pre>
+<h3 id="自连接"><a href="#自连接" class="headerlink" title="自连接"></a>自连接</h3><h4 id="语法-1"><a href="#语法-1" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT field_list FROM tableA aliasA [INNER] JOIN tableA aliasB ON condition;
+
+SELECT field_list FROM tableA aliasA,tableA aliasB WHERE condition;
+SELECT field_list FROM tableA aliasA RIGHT|LEFT [OUTER] JOIN tableA aliasB ON condition...
+</code></pre>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>自连接既可以使用内连接,也可以使用外连接</p>
+<p>自连接时,把一张表看作是两张表</p>
+<p>如果查询内容出现null值,则需要使用外连接</p>
+<h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><ol>
+<li>查询员工及其编号所属领导名字</li>
+</ol>
+<pre><code class="sql">select e.name,m.name from emp e inner join emp m on e.manager_id = m.id;
+</code></pre>
+<ol start="2">
+<li>查询所有员工信息及其领导名字emp,若员工没有领导,也需要查询</li>
+</ol>
+<p>需要外连接</p>
+<pre><code class="sql">select e.name &#39;员工&#39;,m.name &#39;领导&#39; from emp e left outer join emp m on e.manager_id = m.id;
+</code></pre>
+<h3 id="联合查询"><a href="#联合查询" class="headerlink" title="联合查询"></a>联合查询</h3><p>即把多次查询结果合并起来,形成一个新的查询结果</p>
+<h4 id="语法-2"><a href="#语法-2" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT field_list FROM tableA ... -- 没有分号!
+UNION [ALL]
+SELECT field_list FROM tableB...; -- 这三行是一个语句!
+</code></pre>
+<h4 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a>注意事项</h4><p>union all: 直接将查询结果合并(会出现重复)</p>
+<p>union: 去重</p>
+<p>使用条件: 联合查询多张表的列数必须一致,字段类型也必须一致</p>
+<p>如:</p>
+<pre><code class="sql">select * from emp where salary &gt; 1
+union
+select name from emp where age &lt; 50; -- ERROR!字段不一致!
+</code></pre>
+<h4 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h4><p>将薪资低于5000的员工,和年龄大于50的员工查询出来(或逻辑)</p>
+<pre><code class="sql">select * from emp where salary &lt; 5000
+union all
+select * from emp where age &gt;50;
+</code></pre>
+<h3 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h3><p>SQL 语句中嵌套SELECT语句,又称嵌套查询</p>
+<p>分类:</p>
+<ul>
+<li>标量子查询 子查询结果为单个值</li>
+<li>列子查询 结果一个列</li>
+<li>行子查询 一个行</li>
+<li>表子查询 多行多列</li>
+</ul>
+<h4 id="语法-3"><a href="#语法-3" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT * FROM t1 WHERE column1 = (SELECT column1 FROM t2);
+</code></pre>
+<p>外部语句可以是 INSERT|UPDATE|DELETE|SELECT, DQL,DML</p>
+<p>位置可以是WHERE|FROM|SELECT</p>
+<p>标量子查询: 常用&gt; &lt; &#x3D; &gt;&#x3D; &lt;&#x3D;</p>
+<p>列子查询:常用 IN(在指定集合内) NOT IN ANY(子查询返回的列表中,任意一个满足即可) SOME(同ANY) ALL(必须全部满足)</p>
+<p>行子查询: 常用&#x3D; !&#x3D; IN NOT IN</p>
+<p>表子查询: 常用IN</p>
+<h4 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h4><ul>
+<li>标量子查询</li>
+</ul>
+<p>查询销售部所有员工信息</p>
+<pre><code class="sql">select * from emp where dept_id = (select id from dept where name = &#39;销售部&#39;);
+</code></pre>
+<p>查询”方东白”入职后员工信息</p>
+<pre><code class="sql">select * from emp where entry_date &gt; (select entry_date from emp where name = &#39;方东白&#39;);
+</code></pre>
+<ul>
+<li>列子查询</li>
+</ul>
+<ol>
+<li>查询”销售部”和”市场部”的所有员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp where dept in (select id from dept where name in (&#39;销售部&#39;,&#39;市场部&#39;));
+</code></pre>
+<ol start="2">
+<li>查询比财务部所有人工资都高的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp where salary &gt; all(select salary from emp where dept_id = (select id from dept where name = &#39;财务部&#39;)) -- where比聚合函数先执行
+</code></pre>
+<ol start="3">
+<li>查询比研发部任意一人工资都高的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp where salary &gt; any(select salary from emp where dept_id = (select id from dept where name = &#39;研发部&#39;));
+</code></pre>
+<ul>
+<li>行子查询</li>
+</ul>
+<p>查询与”张无忌”的薪资及其直属领导 相同的员工信息</p>
+<pre><code class="sql">select * from emp where salary = (select salary from emp where name = &#39;张无忌&#39;) and manager_id = (select id from emp where name = &#39;张无忌&#39;);
+
+select * from emp where (salary,manager_id) = (select salary,id from emp where name = &#39;张无忌&#39;);
+</code></pre>
+<ul>
+<li>表子查询</li>
+</ul>
+<ol>
+<li>查询与”a”,”b”的职位与薪资相同的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp where (dept_id,salary) in (select dept_id,salary from emp where name in(&#39;a&#39;,&#39;b&#39;));
+</code></pre>
+<ol start="2">
+<li>查询入职日期为’2006-01-01’之后员工信息及其部门信息</li>
+</ol>
+<pre><code class="sql">select e.*,d.* from (select * from emp where entry_date &gt; &#39;2006-01-01&#39;) e left join dept d on d.id = e.dept_id; -- select后也可以直接写*
+</code></pre>
+<h3 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h3><ol>
+<li>查询员工姓名,年龄,职位,部门信息(隐式内连接)</li>
+</ol>
+<pre><code class="sql">select e.name,e.age,e.position,d.name from emp e, dept d where d.id = e.dept_id;
+</code></pre>
+<ol start="2">
+<li>查询年龄小于30岁员工姓名,年龄,职位,部门信息(显式内连接)</li>
+</ol>
+<pre><code class="sql">select e.name,e.age,e.position,d.name from emp e inner join dept d where e.age&lt;30 on e.dept_id = d.id; 
+</code></pre>
+<ol start="3">
+<li>查询拥有员工的部门(id,名称)</li>
+</ol>
+<pre><code class="sql">select distinct d.* from emp e join dept d on e.dept_id = d.id;
+</code></pre>
+<ol start="4">
+<li>查询所有年龄大于40岁的员工,及其归属部门名称,如果员工没有分配部门,也需要展示</li>
+</ol>
+<pre><code class="sql">select e.*,d.name from emp e left join dept d on e.dept_id = d.id where e.age&gt;40;
+</code></pre>
+<ol start="5">
+<li>查询所有员工工资等级</li>
+</ol>
+<p>设有sal_grade表,有losal和hisal(分别是最低工资与最高工资)两列,有grade表示薪资水平</p>
+<pre><code class="sql">select e.name,s.grade from emp e, salary s where e.salary between s.losal and s.hisal;
+</code></pre>
+<ol start="6">
+<li>查询 “研发部” 所有员工信息及工资等级</li>
+</ol>
+<pre><code class="sql">select e.*,s.grade from emp e,salary s where e.dept_id = (select id from dept where name = &#39;研发部&#39;) and e.salary between s.losal and s.hisal;
+</code></pre>
+<ol start="7">
+<li>查询 “研发部” 平均工资</li>
+</ol>
+<pre><code class="sql">select avg(e.salary) from emp e where e.dept_id = (select id from dept where name = &#39;研发部&#39;);
+
+select avg(e.salary) from emp e,dept,d where e.dept_id = d.id and d.name = &#39;研发部&#39;;
+</code></pre>
+<ol start="8">
+<li>查询工资比 ‘a’ 高的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp e where e.salary &gt; (select salary from emp where name = &#39;a&#39;);
+</code></pre>
+<ol start="9">
+<li>查询比平均薪资高的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp e where e.salary &gt; (select avg(salary) from emp);
+</code></pre>
+<ol start="10">
+<li>查询比本部门平均薪资低的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp e1 where e1.salary &lt;(select avg(salary) from emp e2 where e1.dept_id = e2.dept_id);
+</code></pre>
+<ol start="11">
+<li>查询所有部门信息并统计部门的员工人数</li>
+</ol>
+<pre><code class="sql">select d.*,(select count(*) from emp e where e.dept_id = d.id) &#39;人数&#39; from dept d;
+</code></pre>
+<ol start="12">
+<li>查询所有学生选课情况,显示出学生名称,学号,课程名称</li>
+</ol>
+<p>表: student, course, student_course</p>
+<p>连接条件: student.id &#x3D; student_course.student_id, course.id &#x3D; student_course.course_id</p>
+<pre><code class="sql">select s.name,s.number,c.name from student s, student_course sc , course c where sc.student_id = s.id and sc.course_id = course.id;
+</code></pre>
+
             
         </div>
     </div>
     <div class="post-tags">
         
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
         
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/sql-back-end/" style="color: #00a596">sql,back end</a>
+        </span>
         
     </div>
     <a href="/2024/09/17/SQL%E5%AD%A6%E4%B9%A0-%E4%BA%94-%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/" class="go-post">阅读全文</a>
@@ -285,7 +521,7 @@ alter table emp add constraint fk_emp_dept_id foreign key (dept_id) reference de
         
         <span class="tag">
             
-            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #ff7d73">sql,后端</a>
+            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #03a9f4">sql,后端</a>
         </span>
         
     </div>
@@ -450,7 +686,7 @@ select name, case address when &#39;北京&#39; then &#39;一线&#39; when &#39;
         
         <span class="tag">
             
-            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #00bcd4">sql,后端</a>
+            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #ff7d73">sql,后端</a>
         </span>
         
     </div>
@@ -789,7 +1025,7 @@ select work_address,count(*) address_count from emp where age&lt;45 group by wor
         
         <span class="tag">
             
-            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #ff7d73">sql,后端</a>
+            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #00bcd4">sql,后端</a>
         </span>
         
     </div>
@@ -1167,7 +1403,7 @@ varchar(50) -- 最多五十位
         
         <span class="tag">
             
-            <a href="/tags/HTML/" style="color: #00bcd4">HTML</a>
+            <a href="/tags/HTML/" style="color: #03a9f4">HTML</a>
         </span>
         
     </div>
@@ -1259,12 +1495,12 @@ varchar(50) -- 最多五十位
         
         <span class="tag">
             
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ffa2c4">前端</a>
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #00bcd4">前端</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/HTML/" style="color: #00bcd4">HTML</a>
+            <a href="/tags/HTML/" style="color: #ff7d73">HTML</a>
         </span>
         
     </div>
@@ -1392,7 +1628,7 @@ public class main &#123;
         
         <span class="tag">
             
-            <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="color: #03a9f4">Java,面向对象</a>
+            <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="color: #00a596">Java,面向对象</a>
         </span>
         
     </div>

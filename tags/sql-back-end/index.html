@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8" />
-    <title>SQL学习(四) | dancingby&#39;s home</title>
+    <title>Tags: sql,back end | dancingby&#39;s home</title>
     <meta name="author" content="dancingby" />
     <meta name="description" content="" />
     <meta name="keywords" content="blog" />
@@ -31,10 +31,6 @@
 
 
 <script src="/js/lib/preview.js"></script>
-
-
-
-
 
 
 
@@ -148,100 +144,96 @@
 </transition>
 
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
-            <div class="article">
-    <div>
-        <h1>SQL学习(四)</h1>
-    </div>
-    <div class="info">
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/9/16
+            <div id="archives">
+    
+    <div class="categories-tags">
+        
+        
+        
+        <span>
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="background: #ff7d73">
+                <span class="icon">
+                    <i class="fa-solid fa-tags fa-fw"></i>
+                </span>
+                前端
+            </a>
         </span>
         
         
-        <span class="tags">
-            <span class="icon">
-                <i class="fa-solid fa-tags fa-fw"></i>
-            </span>
-            
-            
-            <span class="tag">
+        
+        <span>
+            <a href="/tags/HTML/" style="background: #ffa2c4">
+                <span class="icon">
+                    <i class="fa-solid fa-tags fa-fw"></i>
+                </span>
+                HTML
+            </a>
+        </span>
+        
+        
+        
+        <span>
+            <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="background: #00bcd4">
+                <span class="icon">
+                    <i class="fa-solid fa-tags fa-fw"></i>
+                </span>
+                Java,面向对象
+            </a>
+        </span>
+        
+        
+        
+        <span>
+            <a href="/tags/sql-back-end/" style="background: linear-gradient(120deg, #9abbf7 0%, #ffbbf4 100%)">
+                <span class="icon">
+                    <i class="fa-solid fa-tags fa-fw"></i>
+                </span>
+                sql,back end
+            </a>
+        </span>
+        
+        
+        
+        
+        
+        <span>
+            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="background: #00bcd4">
+                <span class="icon">
+                    <i class="fa-solid fa-tags fa-fw"></i>
+                </span>
+                sql,后端
+            </a>
+        </span>
+        
+        
+    </div>
+    
+    <div class="timeline">
+        <div class="timeline-tail"></div>
+        <div class="timeline-content">
+            <div class="item-time">2024/9/17</div>
+            <a href="/2024/09/17/SQL%E5%AD%A6%E4%B9%A0-%E4%BA%94-%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/">
+                <h3>SQL学习(五) 多表查询</h3>
+            </a>
+            <div class="info">
                 
-                <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #03a9f4">sql,后端</a>
-            </span>
-            
-        </span>
-        
+                
+                <span class="tags">
+                    <span class="icon">
+                        <i class="fa-solid fa-tags fa-fw"></i>
+                    </span>
+                    
+                    
+                    <span class="tag">
+                        
+                        <a href="/tags/sql-back-end/" style="color: #00a596">sql,back end</a>
+                    </span>
+                    
+                </span>
+                
+            </div>
+        </div>
     </div>
-    
-    <div class="content" v-pre>
-        <h2 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h2><p>作用于字段上的规则,限制存储于表中的数据</p>
-<pre><code class="sql">NOT NULL -- 非空约束
-UNIQUE -- 唯一约束 所有数据均唯一
-PRIMARY KEY -- 主键约束 主键是一行数据的唯一标识,非空且唯一
-DEFAULT -- 默认约束,如果保存数据时,未指定该字段的值,则采用默认值
-CHECK -- 检查约束,8.0.16版本后,保证字段满足某条件
-FOREIGN KEY -- 外键约束, 让两张表建立起连接,保证数据一致性
-</code></pre>
-<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>需求:<br>id ID唯一标识 name 非空唯一 age 大于0且小于120 status 若不指定,默认1 gender 无</p>
-<pre><code class="sql">create table user(
-    id int primary key auto_increment comment &#39;主键&#39;, -- auto_increment 自动增长
-    name varchar(10) unique not null comment &#39;姓名&#39;,
-    age tinyint check (age&gt;0 and age&lt;120) comment &#39;年龄&#39;,
-    status char(1) default &#39;1&#39; comment &#39;状态&#39;,
-    gender char(1)
-)comment &#39;用户表&#39;;
-
-insert into user(name,age,status,gender) values (&#39;Tom&#39;,10,&#39;2&#39;,&#39;男&#39;);
-insert into user(name,age,status,gender) values (&#39;Tom&#39;,10,null,&#39;男&#39;);
-</code></pre>
-<h3 id="外键约束"><a href="#外键约束" class="headerlink" title="外键约束"></a>外键约束</h3><p>具有外键的称为子表(从表),外键被关联的称为父表(主表)</p>
-<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">-- 添加外键
-CREATE TABLE 表名(
-    field_name type,
-    ...
-    [CONSTRAINT] [外键名称] FOREIGN KEY (外键字段名) REFERENCES 主表(主表列名)
-)
-ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY (外键字段名) REFERENCES 主表(主表列名) [ON UPDATE/DELETE 外键约束];
-
--- 删除外键
-ALTER TABLE 表名 DROP FOREIGN KEY 外键字段名;
-</code></pre>
-<p>外键约束:</p>
-<p>NO ACTION 当父表中更新&#x2F;删除时,首先检查是否有外键关联.有则不允许,同RESTRICT</p>
-<p>RESTRICT 当父表中更新&#x2F;删除时,首先检查是否有外键关联.有则不允许,同NO ACTION</p>
-<p>CASCADE 当删除&#x2F;更新对应记录时,若有对应外键,则也删除&#x2F;更新对应记录(cascade 级联的,逐级的)</p>
-<p>SET NULL 当删除对应记录时,若有对应外键,设为NULL(要求该外键允许取NULL)</p>
-<p>SET DEFAULT 父表变更时,子表将外键设置为默认值(Innodb不支持)</p>
-<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>如果被外键关联,则父表中不可直接删除关联字段,除非解除关联</p>
-<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">-- 数据准备
-create table debt(
-    id int auto_increment comment &#39;ID&#39; primary key,
-    name varchar(50) not null comment &#39;部门名称&#39;
-)comment &#39;部门表&#39;;
-
-insert into dept (id,name) values(1,&#39;研发部&#39;),(2,&#39;市场部&#39;),(3,&#39;财务部&#39;),(4,&#39;销售部&#39;),(5,&#39;总经办&#39;);
-
-create table emp(
-    id int auto_increment comment &#39;ID&#39; primary key,
-    name varchar(10) not null comment &#39;姓名&#39;,
-    job varchar(20) comment &#39;职位&#39;,
-    dept_id int comment &#39;部门ID&#39;
-)comment &#39;员工表&#39;;
-
--- 添加外键
-alter table emp add constraint fk_emp_dept_id foreign key (dept_id) reference dept(id) on update cascade on delete no action; -- 为本来的字段添加外键
-</code></pre>
-
-    </div>
-    
-    
-    
-    
-    
-    
     
 </div>
 
@@ -273,12 +265,6 @@ alter table emp add constraint fk_emp_dept_id foreign key (dept_id) reference de
         
     </div>
     <script src="/js/main.js"></script>
-    
-    
-
-
-
-
     
 </body>
 </html>
