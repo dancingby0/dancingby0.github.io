@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8" />
-    <title>Tags: sql,back end | dancingby&#39;s home</title>
+    <title>SQL学习(六) 事务 | dancingby&#39;s home</title>
     <meta name="author" content="dancingby" />
     <meta name="description" content="" />
     <meta name="keywords" content="blog" />
@@ -31,6 +31,10 @@
 
 
 <script src="/js/lib/preview.js"></script>
+
+
+
+
 
 
 
@@ -144,107 +148,165 @@
 </transition>
 
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
-            <div id="archives">
-    
-    <div class="categories-tags">
-        
-        
-        
-        <span>
-            <a href="/tags/HTML/" style="background: #00bcd4">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                HTML
-            </a>
+            <div class="article">
+    <div>
+        <h1>SQL学习(六) 事务</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/18
         </span>
         
         
-        
-        <span>
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="background: #ffa2c4">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                前端
-            </a>
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/sql-%E4%BA%8B%E5%8A%A1-mysql-back-end/" style="color: #03a9f4">sql,事务,mysql,back end</a>
+            </span>
+            
         </span>
-        
-        
-        
-        <span>
-            <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="background: #00bcd4">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                Java,面向对象
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="background: #00a596">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                sql,后端
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/tags/sql-back-end/" style="background: linear-gradient(120deg, #9abbf7 0%, #ffbbf4 100%)">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                sql,back end
-            </a>
-        </span>
-        
-        
-        
-        
-        
-        <span>
-            <a href="/tags/sql-%E4%BA%8B%E5%8A%A1-mysql-back-end/" style="background: #ff7d73">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                sql,事务,mysql,back end
-            </a>
-        </span>
-        
         
     </div>
     
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2024/9/17</div>
-            <a href="/2024/09/17/SQL%E5%AD%A6%E4%B9%A0-%E4%BA%94-%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/">
-                <h3>SQL学习(五) 多表查询</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <i class="fa-solid fa-tags fa-fw"></i>
-                    </span>
-                    
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/sql-back-end/" style="color: #03a9f4">sql,back end</a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
+    <div class="content" v-pre>
+        <h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>一组操作的集合,不可分割.事务会将一组操作作为整体进行向系统提交或撤销请求.</p>
+<p>这些操作同时成功,或同时失败</p>
+<p>默认MYSQL的事务是自动提交的,当每执行一条DML语句,便隐式地提交事务</p>
+<p>每一个sql语句都是事务</p>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><p>操作方式:</p>
+<p>将事务提交改为手动提交,在完成一些操作后,如果正常运行,则进行commit提交,如果出错,进行回滚操作</p>
+<ul>
+<li>查看&#x2F;设置事务提交方式:</li>
+</ul>
+<pre><code class="sql">SELECT @@autocommit;
+SET @@autocommit = 0;
+</code></pre>
+<ul>
+<li>提交事务</li>
+</ul>
+<pre><code class="sql">COMMIT;
+</code></pre>
+<ul>
+<li>回滚事务</li>
+</ul>
+<pre><code class="sql">ROLLBACK;
+</code></pre>
+<ul>
+<li>开启事务</li>
+</ul>
+<pre><code class="sql">START TRANSACTION 或 BEGIN;
+</code></pre>
+<ul>
+<li>提交事务</li>
+</ul>
+<pre><code class="sql">COMMIT
+</code></pre>
+<ul>
+<li>回滚事务</li>
+</ul>
+<pre><code class="sql">ROLLBACK;
+</code></pre>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><p>完成转账操作:张三给李四转1000(自动提交事务)</p>
+<pre><code class="sql">select * from account where name = &#39;张三&#39;;
+update account set money = money - 1 where name = &#39;张三&#39;;
+update account set money = money + 1 where name = &#39;李四&#39;;
+</code></pre>
+<p>手动提交事务(方式一)</p>
+<pre><code class="sql">set @autocommit = 0; -- 设置为手动提交
+select * from account where name = &#39;张三&#39;;
+update account set money = money - 1 where name = &#39;张三&#39;;
+update account set money = money + 1 where name = &#39;李四&#39;;
+-- 此时数据并未更新
+commit; -- 提交事务,如果途中出错,则不会允许到commit,也就不会执行出错前的结果.
+
+rollback; -- 回滚事务,把之前操作取消了(因为如果出错的话,则原来的操作结果会在缓存内,如果不进行回滚,当执行其他语句时,这些缓存的操作结果会影响数据,因此必须回滚)
+</code></pre>
+<p>方式二</p>
+<pre><code class="sql">set @@autocommit = 1
+start transaction;
+select * from account where name = &#39;张三&#39;;
+update account set money = money - 1 where name = &#39;张三&#39;;
+update account set money = money + 1 where name = &#39;李四&#39;;
+
+commit; -- 如果没有异常
+rollback; -- 如果出现异常
+</code></pre>
+<h3 id="四大特性"><a href="#四大特性" class="headerlink" title="四大特性"></a>四大特性</h3><ul>
+<li><p>原子性(Atomicity): 事务不可分割最小单元, 要么全部成功,要么全部失败</p>
+</li>
+<li><p>一致性(Consistency): 事务完成时,必须使所有数据保持一致状态</p>
+</li>
+<li><p>隔离性(Isolation): 数据库提供隔离机制,保证事务不受外部并发操作影响</p>
+</li>
+<li><p>持久性(Durability): 事务一旦提交或回滚,则它对数据库数据改变是永久的</p>
+</li>
+</ul>
+<h3 id="并发事务问题"><a href="#并发事务问题" class="headerlink" title="并发事务问题"></a>并发事务问题</h3><p>问题如下:</p>
+<ol>
+<li><p>脏读: 一个事务读到另一个事务还没有提交的数据(如果那个事务失败了,则会出现问题)</p>
+</li>
+<li><p>不可重复读: 一个事务先后读取同一条记录,但两次读取数据不同(数据在两次读取期间被改了)</p>
+</li>
+<li><p>幻读: 一个事务按照条件查询数据时,没有对应数据行,但插入数据时,又发现这条数据已经存在,好像出现幻影(即查询时数据未存在,而到插入数据之前,数据被插入到表中)</p>
+</li>
+</ol>
+<h3 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h3><p>√ 表示会出现问题</p>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Read uncommitted()</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>Read committed</td>
+<td>x</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>Repeatable Read(默认)</td>
+<td>x</td>
+<td>x</td>
+<td>√</td>
+</tr>
+<tr>
+<td>Serializable</td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+</tr>
+</tbody></table>
+<p>从上至下性能下降</p>
+<pre><code class="sql">-- 查看事务隔离级别
+SELECT @@TRANSACTION_ISOLATION; 
+-- 设置事务隔离级别(SESSION表当前会话,即当前客户端窗口,GLOBAL全局)
+SET [SESSION|GLOBAL] TRANSACTION ISOLATION LEVEL [READ UNCOMMITTED|READ COMMITTED|REPEATABLE READ|SERIALIZABLE];
+</code></pre>
+
     </div>
+    
+    
+    
+    
+    
+    
     
 </div>
 
@@ -276,6 +338,12 @@
         
     </div>
     <script src="/js/main.js"></script>
+    
+    
+
+
+
+
     
 </body>
 </html>

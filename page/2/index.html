@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8" />
-    <title>Tags: sql,back end | dancingby&#39;s home</title>
+    <title>dancingby&#39;s home</title>
     <meta name="author" content="dancingby" />
     <meta name="description" content="" />
     <meta name="keywords" content="blog" />
@@ -35,6 +35,8 @@
 
 
 
+
+<script src="/js/lib/home.js"></script>
 
 <link rel="stylesheet" href="/css/main.css" />
 
@@ -144,106 +146,119 @@
 </transition>
 
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
-            <div id="archives">
-    
-    <div class="categories-tags">
-        
-        
-        
-        <span>
-            <a href="/tags/HTML/" style="background: #00bcd4">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                HTML
-            </a>
+            <div id="home-head">
+    <div id="home-background" ref="homeBackground" data-images="/images/background.jpg"></div>
+    <div id="home-info" @click="homeClick">
+        <span class="loop"></span>
+        <span class="loop"></span>
+        <span class="loop"></span>
+        <span class="loop"></span>
+        <span class="info">
+            <div class="wrap">
+                <h1>dancingby&#39;s home</h1>
+                <h3>dancingbyのblogs</h3>
+                <h5></h5>
+            </div>
         </span>
+    </div>
+</div>
+<div id="home-posts-wrap" true ref="homePostsWrap">
+    <div id="home-posts">
         
+
+<div class="post">
+    <a href="/2024/04/25/hello-world/">
+        <h2 class="post-title">Hello World</h2>
+    </a>
+    <div class="category-and-date">
         
-        
-        <span>
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="background: #ffa2c4">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                前端
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="background: #00bcd4">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                Java,面向对象
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="background: #00a596">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                sql,后端
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/tags/sql-back-end/" style="background: linear-gradient(120deg, #9abbf7 0%, #ffbbf4 100%)">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                sql,back end
-            </a>
-        </span>
-        
-        
-        
-        
-        
-        <span>
-            <a href="/tags/sql-%E4%BA%8B%E5%8A%A1-mysql-back-end/" style="background: #ff7d73">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                sql,事务,mysql,back end
-            </a>
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/4/25
         </span>
         
         
     </div>
-    
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2024/9/17</div>
-            <a href="/2024/09/17/SQL%E5%AD%A6%E4%B9%A0-%E4%BA%94-%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/">
-                <h3>SQL学习(五) 多表查询</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <i class="fa-solid fa-tags fa-fw"></i>
-                    </span>
-                    
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/sql-back-end/" style="color: #03a9f4">sql,back end</a>
-                    </span>
-                    
-                </span>
-                
-            </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <p>This is my first blog.</p>
+<p>我精通五种编程语言</p>
+<p>的hello world.</p>
+<h3 id="c"><a href="#c" class="headerlink" title="c"></a>c</h3><pre><code class="c">printf(&quot;hello world!&quot;);
+</code></pre>
+<h3 id="cpp"><a href="#cpp" class="headerlink" title="cpp"></a>cpp</h3><pre><code class="cpp">std::cout&lt;&lt; &quot;hello world!&quot;;
+</code></pre>
+<h3 id="java"><a href="#java" class="headerlink" title="java"></a>java</h3><pre><code class="java">system.out.println(&quot;hello world!&quot;);
+</code></pre>
+<h3 id="python"><a href="#python" class="headerlink" title="python"></a>python</h3><pre><code class="python">print(&quot;hello world!&quot;)
+</code></pre>
+<h3 id="csharp"><a href="#csharp" class="headerlink" title="csharp"></a>csharp</h3><pre><code class="csharp">Console.Writeline(&quot;hello world!&quot;);
+</code></pre>
+
+            
         </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2024/04/25/hello-world/" class="go-post">阅读全文</a>
+</div>
+
+
+        <div class="page-current">
+    
+    <a class="page-num" href="/">
+        <i class="fa-solid fa-caret-left fa-fw"></i>
+    </a>
+    <a class="page-num" href="/">1</a>
+    <span class="page-omit">...</span>
+    
+    <span class="current">2</span>
+    
+    
+    
+    
+</div>
+
+    </div>
+    
+    <div id="home-card">
+        <div id="card-style">
+    <div id="card-div">
+        <div class="avatar">
+            <img src="/images/avatar.jpg" alt="avatar" />
+        </div>
+        <div class="name">dancingby</div>
+        <div class="description">
+            <p>Description<br>dancingbyです！</p>
+
+        </div>
+        
+        
+        <div class="friend-links">
+            
+            <div class="friend-link">
+                <a target="_blank" rel="noopener" href="https://github.com/dancingby0">github</a>
+            </div>
+            
+            <div class="friend-link">
+                <a target="_blank" rel="noopener" href="https://afdian.net/a/dancingby">爱发电</a>
+            </div>
+            
+            <div class="friend-link">
+                <a target="_blank" rel="noopener" href="https://argvchs.github.io">Argvchs</a>
+            </div>
+            
+        </div>
+        
+    </div>
+</div>
+
     </div>
     
 </div>
