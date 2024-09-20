@@ -167,6 +167,99 @@
         
 
 <div class="post">
+    <a href="/2024/04/26/Java%E4%BF%AE%E9%A5%B0%E7%AC%A6%E4%B8%8E%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/">
+        <h2 class="post-title">Java修饰符与异常处理</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/4/26
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h1 id="修饰符"><a href="#修饰符" class="headerlink" title="修饰符"></a>修饰符</h1><p>两类: 访问修饰符 与 非访问修饰符</p>
+<h2 id="访问修饰符"><a href="#访问修饰符" class="headerlink" title="访问修饰符"></a>访问修饰符</h2><h3 id="public"><a href="#public" class="headerlink" title="public:"></a>public:</h3><p>公有,任何其他类可以访问<br>适用对象:(类,字段,方法,接口)</p>
+<h6 id="1-修饰类"><a href="#1-修饰类" class="headerlink" title="1.修饰类:"></a>1.修饰类:</h6><p>一个文件中只能有一个public类,并且该文件名必须与该类名相同(编译器在链接时,public 类会作为该文件的入口)</p>
+<h3 id="private"><a href="#private" class="headerlink" title="private:"></a>private:</h3><p>私有,仅该类被调用<br>适用对象:字段,方法</p>
+<h6 id="1-修饰字段"><a href="#1-修饰字段" class="headerlink" title="1.修饰字段"></a>1.修饰字段</h6><p>表该字段为私有的,仅该类被调用</p>
+<h6 id="2-修饰方法"><a href="#2-修饰方法" class="headerlink" title="2.修饰方法"></a>2.修饰方法</h6><p>表该方法私有,仅该类被调用</p>
+<h3 id="protected"><a href="#protected" class="headerlink" title="protected:"></a>protected:</h3><p>受保护的,表本包内的类和其子类可以访问<br>适用对象:字段,方法</p>
+<h3 id="default-缺省"><a href="#default-缺省" class="headerlink" title="default(缺省):"></a>default(缺省):</h3><p>本包内的类可以使用<br>适用对象:类,字段,方法,接口.</p>
+<h3 id="演示代码"><a href="#演示代码" class="headerlink" title="演示代码:"></a>演示代码:</h3><pre><code class="java">package cn.dancingby;
+public class Demo20240426_1 &#123;
+// 公有类
+    public String name; // 公有字段
+    public String getName()&#123;
+        // 公有方法
+        return this.name;
+    &#125;
+&#125;
+
+class Animal&#123;
+    // 缺省值,仅本包内可访问,意味着包外无法访问Animal
+    private String name; // 仅本类可以访问name
+    public void setName(String name) &#123;
+        // 任意类可以访问其方法
+        this.name = name;
+    &#125;
+&#125;
+</code></pre>
+<h2 id="非访问修饰符"><a href="#非访问修饰符" class="headerlink" title="非访问修饰符"></a>非访问修饰符</h2><p>有static final abstract synchronized volatile transient</p>
+<h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><p>静态的,表示类的字段或方法<br>调用方式:<br>类.静态字段&#x2F;方法<br>对象.静态字段&#x2F;方法<br>静态方法只能使用静态对象.</p>
+<h3 id="final"><a href="#final" class="headerlink" title="final"></a>final</h3><h6 id="类"><a href="#类" class="headerlink" title="类"></a>类</h6><p>表示其不可继承,因此不可以使用abstract修饰符,因为abstract修饰符下的类无法实例化,而final类没有子类,因此该类没有对象,就没有存在的意义了.</p>
+<h6 id="字段"><a href="#字段" class="headerlink" title="字段"></a>字段</h6><p>表示该字段一经赋值便无法被改变.</p>
+<h6 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h6><p>无法被重写.</p>
+<h3 id="abstract"><a href="#abstract" class="headerlink" title="abstract"></a>abstract</h3><h6 id="类-1"><a href="#类-1" class="headerlink" title="类"></a>类</h6><p>表示该类为抽象类,无法被实例化,类中可以有抽象方法和非抽象方法</p>
+<h6 id="方法-1"><a href="#方法-1" class="headerlink" title="方法"></a>方法</h6><p>表示该方法是抽象方法,需要被继承后实现<br>示例:</p>
+<pre><code class="java">abstract public class bird &#123;
+    abstract void fly(String name);
+&#125;
+</code></pre>
+<h3 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h3><p>表示该方法同一时间只能被一种线程访问.<br>不能和static,final,abstract一起使用</p>
+<h3 id="transient"><a href="#transient" class="headerlink" title="transient"></a>transient</h3><p>只能用于字段,表示该字段无法被序列化.</p>
+<h3 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h3><p>表示该字段每次被线程访问时,都强制从共享内存中重新读取该成员变量的值。而且，当成员变量发生变化时，会强制线程将变化值回写到共享内存。这样在任何时刻，两个不同的线程总是看到某个成员变量的同一个值</p>
+<h1 id="命名规则"><a href="#命名规则" class="headerlink" title="命名规则"></a>命名规则</h1><h2 id="类-2"><a href="#类-2" class="headerlink" title="类"></a>类</h2><p>大驼峰</p>
+<h2 id="字段-1"><a href="#字段-1" class="headerlink" title="字段"></a>字段</h2><p>小驼峰</p>
+<h2 id="方法-2"><a href="#方法-2" class="headerlink" title="方法"></a>方法</h2><p>小驼峰</p>
+<h2 id="临时变量"><a href="#临时变量" class="headerlink" title="临时变量"></a>临时变量</h2><p>蛇形</p>
+<h1 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h1><h2 id="异常分类"><a href="#异常分类" class="headerlink" title="异常分类"></a>异常分类</h2><p>总:Exception,分为IOException和RuntimeException<br>Error不会被程序捕获(这个不是异常)<br>Error和Exception同隶属于Throwable<br>如果异常被抛出后没有被处理,这个线程就死了(如果单线程,整个程序就死了)</p>
+<h2 id="捕获异常"><a href="#捕获异常" class="headerlink" title="捕获异常"></a>捕获异常</h2><pre><code class="java">try &#123;
+    // 可能会抛出异常的代码
+&#125; catch (IOException e) &#123;
+    // 处理异常的代码
+&#125;
+</code></pre>
+<h2 id="抛出异常"><a href="#抛出异常" class="headerlink" title="抛出异常"></a>抛出异常</h2><pre><code class="java">public void division11(int dividend,int divisor) throws ArrayIndexOutOfBoundsException,ArithmeticException&#123;
+        // throws 的意义在于如果你没有处理这个异常IDE会替代码审查员来打你
+        System.out.println(dividend/divisor); //divisor为0时,就会抛出
+    &#125;
+    public void division12(int dividend,int divisor)&#123;
+        if(divisor==0)&#123;
+            throw new ArithmeticException();
+            // 丢异常
+        &#125;
+    &#125;
+</code></pre>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2024/04/26/Java%E4%BF%AE%E9%A5%B0%E7%AC%A6%E4%B8%8E%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/2024/04/25/hello-world/">
         <h2 class="post-title">Hello World</h2>
     </a>

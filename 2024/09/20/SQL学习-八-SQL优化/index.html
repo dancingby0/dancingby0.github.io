@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <title>SQL学习(八) SQL优化 | dancingby&#39;s home</title>
+    <meta name="author" content="dancingby" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="blog" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.loli.net" />
+<link rel="preconnect" href="https://gstatic.loli.net" crossorigin />
+<link rel="stylesheet" href="https://fonts.loli.net/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" />
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.2.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>DANCINGBY&#39;S HOME</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;Home</span>
+        </a>
+        
+        <a href="/about">
+            <i class="fa-solid fa-id-card fa-fw"></i>
+            <span>&ensp;About</span>
+        </a>
+        
+        <a href="/archives">
+            <i class="fa-solid fa-box-archive fa-fw"></i>
+            <span>&ensp;Archives</span>
+        </a>
+        
+        <a href="/categories">
+            <i class="fa-solid fa-bookmark fa-fw"></i>
+            <span>&ensp;Categories</span>
+        </a>
+        
+        <a href="/tags">
+            <i class="fa-solid fa-tags fa-fw"></i>
+            <span>&ensp;Tags</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;DANCINGBY&#39;S HOME</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Home</div>
+                    </div>
+                </a>
+                
+                <a href="/about">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-id-card fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">About</div>
+                    </div>
+                </a>
+                
+                <a href="/archives">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-box-archive fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Archives</div>
+                    </div>
+                </a>
+                
+                <a href="/categories">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-bookmark fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Categories</div>
+                    </div>
+                </a>
+                
+                <a href="/tags">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-tags fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Tags</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>SQL学习(八) SQL优化</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/20
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/sql-back-end/" style="color: #ff7d73">sql,back end</a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <h1 id="SQL优化"><a href="#SQL优化" class="headerlink" title="SQL优化"></a>SQL优化</h1><h2 id="插入数据"><a href="#插入数据" class="headerlink" title="插入数据"></a>插入数据</h2><p>insert优化:</p>
+<ol>
+<li><p>建议批量插入(一次性插入数据最好500-1000条),若上千条,则分割为多条insert插入</p>
+</li>
+<li><p>手动提交事务</p>
+</li>
+</ol>
+<pre><code class="sql">start transaction;
+insert ...
+
+commit;
+</code></pre>
+<ol start="3">
+<li>主键顺序插入</li>
+</ol>
+<p>建议顺序插入,而不是乱序插入</p>
+<ul>
+<li>大批量插入数据</li>
+</ul>
+<p>如果一次性插入大量数据,不建议使用insert,而是使用load</p>
+<pre><code class="bash"># 客户端连接服务端时,加上参数--local-infile用于加载本地文件
+mysql --local-infile -u root -p
+# 设置全局参数local_infile为1,开启从本地加载文件导入数据的开关
+set global local_infile = 1;
+# 执行load指令,将数据文件加载至表结构中
+load data local infile &#39;/root/sql1.log&#39; into table &#39;rb_user&#39; fields terminated by &#39;,&#39; lines terminated by &#39;\n&#39;;
+</code></pre>
+<h2 id="主键优化"><a href="#主键优化" class="headerlink" title="主键优化"></a>主键优化</h2><p>在InnoDB存储引擎中,表数据根据主键顺序组织存放,即索引组织表(IOP,Index Organized Table)</p>
+<h3 id="页分裂"><a href="#页分裂" class="headerlink" title="页分裂"></a>页分裂</h3><p>页可以为空,也可以填充一半,百分百.每个页包含了2-N行数据(如果一行数据过大,会行溢出),根据主键排列</p>
+<p><img src="/images/SQL%E5%AD%A6%E4%B9%A0-%E5%85%AB-SQL%E4%BC%98%E5%8C%96-1.png" alt="主键顺序插入"></p>
+<p>主键乱序插入时,会出现页分裂情况,具体操作如下:</p>
+<p>插入一个已满的页时,将满的页分为两份,第二份放入新的页,并重新调整页与页间的指针</p>
+<h3 id="页合并"><a href="#页合并" class="headerlink" title="页合并"></a>页合并</h3><p>删除一行记录时,并没有实际上被物理删除,只是被标记(flaged)为删除,并且其空间变为允许其他记录声明使用</p>
+<p>当页中删除的记录达到MERGE_THRESHOLD(默认为页的50%),InnoDB会开始寻找最靠近的页(前或后)是否可将两个页合并优化空间使用,即页合并</p>
+<p>MERGE_THRESHOLD</p>
+<h3 id="主键设计原则"><a href="#主键设计原则" class="headerlink" title="主键设计原则"></a>主键设计原则</h3><ol>
+<li><p>满足业务需求情况下,尽量降低主键长度</p>
+</li>
+<li><p>插入数据时,尽量顺序插入(乱序插入会出现页分裂问题),选择使用AUTO_INCREMENT自增主键</p>
+</li>
+<li><p>尽量不要使用UUID或其他自然主键(如身份证),因为长度过长并且无序</p>
+</li>
+<li><p>业务操作时,尽量避免对主键的修改</p>
+</li>
+</ol>
+<h2 id="order-by-优化"><a href="#order-by-优化" class="headerlink" title="order by 优化"></a>order by 优化</h2><p>排序方式</p>
+<ol>
+<li><p>Using filesort: 通过表索引或全表扫描,读取满足条件的数据行,在排序缓冲区sort buffer中完成排序操作, 所有不是通过索引直接返回排序结果的排序都称为FileSort排序</p>
+</li>
+<li><p>Using index: 通过索引顺序扫描直接返回有序数据,这种是using index,不需要额外排序,操作效率高</p>
+</li>
+</ol>
+<p>即:尽可能覆盖索引,</p>
+<pre><code class="sql">-- 没有创建索引时,根据age,phone进行排序(效率低)
+explain select id,age,phone from tb_user order by age,phone;
+-- 创建索引
+create index idx_user_age_phone_aa on tb_user(age,phone);
+-- 再升序排
+explain select id,age,phone from tb_user order by age,phone;
+-- age 降,phone降
+explain select id,age,phone from tb_user order by age desc,phone desc;
+-- 如果一个升序排,一个降序排,会出现FileSort
+explain select id,age,name from tb_user order by age asc, phone desc;
+-- 创建索引(根据升降序)
+create index idx_user_phone_ad on tb_user(age asc,phone desc); -- 如果不指定asc,desc,默认asc
+-- 再进行排序(此时using index)
+explain select id,age,name from tb_user order by age asc,phone desc;
+</code></pre>
+<h3 id="设计原则"><a href="#设计原则" class="headerlink" title="设计原则"></a>设计原则</h3><ol>
+<li><p>根据排序字段建立合适的索引,多字段排序时,遵循最左前缀法则</p>
+</li>
+<li><p>尽量使用覆盖索引</p>
+</li>
+<li><p>多字段排序,一个升一个降时,注意联合索引在创建时的规则(ASC&#x2F;DESC)</p>
+</li>
+<li><p>如果不可避免出现filesort,大数据量排序时,可适当增大排序缓冲区大小sort_buffer_size(默认256k)(若超出缓冲区大小,则会在磁盘文件中排序,效率较低)</p>
+</li>
+</ol>
+<h2 id="group-by优化"><a href="#group-by优化" class="headerlink" title="group by优化"></a>group by优化</h2><pre><code class="sql">-- 删索引
+drop index idx_user_pro_age_sta on tb_user;
+-- 执行分组操作,根据profession字段分组
+explain select profession,count(*) from tb_user group by profession;
+-- 创建索引
+create index idx_user_sta on tb_user(profession,age,status)
+-- 分组,根据profession字段分组
+explain select profession,count(*) from tb_user group by profession; -- 满足最左前缀
+-- 根据profession,age分组
+explain select profession,count(*) from tb_user group by profession,age; -- 满足最左前缀
+explain select profession,count(*) from tb_user group by age; -- 不满足最左前缀
+explain select profession,count(*) from tb_user where profession = &#39;软件工程&#39; group by age; -- 满足最左前缀
+</code></pre>
+<p>当我们执行 group by 操作在没有合适的索引可用的时候，通常先扫描整个表提取数据并创建一个临时表，然后按照 group by 指定的列进行排序。在这个临时表里面，对于每一个 group 的数据行来说是连续在一起的。完成排序之后，就可以发现所有的 groups，并可以执行聚集函数（aggregate function）。可以看到，在没有使用索引的时候，需要创建临时表和排序。在执行计划中通常可以看到“Using temporary; Using filesort”。</p>
+<p>在Extra中</p>
+<p>Using index，表示这个语句使用了覆盖索引，选择了索引 a，不需要回表；</p>
+<p>Using temporary，表示使用了临时表；</p>
+<p>Using filesort，表示需要排序。</p>
+<h3 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h3><p>满足最左前缀法则,尽可能覆盖索引,避免建立临时表</p>
+<h2 id="limit优化"><a href="#limit优化" class="headerlink" title="limit优化"></a>limit优化</h2><p>在大数据情况下,越往后效率越低,耗时越长,如limit 2000000,10,此时mysql需要对前2000000进行排序,而仅返回需要的10个数据,并丢弃前面的记录,代价巨大</p>
+<p>优化思路: 创建 覆盖索引 提升性能,通过覆盖索引和子查询形式进行优化</p>
+<pre><code class="sql">explain select * from tb_sku t limit 2000000,10; -- 耗时时间长
+
+select id from tb_sku order by id limit 2000000,10;
+explain select * from tb_sku t, (select id from tb_sku order by id limit 2000000, 10) a where t.id = a.id;
+explain select * from tb_sku where id in (select id from tb_sku order by id limit 2000000,10);
+</code></pre>
+<h2 id="count优化"><a href="#count优化" class="headerlink" title="count优化"></a>count优化</h2><pre><code class="sql">explain select count(*) from tb_user;
+</code></pre>
+<p>MyISAM引擎把一个表总行数存在磁盘中,因此执行count(*)时直接返回该数,效率高</p>
+<p>InnoDB需要一行行读出来,累积计数</p>
+<p>优化思路:自己计数(自行维护总数,插入时自行加一,删除时自行减一)</p>
+<h3 id="count用法"><a href="#count用法" class="headerlink" title="count用法"></a>count用法</h3><p>非null计数</p>
+<p>count(*),count(字段),count(1)</p>
+<h3 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h3><ul>
+<li>count(主键)</li>
+</ul>
+<p>InnoDB引擎遍历整张表,把每一行主键id值取出来,返回给服务层,服务层拿到主键后一行行累加(主键不可能为null)</p>
+<ul>
+<li>count(字段)</li>
+</ul>
+<p>没有not null约束: InnoDB引擎遍历整张表把每一行字段取出来,返回给服务层,判断是否为null</p>
+<p>有not null约束:同count(主键)</p>
+<ul>
+<li>count(1)</li>
+</ul>
+<p>InnoDB遍历整张表,但不取值,对于返回的每一行放个’1’进去,直接按行累加</p>
+<ul>
+<li>count(*)</li>
+</ul>
+<p>InnoDB引擎并不把全部字段取出,而是优化,不取值,直接进行累加</p>
+<p>效率排行: count(字段) &lt; count(主键) &lt; count(1) &#x3D; count(*),所以尽量使用count(*)</p>
+<h2 id="update优化"><a href="#update优化" class="headerlink" title="update优化"></a>update优化</h2><pre><code class="sql">update student set no = &#39;200100100&#39; where id = 1;
+update student set no = &#39;2000100105&#39; where name = &#39;韦一笑&#39;;
+</code></pre>
+<p>InnoDB行锁是针对索引加的锁,而非针对记录加的锁,并且该索引不能失效,否则将从行锁上升到表锁;如果没有索引,也会从行锁上升至表锁</p>
+<p>上升至表锁,并发性能将会降低</p>
+<p>加锁后,只要事务没有提交,该锁就不会释放</p>
+<p>不要让锁上升至表锁,否则所有业务都会停滞</p>
+<p>关键还得看这条语句在执行过程中，优化器最终选择的是索引扫描，还是全表扫描，如果走了全表扫描，就会对全表的记录加锁了。</p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2024 - 2024 dancingby&#39;s home
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;dancingby
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+</body>
+</html>

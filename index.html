@@ -167,6 +167,183 @@
         
 
 <div class="post">
+    <a href="/2024/09/20/SQL%E5%AD%A6%E4%B9%A0-%E5%85%AB-SQL%E4%BC%98%E5%8C%96/">
+        <h2 class="post-title">SQL学习(八) SQL优化</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/20
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h1 id="SQL优化"><a href="#SQL优化" class="headerlink" title="SQL优化"></a>SQL优化</h1><h2 id="插入数据"><a href="#插入数据" class="headerlink" title="插入数据"></a>插入数据</h2><p>insert优化:</p>
+<ol>
+<li><p>建议批量插入(一次性插入数据最好500-1000条),若上千条,则分割为多条insert插入</p>
+</li>
+<li><p>手动提交事务</p>
+</li>
+</ol>
+<pre><code class="sql">start transaction;
+insert ...
+
+commit;
+</code></pre>
+<ol start="3">
+<li>主键顺序插入</li>
+</ol>
+<p>建议顺序插入,而不是乱序插入</p>
+<ul>
+<li>大批量插入数据</li>
+</ul>
+<p>如果一次性插入大量数据,不建议使用insert,而是使用load</p>
+<pre><code class="bash"># 客户端连接服务端时,加上参数--local-infile用于加载本地文件
+mysql --local-infile -u root -p
+# 设置全局参数local_infile为1,开启从本地加载文件导入数据的开关
+set global local_infile = 1;
+# 执行load指令,将数据文件加载至表结构中
+load data local infile &#39;/root/sql1.log&#39; into table &#39;rb_user&#39; fields terminated by &#39;,&#39; lines terminated by &#39;\n&#39;;
+</code></pre>
+<h2 id="主键优化"><a href="#主键优化" class="headerlink" title="主键优化"></a>主键优化</h2><p>在InnoDB存储引擎中,表数据根据主键顺序组织存放,即索引组织表(IOP,Index Organized Table)</p>
+<h3 id="页分裂"><a href="#页分裂" class="headerlink" title="页分裂"></a>页分裂</h3><p>页可以为空,也可以填充一半,百分百.每个页包含了2-N行数据(如果一行数据过大,会行溢出),根据主键排列</p>
+<p><img src="/images/SQL%E5%AD%A6%E4%B9%A0-%E5%85%AB-SQL%E4%BC%98%E5%8C%96-1.png" alt="主键顺序插入"></p>
+<p>主键乱序插入时,会出现页分裂情况,具体操作如下:</p>
+<p>插入一个已满的页时,将满的页分为两份,第二份放入新的页,并重新调整页与页间的指针</p>
+<h3 id="页合并"><a href="#页合并" class="headerlink" title="页合并"></a>页合并</h3><p>删除一行记录时,并没有实际上被物理删除,只是被标记(flaged)为删除,并且其空间变为允许其他记录声明使用</p>
+<p>当页中删除的记录达到MERGE_THRESHOLD(默认为页的50%),InnoDB会开始寻找最靠近的页(前或后)是否可将两个页合并优化空间使用,即页合并</p>
+<p>MERGE_THRESHOLD</p>
+<h3 id="主键设计原则"><a href="#主键设计原则" class="headerlink" title="主键设计原则"></a>主键设计原则</h3><ol>
+<li><p>满足业务需求情况下,尽量降低主键长度</p>
+</li>
+<li><p>插入数据时,尽量顺序插入(乱序插入会出现页分裂问题),选择使用AUTO_INCREMENT自增主键</p>
+</li>
+<li><p>尽量不要使用UUID或其他自然主键(如身份证),因为长度过长并且无序</p>
+</li>
+<li><p>业务操作时,尽量避免对主键的修改</p>
+</li>
+</ol>
+<h2 id="order-by-优化"><a href="#order-by-优化" class="headerlink" title="order by 优化"></a>order by 优化</h2><p>排序方式</p>
+<ol>
+<li><p>Using filesort: 通过表索引或全表扫描,读取满足条件的数据行,在排序缓冲区sort buffer中完成排序操作, 所有不是通过索引直接返回排序结果的排序都称为FileSort排序</p>
+</li>
+<li><p>Using index: 通过索引顺序扫描直接返回有序数据,这种是using index,不需要额外排序,操作效率高</p>
+</li>
+</ol>
+<p>即:尽可能覆盖索引,</p>
+<pre><code class="sql">-- 没有创建索引时,根据age,phone进行排序(效率低)
+explain select id,age,phone from tb_user order by age,phone;
+-- 创建索引
+create index idx_user_age_phone_aa on tb_user(age,phone);
+-- 再升序排
+explain select id,age,phone from tb_user order by age,phone;
+-- age 降,phone降
+explain select id,age,phone from tb_user order by age desc,phone desc;
+-- 如果一个升序排,一个降序排,会出现FileSort
+explain select id,age,name from tb_user order by age asc, phone desc;
+-- 创建索引(根据升降序)
+create index idx_user_phone_ad on tb_user(age asc,phone desc); -- 如果不指定asc,desc,默认asc
+-- 再进行排序(此时using index)
+explain select id,age,name from tb_user order by age asc,phone desc;
+</code></pre>
+<h3 id="设计原则"><a href="#设计原则" class="headerlink" title="设计原则"></a>设计原则</h3><ol>
+<li><p>根据排序字段建立合适的索引,多字段排序时,遵循最左前缀法则</p>
+</li>
+<li><p>尽量使用覆盖索引</p>
+</li>
+<li><p>多字段排序,一个升一个降时,注意联合索引在创建时的规则(ASC&#x2F;DESC)</p>
+</li>
+<li><p>如果不可避免出现filesort,大数据量排序时,可适当增大排序缓冲区大小sort_buffer_size(默认256k)(若超出缓冲区大小,则会在磁盘文件中排序,效率较低)</p>
+</li>
+</ol>
+<h2 id="group-by优化"><a href="#group-by优化" class="headerlink" title="group by优化"></a>group by优化</h2><pre><code class="sql">-- 删索引
+drop index idx_user_pro_age_sta on tb_user;
+-- 执行分组操作,根据profession字段分组
+explain select profession,count(*) from tb_user group by profession;
+-- 创建索引
+create index idx_user_sta on tb_user(profession,age,status)
+-- 分组,根据profession字段分组
+explain select profession,count(*) from tb_user group by profession; -- 满足最左前缀
+-- 根据profession,age分组
+explain select profession,count(*) from tb_user group by profession,age; -- 满足最左前缀
+explain select profession,count(*) from tb_user group by age; -- 不满足最左前缀
+explain select profession,count(*) from tb_user where profession = &#39;软件工程&#39; group by age; -- 满足最左前缀
+</code></pre>
+<p>当我们执行 group by 操作在没有合适的索引可用的时候，通常先扫描整个表提取数据并创建一个临时表，然后按照 group by 指定的列进行排序。在这个临时表里面，对于每一个 group 的数据行来说是连续在一起的。完成排序之后，就可以发现所有的 groups，并可以执行聚集函数（aggregate function）。可以看到，在没有使用索引的时候，需要创建临时表和排序。在执行计划中通常可以看到“Using temporary; Using filesort”。</p>
+<p>在Extra中</p>
+<p>Using index，表示这个语句使用了覆盖索引，选择了索引 a，不需要回表；</p>
+<p>Using temporary，表示使用了临时表；</p>
+<p>Using filesort，表示需要排序。</p>
+<h3 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h3><p>满足最左前缀法则,尽可能覆盖索引,避免建立临时表</p>
+<h2 id="limit优化"><a href="#limit优化" class="headerlink" title="limit优化"></a>limit优化</h2><p>在大数据情况下,越往后效率越低,耗时越长,如limit 2000000,10,此时mysql需要对前2000000进行排序,而仅返回需要的10个数据,并丢弃前面的记录,代价巨大</p>
+<p>优化思路: 创建 覆盖索引 提升性能,通过覆盖索引和子查询形式进行优化</p>
+<pre><code class="sql">explain select * from tb_sku t limit 2000000,10; -- 耗时时间长
+
+select id from tb_sku order by id limit 2000000,10;
+explain select * from tb_sku t, (select id from tb_sku order by id limit 2000000, 10) a where t.id = a.id;
+explain select * from tb_sku where id in (select id from tb_sku order by id limit 2000000,10);
+</code></pre>
+<h2 id="count优化"><a href="#count优化" class="headerlink" title="count优化"></a>count优化</h2><pre><code class="sql">explain select count(*) from tb_user;
+</code></pre>
+<p>MyISAM引擎把一个表总行数存在磁盘中,因此执行count(*)时直接返回该数,效率高</p>
+<p>InnoDB需要一行行读出来,累积计数</p>
+<p>优化思路:自己计数(自行维护总数,插入时自行加一,删除时自行减一)</p>
+<h3 id="count用法"><a href="#count用法" class="headerlink" title="count用法"></a>count用法</h3><p>非null计数</p>
+<p>count(*),count(字段),count(1)</p>
+<h3 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h3><ul>
+<li>count(主键)</li>
+</ul>
+<p>InnoDB引擎遍历整张表,把每一行主键id值取出来,返回给服务层,服务层拿到主键后一行行累加(主键不可能为null)</p>
+<ul>
+<li>count(字段)</li>
+</ul>
+<p>没有not null约束: InnoDB引擎遍历整张表把每一行字段取出来,返回给服务层,判断是否为null</p>
+<p>有not null约束:同count(主键)</p>
+<ul>
+<li>count(1)</li>
+</ul>
+<p>InnoDB遍历整张表,但不取值,对于返回的每一行放个’1’进去,直接按行累加</p>
+<ul>
+<li>count(*)</li>
+</ul>
+<p>InnoDB引擎并不把全部字段取出,而是优化,不取值,直接进行累加</p>
+<p>效率排行: count(字段) &lt; count(主键) &lt; count(1) &#x3D; count(*),所以尽量使用count(*)</p>
+<h2 id="update优化"><a href="#update优化" class="headerlink" title="update优化"></a>update优化</h2><pre><code class="sql">update student set no = &#39;200100100&#39; where id = 1;
+update student set no = &#39;2000100105&#39; where name = &#39;韦一笑&#39;;
+</code></pre>
+<p>InnoDB行锁是针对索引加的锁,而非针对记录加的锁,并且该索引不能失效,否则将从行锁上升到表锁;如果没有索引,也会从行锁上升至表锁</p>
+<p>上升至表锁,并发性能将会降低</p>
+<p>加锁后,只要事务没有提交,该锁就不会释放</p>
+<p>不要让锁上升至表锁,否则所有业务都会停滞</p>
+<p>关键还得看这条语句在执行过程中，优化器最终选择的是索引扫描，还是全表扫描，如果走了全表扫描，就会对全表的记录加锁了。</p>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/sql-back-end/" style="color: #03a9f4">sql,back end</a>
+        </span>
+        
+    </div>
+    <a href="/2024/09/20/SQL%E5%AD%A6%E4%B9%A0-%E5%85%AB-SQL%E4%BC%98%E5%8C%96/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/2024/09/18/SQL%E5%AD%A6%E4%B9%A0-%E5%85%AD-%E4%BA%8B%E5%8A%A1/">
         <h2 class="post-title">SQL学习(六) 事务</h2>
     </a>
@@ -320,7 +497,7 @@ SET [SESSION|GLOBAL] TRANSACTION ISOLATION LEVEL [READ UNCOMMITTED|READ COMMITTE
         
         <span class="tag">
             
-            <a href="/tags/sql-%E4%BA%8B%E5%8A%A1-mysql-back-end/" style="color: #00bcd4">sql,事务,mysql,back end</a>
+            <a href="/tags/sql-%E4%BA%8B%E5%8A%A1-mysql-back-end/" style="color: #00a596">sql,事务,mysql,back end</a>
         </span>
         
     </div>
@@ -586,7 +763,7 @@ select avg(e.salary) from emp e,dept,d where e.dept_id = d.id and d.name = &#39;
         
         <span class="tag">
             
-            <a href="/tags/sql-back-end/" style="color: #00a596">sql,back end</a>
+            <a href="/tags/sql-back-end/" style="color: #03a9f4">sql,back end</a>
         </span>
         
     </div>
@@ -847,7 +1024,7 @@ select name, case address when &#39;北京&#39; then &#39;一线&#39; when &#39;
         
         <span class="tag">
             
-            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #ff7d73">sql,后端</a>
+            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #03a9f4">sql,后端</a>
         </span>
         
     </div>
@@ -1186,7 +1363,7 @@ select work_address,count(*) address_count from emp where age&lt;45 group by wor
         
         <span class="tag">
             
-            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #ff7d73">sql,后端</a>
+            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #ffa2c4">sql,后端</a>
         </span>
         
     </div>
@@ -1559,12 +1736,12 @@ varchar(50) -- 最多五十位
         
         <span class="tag">
             
-            <a href="/tags/HTML/" style="color: #ff7d73">HTML</a>
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #00bcd4">前端</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #03a9f4">前端</a>
+            <a href="/tags/HTML/" style="color: #03a9f4">HTML</a>
         </span>
         
     </div>
@@ -1656,12 +1833,12 @@ varchar(50) -- 最多五十位
         
         <span class="tag">
             
-            <a href="/tags/HTML/" style="color: #ff7d73">HTML</a>
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ffa2c4">前端</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #00bcd4">前端</a>
+            <a href="/tags/HTML/" style="color: #03a9f4">HTML</a>
         </span>
         
     </div>
@@ -1789,104 +1966,11 @@ public class main &#123;
         
         <span class="tag">
             
-            <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="color: #ffa2c4">Java,面向对象</a>
+            <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="color: #ff7d73">Java,面向对象</a>
         </span>
         
     </div>
     <a href="/2024/04/27/Java%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/2024/04/26/Java%E4%BF%AE%E9%A5%B0%E7%AC%A6%E4%B8%8E%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/">
-        <h2 class="post-title">Java修饰符与异常处理</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/4/26
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <h1 id="修饰符"><a href="#修饰符" class="headerlink" title="修饰符"></a>修饰符</h1><p>两类: 访问修饰符 与 非访问修饰符</p>
-<h2 id="访问修饰符"><a href="#访问修饰符" class="headerlink" title="访问修饰符"></a>访问修饰符</h2><h3 id="public"><a href="#public" class="headerlink" title="public:"></a>public:</h3><p>公有,任何其他类可以访问<br>适用对象:(类,字段,方法,接口)</p>
-<h6 id="1-修饰类"><a href="#1-修饰类" class="headerlink" title="1.修饰类:"></a>1.修饰类:</h6><p>一个文件中只能有一个public类,并且该文件名必须与该类名相同(编译器在链接时,public 类会作为该文件的入口)</p>
-<h3 id="private"><a href="#private" class="headerlink" title="private:"></a>private:</h3><p>私有,仅该类被调用<br>适用对象:字段,方法</p>
-<h6 id="1-修饰字段"><a href="#1-修饰字段" class="headerlink" title="1.修饰字段"></a>1.修饰字段</h6><p>表该字段为私有的,仅该类被调用</p>
-<h6 id="2-修饰方法"><a href="#2-修饰方法" class="headerlink" title="2.修饰方法"></a>2.修饰方法</h6><p>表该方法私有,仅该类被调用</p>
-<h3 id="protected"><a href="#protected" class="headerlink" title="protected:"></a>protected:</h3><p>受保护的,表本包内的类和其子类可以访问<br>适用对象:字段,方法</p>
-<h3 id="default-缺省"><a href="#default-缺省" class="headerlink" title="default(缺省):"></a>default(缺省):</h3><p>本包内的类可以使用<br>适用对象:类,字段,方法,接口.</p>
-<h3 id="演示代码"><a href="#演示代码" class="headerlink" title="演示代码:"></a>演示代码:</h3><pre><code class="java">package cn.dancingby;
-public class Demo20240426_1 &#123;
-// 公有类
-    public String name; // 公有字段
-    public String getName()&#123;
-        // 公有方法
-        return this.name;
-    &#125;
-&#125;
-
-class Animal&#123;
-    // 缺省值,仅本包内可访问,意味着包外无法访问Animal
-    private String name; // 仅本类可以访问name
-    public void setName(String name) &#123;
-        // 任意类可以访问其方法
-        this.name = name;
-    &#125;
-&#125;
-</code></pre>
-<h2 id="非访问修饰符"><a href="#非访问修饰符" class="headerlink" title="非访问修饰符"></a>非访问修饰符</h2><p>有static final abstract synchronized volatile transient</p>
-<h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><p>静态的,表示类的字段或方法<br>调用方式:<br>类.静态字段&#x2F;方法<br>对象.静态字段&#x2F;方法<br>静态方法只能使用静态对象.</p>
-<h3 id="final"><a href="#final" class="headerlink" title="final"></a>final</h3><h6 id="类"><a href="#类" class="headerlink" title="类"></a>类</h6><p>表示其不可继承,因此不可以使用abstract修饰符,因为abstract修饰符下的类无法实例化,而final类没有子类,因此该类没有对象,就没有存在的意义了.</p>
-<h6 id="字段"><a href="#字段" class="headerlink" title="字段"></a>字段</h6><p>表示该字段一经赋值便无法被改变.</p>
-<h6 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h6><p>无法被重写.</p>
-<h3 id="abstract"><a href="#abstract" class="headerlink" title="abstract"></a>abstract</h3><h6 id="类-1"><a href="#类-1" class="headerlink" title="类"></a>类</h6><p>表示该类为抽象类,无法被实例化,类中可以有抽象方法和非抽象方法</p>
-<h6 id="方法-1"><a href="#方法-1" class="headerlink" title="方法"></a>方法</h6><p>表示该方法是抽象方法,需要被继承后实现<br>示例:</p>
-<pre><code class="java">abstract public class bird &#123;
-    abstract void fly(String name);
-&#125;
-</code></pre>
-<h3 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h3><p>表示该方法同一时间只能被一种线程访问.<br>不能和static,final,abstract一起使用</p>
-<h3 id="transient"><a href="#transient" class="headerlink" title="transient"></a>transient</h3><p>只能用于字段,表示该字段无法被序列化.</p>
-<h3 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h3><p>表示该字段每次被线程访问时,都强制从共享内存中重新读取该成员变量的值。而且，当成员变量发生变化时，会强制线程将变化值回写到共享内存。这样在任何时刻，两个不同的线程总是看到某个成员变量的同一个值</p>
-<h1 id="命名规则"><a href="#命名规则" class="headerlink" title="命名规则"></a>命名规则</h1><h2 id="类-2"><a href="#类-2" class="headerlink" title="类"></a>类</h2><p>大驼峰</p>
-<h2 id="字段-1"><a href="#字段-1" class="headerlink" title="字段"></a>字段</h2><p>小驼峰</p>
-<h2 id="方法-2"><a href="#方法-2" class="headerlink" title="方法"></a>方法</h2><p>小驼峰</p>
-<h2 id="临时变量"><a href="#临时变量" class="headerlink" title="临时变量"></a>临时变量</h2><p>蛇形</p>
-<h1 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h1><h2 id="异常分类"><a href="#异常分类" class="headerlink" title="异常分类"></a>异常分类</h2><p>总:Exception,分为IOException和RuntimeException<br>Error不会被程序捕获(这个不是异常)<br>Error和Exception同隶属于Throwable<br>如果异常被抛出后没有被处理,这个线程就死了(如果单线程,整个程序就死了)</p>
-<h2 id="捕获异常"><a href="#捕获异常" class="headerlink" title="捕获异常"></a>捕获异常</h2><pre><code class="java">try &#123;
-    // 可能会抛出异常的代码
-&#125; catch (IOException e) &#123;
-    // 处理异常的代码
-&#125;
-</code></pre>
-<h2 id="抛出异常"><a href="#抛出异常" class="headerlink" title="抛出异常"></a>抛出异常</h2><pre><code class="java">public void division11(int dividend,int divisor) throws ArrayIndexOutOfBoundsException,ArithmeticException&#123;
-        // throws 的意义在于如果你没有处理这个异常IDE会替代码审查员来打你
-        System.out.println(dividend/divisor); //divisor为0时,就会抛出
-    &#125;
-    public void division12(int dividend,int divisor)&#123;
-        if(divisor==0)&#123;
-            throw new ArithmeticException();
-            // 丢异常
-        &#125;
-    &#125;
-</code></pre>
-
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        
-        
-    </div>
-    <a href="/2024/04/26/Java%E4%BF%AE%E9%A5%B0%E7%AC%A6%E4%B8%8E%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" class="go-post">阅读全文</a>
 </div>
 
 
