@@ -336,11 +336,511 @@ update student set no = &#39;2000100105&#39; where name = &#39;韦一笑&#39;;
         
         <span class="tag">
             
-            <a href="/tags/sql-back-end/" style="color: #03a9f4">sql,back end</a>
+            <a href="/tags/sql-back-end/" style="color: #00bcd4">sql,back end</a>
         </span>
         
     </div>
     <a href="/2024/09/20/SQL%E5%AD%A6%E4%B9%A0-%E5%85%AB-SQL%E4%BC%98%E5%8C%96/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2024/09/18/SQL%E5%AD%A6%E4%B9%A0-%E4%B8%83-%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E-%E7%B4%A2%E5%BC%95/">
+        <h2 class="post-title">SQL学习(七) 存储引擎,索引</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/18
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h1 id="存储引擎"><a href="#存储引擎" class="headerlink" title="存储引擎"></a>存储引擎</h1><h2 id="MYSQL体系结构"><a href="#MYSQL体系结构" class="headerlink" title="MYSQL体系结构"></a>MYSQL体系结构</h2><p><img src="/images/sql%E5%AD%A6%E4%B9%A0-%E4%B8%83-%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E-%E7%B4%A2%E5%BC%95-1.png" alt="体系结构图"></p>
+<ul>
+<li>客户端连接器</li>
+</ul>
+<p>用于连接mysql服务器</p>
+<ul>
+<li>连接层</li>
+</ul>
+<p>连接池,接收客户端连接,进行认证处理(校验密码),权限等,检查是否超过最大连接数</p>
+<ul>
+<li>服务层</li>
+</ul>
+<p>核心功能, SQL接口,解析器,查询优化器,缓存</p>
+<ul>
+<li>可插拔引擎层</li>
+</ul>
+<p>可插拔:如果需要该存储引擎,则插入;不需要则拔掉,即可插拔</p>
+<p>控制数据存储和提取方式</p>
+<p>索引是在存储引擎实现的,即:不同引擎索引结构不同</p>
+<p>InnoDB是Mysql5.5后默认引擎</p>
+<ul>
+<li>存储层</li>
+</ul>
+<p>用于存储数据库相关数据,如日志,系统文件,数据文件</p>
+<h2 id="存储引擎-1"><a href="#存储引擎-1" class="headerlink" title="存储引擎"></a>存储引擎</h2><p>存储引擎即 存储数据,更新&#x2F;查询等技术实现方式.存储引擎是基于<strong>表</strong>的,而不是基于库的,因此存储引擎也可被称为表类型</p>
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><p>查询建表语句 – 默认InnoDB</p>
+<pre><code class="sql">show create table 表;
+</code></pre>
+<p>查询当前数据库支持的存储引擎</p>
+<pre><code class="sql">SHOW ENGINES;
+</code></pre>
+<p>创建表时,指定存储引擎:</p>
+<pre><code class="sql">create table 表名(
+    字段名 类型(范围) 约束 comment 注释,
+    ... 
+)ENGINE = 存储引擎 comment 注释;
+</code></pre>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>创建 my_myisam, 并指定MyISAM存储引擎</p>
+<pre><code class="sql">create table my_myisam(
+    id int,
+    name varchar(10)
+)engine = MyISAM;
+</code></pre>
+<p>创建表my_memory,并指定Memory存储引擎</p>
+<pre><code class="sql">create table my_memory(
+    id int,
+    name varchar(10)
+)engine = Memory;
+</code></pre>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><h3 id="InnoDB"><a href="#InnoDB" class="headerlink" title="InnoDB"></a>InnoDB</h3><p>高可靠性和高性能,MySQL5.5后为默认MySQL存储引擎</p>
+<h4 id="特点-1"><a href="#特点-1" class="headerlink" title="特点:"></a>特点:</h4><p>DML操作支持ACID模型,支持<strong>事务</strong></p>
+<p><strong>行级锁</strong>,提高并发访问性能</p>
+<p>支持<strong>外键</strong>约束,保证数据完整和正确性</p>
+<h4 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h4><p>xxx.idb, xxx为表名,innoDB引擎每张表都会有一个idb文件,存储表结构(frm,sdi),数据和索引</p>
+<p>参数:innodb_file_per_table(默认打开,说明每个表独立空间,关闭则共享空间)</p>
+<p>命令行:idb2sdi,从idb文件提取表结构</p>
+<h4 id="逻辑存储结构"><a href="#逻辑存储结构" class="headerlink" title="逻辑存储结构"></a>逻辑存储结构</h4><p>TableSpace: 表空间 存储Segment</p>
+<p>Segment: 段 存储Extent</p>
+<p>Extent: 区 存储Page, 大小固定1M,包含64个page</p>
+<p>Page: 页 存储Row,是磁盘操作的最小单元,大小固定16K</p>
+<p>Row: 行 存储数据</p>
+<h3 id="MyISAM"><a href="#MyISAM" class="headerlink" title="MyISAM"></a>MyISAM</h3><p>MySQL早期引擎</p>
+<h4 id="特点-2"><a href="#特点-2" class="headerlink" title="特点"></a>特点</h4><p>不支持事务,不支持外键</p>
+<p>支持表锁,不支持行锁</p>
+<p>访问速度快</p>
+<h4 id="文件-1"><a href="#文件-1" class="headerlink" title="文件"></a>文件</h4><p>xxx.sdi: 表结构信息,可直接打开,存储json文件数据</p>
+<p>xxx.MYD: 存储数据</p>
+<p>xxx.MYI: 存储索引</p>
+<h3 id="Memory"><a href="#Memory" class="headerlink" title="Memory"></a>Memory</h3><p>存储在内存中,受到硬件问题,或断电影响,这些表只能作为临时表或缓存使用</p>
+<h4 id="特点-3"><a href="#特点-3" class="headerlink" title="特点"></a>特点</h4><p>内存存放(快)</p>
+<p>hash索引(默认)</p>
+<h4 id="文件-2"><a href="#文件-2" class="headerlink" title="文件:"></a>文件:</h4><p>xxx.sdi(存储表结构,只有这个文件,因为数据都在内存中)</p>
+<p><img src="/images/sql%E5%AD%A6%E4%B9%A0-%E4%B8%83-%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E-%E7%B4%A2%E5%BC%95-2.png" alt="三引擎区别图"></p>
+<h2 id="存储引擎选择"><a href="#存储引擎选择" class="headerlink" title="存储引擎选择"></a>存储引擎选择</h2><p>InnoDB: MySQL默认存储引擎,事务外键行级锁,若应用对事务完整性有较高要求,在并发条件下要求数据一致性,数据除了插入,查询外,还有很多更新删除操作,则选用InnoDB较合适</p>
+<p>MyISAM: 若应用是以读或插入为主,而很少有更新或删除操作,对事务完整性要求并不高,则选用MyISAM较合适, 如日志,或评论等 被替代品:MongoDB(nosql)</p>
+<p>Memory: 所有数据在内存中,访问速度快,通常用于临时表及缓存.缺陷即对表大小有限制,无法保障数据安全性 被替代品:Redis(nosql)</p>
+<h1 id="Linux安装MySQL"><a href="#Linux安装MySQL" class="headerlink" title="Linux安装MySQL"></a>Linux安装MySQL</h1><ol>
+<li>准备Linux服务器</li>
+</ol>
+<p>版本如CentOS7</p>
+<ol start="2">
+<li>远程连接Linux服务器</li>
+</ol>
+<p>使用如Final Shell工具</p>
+<ol start="3">
+<li><p>下载Linux版MySQL安装包</p>
+</li>
+<li><p>上传至Linux系统</p>
+</li>
+<li><p>创建目录,解压</p>
+</li>
+<li><p>安装mysql安装包(注意安装顺序)</p>
+</li>
+<li><p>启动SQL服务</p>
+</li>
+</ol>
+<pre><code class="bash">systemctl start mysqld
+systemctl restart mysqld
+systemctl stop mysqld
+</code></pre>
+<ol start="8">
+<li>查询自动生成的root用户密码</li>
+</ol>
+<pre><code class="bash">grep &#39;temporary password&#39; /var/log/mysqld.log
+</code></pre>
+<ol start="9">
+<li>设定密码</li>
+</ol>
+<p>Linux下有密码校验,密码不能太简单,可以设置密码校验策略</p>
+<pre><code class="sql">ALTER USER &#39;root&#39;@&#39;localhost&#39; IDENTIFIED BY &#39;1234&#39;; -- 修改root密码
+</code></pre>
+<pre><code class="sql">set global validate_password.policy = 0; -- 设置密码校验强度,0表最弱,1表最强
+set global validate_password.length = 4; -- 设置密码长度
+</code></pre>
+<ol start="10">
+<li>创建用户</li>
+</ol>
+<pre><code class="sql">create user &#39;root&#39;@&#39;%&#39; identified with mysql_native_password by &#39;1234&#39;; -- 用于远程访问
+</code></pre>
+<ol start="11">
+<li>防火墙</li>
+</ol>
+<p>防火墙开放相应端口,否则可能无法远程连接</p>
+<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><p>索引是帮助MySQL高效获取数据的数据结构(有序),在数据之外,数据库系统维护着满足特定查找算法的数据结构,这些数据结构以某种方式引用(指向)数据.这种数据结构即为索引</p>
+<p>优点:</p>
+<p>加快数据检索效率,降低IO成本;通过索引进行排序,降低CPU效率</p>
+<p>缺点:</p>
+<p>索引列占用空间(磁盘便宜);降低更新表的速度(增删改频率低)</p>
+<h2 id="索引结构"><a href="#索引结构" class="headerlink" title="索引结构"></a>索引结构</h2><p>B+Tree索引: 最常见所有,大部分引擎支持B+树索引</p>
+<p>Hash索引: 底层数据结构由哈希表实现,只有精确匹配索引列查询时有效,不支持范围查询</p>
+<p>R-tree(空间索引): MyISAM引擎的特殊索引类型,主要用于地理空间数据类型,使用较少</p>
+<p>Full-text(全文索引): 通过建立倒排索引,快速匹配文档的方式,类似于Lucene,Solr,ES(将文本分词后记录每个词出现在哪篇文本中,用于文本检索)</p>
+<p>B+Tree: 三者均支持</p>
+<p>Hash 索引: 仅Memory支持</p>
+<p>R-tree: 仅MyISAM支持</p>
+<p>Full-text: InnoDB 5.6后支持,MyISAM支持</p>
+<p>一般指的索引均是B+树结构组织的索引</p>
+<h3 id="B-Tree"><a href="#B-Tree" class="headerlink" title="B+Tree"></a>B+Tree</h3><p>二叉树弊端: 顺序插入时,会退化为链表,查询性能大大降低,大数据量情况下,层级较深,检索速度慢(需要平衡)</p>
+<p>解决方案: 红黑树(解决平衡问题)</p>
+<p>红黑树问题: 因为是二叉树,层级较深,检索速度慢</p>
+<p>B-Tree(多路平衡查找树)</p>
+<p>以最大度数5的b树为例(一个节点下四个key(自身),5个指针(指向5个子节点))</p>
+<p><img src="/images/sql%E5%AD%A6%E4%B9%A0-%E4%B8%83-%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E-%E7%B4%A2%E5%BC%95-3.png" alt="B树图例"></p>
+<p>当一个节点大于key数时,该节点中间元素向上分裂</p>
+<p>B+树:</p>
+<p>所有元素均会出现底层叶子节点中(上层的节点用于索引作用),下层形成单向链表,提高插入元素的效率</p>
+<p><img src="/images/sql%E5%AD%A6%E4%B9%A0-%E4%B8%83-%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E-%E7%B4%A2%E5%BC%95-4.png" alt="B+树图例"></p>
+<p>mysql进行了优化,下层为双向循环链表</p>
+<p><img src="/images/sql%E5%AD%A6%E4%B9%A0-%E4%B8%83-%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E-%E7%B4%A2%E5%BC%95-5.png" alt="b+树mysql优化图例"></p>
+<p>key值和指针的大小为一个页大小,即16K,因为B+树叶子不存储数据,能够存放的东西变多了,层级变少</p>
+<h3 id="hash"><a href="#hash" class="headerlink" title="hash"></a>hash</h3><p>采用一定hash算法,键值转化为新的hash值,对应到相应槽位中,存储到hash表中</p>
+<p>hash冲突(hash碰撞):两个或多个值落于相同槽位上;可以通过链表解决</p>
+<p>hash索引特点:</p>
+<ol>
+<li><p>只能用于对等匹配(&#x3D;,in), 不支持范围查询(between,&gt;,&lt;,…)</p>
+</li>
+<li><p>无法利用索引完成排序操作</p>
+</li>
+<li><p>查询效率,通常一次检索即可(不出现哈希碰撞情况下),效率通常高于B+树</p>
+</li>
+</ol>
+<p>存储引擎支持:</p>
+<p>Memory引擎支持.InnoDB具有自适应hash功能,hash索引是存储引擎根据B+树索引在指定条件下自动构建的.</p>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><p>为什么InnoDB存储引擎使用B+tree呢?</p>
+<p>相对于二叉树,层级更少,搜索效率高</p>
+<p>对于B树,节点都会保存数据,导致一页中存储键值减少,指针减少.要同样保存大量数据,只能增加树的高度,导致性能降低</p>
+<p>相对于哈希索引(只支持等值匹配),B+tree支持范围匹配</p>
+<h2 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h2><table>
+<thead>
+<tr>
+<th>分类</th>
+<th>含义</th>
+<th>特点</th>
+<th>关键字</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>主键索引</td>
+<td>针对表中主键创建的索引</td>
+<td>默认自动创建,只能有一个</td>
+<td>PRIMARY</td>
+</tr>
+<tr>
+<td>唯一索引</td>
+<td>避免同一个表中某数据列值重复</td>
+<td>(创建唯一字段时自动创建)可以有多个</td>
+<td>UNIQUE</td>
+</tr>
+<tr>
+<td>常规索引</td>
+<td>快速定位特定数据</td>
+<td>可以有多个</td>
+<td></td>
+</tr>
+<tr>
+<td>全文索引</td>
+<td>全文索引查找文本中关键词,而不是比较索引中的值</td>
+<td>可以有多个</td>
+<td>FULLTEXT</td>
+</tr>
+</tbody></table>
+<p>根据索引存储形式,分为以下两种:</p>
+<p>聚集索引(clustered Index): 数据存储和索引放在一块, 索引结构和叶子节点保存了行数据 必须有且只有一个</p>
+<p>二级索引(Secondary Index): 将数据和索引分开存储,索引结构的叶子节点关联的是对应主键 可以存在多个</p>
+<p>聚集索引选取规则:</p>
+<p>如果存在主键,主键索引就是聚集索引</p>
+<p>若不存在主键,将使用唯一索引作为聚集索引</p>
+<p>如果表没有主键,或没有合适的唯一索引,则InnoDB会自动生成一个rowid作为隐藏的聚集索引</p>
+<p><img src="/images/sql%E5%AD%A6%E4%B9%A0-%E4%B8%83-%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E-%E7%B4%A2%E5%BC%95-6.png" alt="聚集索引图例"></p>
+<p>每个叶子节点都保存行数据</p>
+<p><img src="/images/sql%E5%AD%A6%E4%B9%A0-%E4%B8%83-%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E-%E7%B4%A2%E5%BC%95-7.png" alt="二级索引图例"></p>
+<p>二级索引每个叶子存储唯一索引</p>
+<p>当执行select * from user where name &#x3D; ‘arm’时,首先从二级索引找到arm,然后通过唯一索引找到行数据,并返回</p>
+<h3 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h3><ol>
+<li>效率问题</li>
+</ol>
+<p>select * from user where id &#x3D; 10;</p>
+<p>与</p>
+<p>select * from user where name &#x3D; ‘Arm’;</p>
+<p>前者效率更高,因为前者只需要进行聚集索引的查找,而后者需要先通过二级索引,再通过聚集索引查找(后者称为<strong>回表查询</strong>)</p>
+<ol start="2">
+<li>B+树高度问题</li>
+</ol>
+<p>假设一行数据1k大小,一页则可以存储16个这样的数据;InnoDB指针占用6字节空间,主键设为BigInt,占用空间为8字节</p>
+<p>当高度为2时,根节点一个<br>设n为主键个数,一个节点为一页大小,则</p>
+<p>8<em>n+6(n+1) &#x3D; 16</em>1024</p>
+<p>则n&#x3D;1170,则一个节点指针个数为1171,一个叶子节点有16个数据,则数据量为16*1171 &#x3D; 18736个</p>
+<p>若树高度为3,则18736*1171 &#x3D; 21939856个数据</p>
+<h2 id="索引操作语法"><a href="#索引操作语法" class="headerlink" title="索引操作语法"></a>索引操作语法</h2><h4 id="语法-1"><a href="#语法-1" class="headerlink" title="语法"></a>语法</h4><ul>
+<li>创建索引</li>
+</ul>
+<pre><code class="sql">CREATE [UNIQUE|FULLTEXT] INDEX index_name ON table_name (index_col_name,...); -- 若不指定UNIQUE,FULLTEXT,则为常规索引
+</code></pre>
+<p>如果一个索引仅关联一个字段,则称为单列索引</p>
+<p>如果一个索引关联多个字段,则成为联合索引|组合索引</p>
+<ul>
+<li>查看索引</li>
+</ul>
+<pre><code class="sql">SHOW INDEX FROM table_name;
+</code></pre>
+<ul>
+<li>删除索引</li>
+</ul>
+<pre><code class="sql">DROP INDEX index_name ON table_name;
+</code></pre>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><ol>
+<li><p>name字段姓名字段,该字段值可能会重复,为该字段创建索引</p>
+</li>
+<li><p>phone手机号字段值,非空唯一,创建唯一索引</p>
+</li>
+<li><p>为profession,age,status创建联合索引</p>
+</li>
+<li><p>为email建立合适的索引提高查询效率</p>
+</li>
+</ol>
+<pre><code class="sql">create index idx_user_name on tb_user(name);
+create unique index idx_phone on tb_user(phone);
+create index idx_profession_age_status on tb_user(profession,age,status);
+create index idx_email on tb_user(email);
+</code></pre>
+<h2 id="SQL性能分析"><a href="#SQL性能分析" class="headerlink" title="SQL性能分析"></a>SQL性能分析</h2><h3 id="查询操作次数"><a href="#查询操作次数" class="headerlink" title="查询操作次数"></a>查询操作次数</h3><ul>
+<li>SQL执行频率</li>
+</ul>
+<p>MYSQL客户端连接成功后,通过show [session|global] status提供服务端状态信息,查看当前数据库INSERT,UPDATE,DELETE,SELECT访问频次</p>
+<pre><code class="sql">show global status like &#39;com_______&#39; -- like后面表示需要查询的操作
+</code></pre>
+<h3 id="慢查询日志"><a href="#慢查询日志" class="headerlink" title="慢查询日志"></a>慢查询日志</h3><p>慢查询日志记录了所有执行时间超过指定参数(long_query_time,s,默认10s)的所有SQL语句的日志</p>
+<p>MySQL慢查询日志默认未开启,需要在MySQL配置文件(&#x2F;etc&#x2F;my.cnf)中配置如下信息:</p>
+<pre><code class="bash"># 开启MySQL慢日志查询开关
+slow_query_log = 1
+# 设置慢日志时间为2s,SQL语句执行时间超过2s,则视为慢查询,记录慢查询日志
+long_query_time = 2
+</code></pre>
+<ul>
+<li>查询变量</li>
+</ul>
+<pre><code class="sql">show variables like &#39;slow_query_log&#39; -- 查看慢查询日志是否开启
+</code></pre>
+<p>慢查询日志位置: &#x2F;var&#x2F;lib&#x2F;mysql&#x2F;localhost_slow.log</p>
+<h3 id="profile详情"><a href="#profile详情" class="headerlink" title="profile详情"></a>profile详情</h3><p>show profiles能够在优化SQL时帮助了解时间消耗,通过have_profiling参数,查看系统是否支持profile操作</p>
+<pre><code class="sql">SELECT @@have_profiling; -- 查看是否支持
+</code></pre>
+<p>默认profiling关闭,可以通过SET语句在session&#x2F;global级别开启profiling</p>
+<pre><code class="sql">select @@profiling; -- 查询是否开启
+SET [SESSION|GLOBAL] profiling = 1; 
+show profile; -- 查看操作时所消耗的时间
+</code></pre>
+<ul>
+<li>查询指定query_id的SQL语句各个阶段耗时情况</li>
+</ul>
+<pre><code class="sql">show profile for query query_id;
+</code></pre>
+<ul>
+<li>查看指定query_id的SQL语句CPU使用情况</li>
+</ul>
+<pre><code class="sql">show profile cpu for query query_id;
+</code></pre>
+<h3 id="explain执行计划"><a href="#explain执行计划" class="headerlink" title="explain执行计划"></a>explain执行计划</h3><p>EXPLAIN或DESC命令获取MYSQL如何执行SELECT语句信息,包括SELECT语句执行过程中表如何连接和链接的顺序</p>
+<pre><code class="sql">EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件; -- 直接在前面加EXPLAIN/DESC即可
+</code></pre>
+<h4 id="各字段含义"><a href="#各字段含义" class="headerlink" title="各字段含义"></a>各字段含义</h4><ul>
+<li>id</li>
+</ul>
+<p>select查询的序列号,表查询中执行select子句或操作表的顺序(id越大,越先执行;id相同,从上至下执行)</p>
+<ul>
+<li>select_type</li>
+</ul>
+<p>表select类型</p>
+<p>SIMPLE: 简单表,即不使用表连接或子查询</p>
+<p>PRIMARY: 主查询,即外层的查询</p>
+<p>UNION: UNION中的第二个或后面的查询语句</p>
+<p>SUBQUERY: SELECT&#x2F;WHERE之后包含了子查询</p>
+<ul>
+<li>type</li>
+</ul>
+<p>表示连接类型,性能由好到差为: NULL,system,const,eq_ref,ref,range,index,all.</p>
+<p>业务系统中不太可能出现NULL(因为NULL是在不访问任何表时出现),尽量向前优化即可</p>
+<p>system基本是访问系统表时出现</p>
+<p>const在访问主键或唯一索引时会出现</p>
+<p>ref在非唯一索引访问时会出现(回表查询)</p>
+<p>index是扫描了全部索引</p>
+<p>all代表全表扫描,性能最差</p>
+<pre><code class="sql">select &#39;A&#39;; -- NULL
+</code></pre>
+<ul>
+<li>possible_key</li>
+</ul>
+<p>显示可能应用在这张表上的索引,一个或多个</p>
+<ul>
+<li>key</li>
+</ul>
+<p>实际用到的索引,若NULL,则没有使用索引</p>
+<ul>
+<li>key_len</li>
+</ul>
+<p>表索引中使用的字节数,该值表示索引字段最大可能长度,并非实际使用长度,在不损失精确性前提下,长度越短越好;关注,用于查明是否在检索时使用了相关的索引</p>
+<ul>
+<li>ref</li>
+</ul>
+<p>哪些列或者常量被用做索引列上的值</p>
+<ul>
+<li>rows</li>
+</ul>
+<p>MySQL认为必须要执行查询的行数,在InnoDB引擎表中,是一个估计值(仅作参考)</p>
+<ul>
+<li>filtered</li>
+</ul>
+<p>表示返回结果行数占需读取行数的百分比,filtered的值越大越好(即有效的查询量)</p>
+<ul>
+<li>Extra</li>
+</ul>
+<p>附加信息</p>
+<h2 id="索引使用"><a href="#索引使用" class="headerlink" title="索引使用"></a>索引使用</h2><h3 id="验证索引效率"><a href="#验证索引效率" class="headerlink" title="验证索引效率"></a>验证索引效率</h3><p>未建立索引前,执行如下SQL语句,查看SQL的耗时</p>
+<pre><code class="sql">SELECT * FROM table_name where name = &quot;xxx&quot;; -- 进行查询
+</code></pre>
+<p>针对字段创建索引</p>
+<pre><code class="sql">create [UNIQUE|FULLTEXT] index idx_name on table_name(field_name);
+</code></pre>
+<p>再次指向相同SQL语句,查看SQL耗时</p>
+<h3 id="最左前缀法则"><a href="#最左前缀法则" class="headerlink" title="最左前缀法则"></a>最左前缀法则</h3><p>针对联合索引. 要求遵循最左前缀法则</p>
+<p>最左前缀法则: 查询从索引最左列开始,并且不能跳过索引中的列,<strong>在查询时必须包括最左侧的列,否则将不会走索引</strong></p>
+<p>若跳过了某一列,则索引将部分失效(后面的字段索引失效)</p>
+<p>即要求最左列必须存在,否则将跳过某一列(即最左列要表明右侧均存在)</p>
+<p>如</p>
+<pre><code class="sql">create index idx_a_b_c on test(a,b,c);
+</code></pre>
+<pre><code class="sql">select * from test where a = &#39;aa&#39;; -- 满足最左前缀法则,ref
+select * from test where a = &#39;a&#39; and b = &#39;b&#39; and c = &#39;c&#39; ; -- 满足最左前缀法则,ref
+select * from test where b = &#39;b&#39; ;-- 不满足最左前缀法则,全表扫描,索引没有生效
+select * from test where a=&#39;a&#39; and c = &#39;c&#39;; -- 索引部分失效,前面满足最左前缀法则,索引生效,中间跳过了b,后面索引失效
+select * from test where c = &#39;c&#39; and b = &#39;b&#39; and a = &#39;a&#39;; -- 索引生效,只需要存在即可满足最左前缀法则,不需要关注顺序
+</code></pre>
+<h3 id="范围查询"><a href="#范围查询" class="headerlink" title="范围查询"></a>范围查询</h3><p>联合索引中,出现范围查询(&gt;,&lt;),范围查询右侧的列索引失效,如:</p>
+<pre><code class="sql">explain select * from tb_user where profession = &#39;软件工程&#39; and age &gt; 30 and status = &#39;0&#39;; -- key_len 49,说明status没有使用索引,因为范围查询右侧不走索引
+explain select * from tb_user where profession = &#39;软件工程&#39; and age &gt;= 30 and status = &#39;0&#39;; -- key_len 54,说明status使用索引,因此尽可能使用&gt;=这样的运算符
+</code></pre>
+<h3 id="索引失效"><a href="#索引失效" class="headerlink" title="索引失效"></a>索引失效</h3><ol>
+<li>索引列运算</li>
+</ol>
+<p>不要在索引列上进行运算,否则索引将失效</p>
+<p>如:</p>
+<pre><code class="sql">select * from tb_user where substring(phone,10,2) = &#39;15&#39;; -- 在索引列上进行计算,将进行全表查询,type ALL, like &quot;%15&quot;也同样(因为第一个是%,头部模糊匹配,全表)
+</code></pre>
+<ol start="2">
+<li>字符串不加单引号,隐式类型转换</li>
+</ol>
+<p>字符串字段使用时,必须要加单引号,不然索引失效(因为隐式转换相当于调用函数)</p>
+<ol start="3">
+<li>模糊查询</li>
+</ol>
+<p>若仅仅尾部模糊匹配,则索引不会失效;若头部模糊匹配,索引将会失效</p>
+<p>‘%12’ 头部模糊查询失效</p>
+<p>‘软件%’ 尾部查询,索引不失效</p>
+<ol start="4">
+<li>or连接的条件</li>
+</ol>
+<p>若or一侧有索引,一侧没有索引(或不满足最左前缀原则),不生效,只有两侧都有索引才生效(因为有一个没有索引,就会走全表扫描,为了高效,就不必走索引了)</p>
+<p>解决方案: 对于没有索引的建立索引</p>
+<ol start="5">
+<li>数据分布影响</li>
+</ol>
+<p>如果MySQL评估发现比全表扫描还慢时,就会直接全表扫描</p>
+<p>原因:若几乎所有表内数据基本符合查询条件,则直接全表扫描,不会走索引,提高效率</p>
+<h3 id="SQL提示"><a href="#SQL提示" class="headerlink" title="SQL提示"></a>SQL提示</h3><p>在SQL语句中加入一些认为的提示来达到优化操作的目的</p>
+<p>use index:</p>
+<pre><code class="sql">explain select * from tb_user use index(idx_user_pro) where profession = &#39;软件工程&#39;; -- 提示SQL去用这个索引
+</code></pre>
+<p>当sql评估使用该索引速度较慢时,则不会使用该索引</p>
+<p>ignore index:</p>
+<pre><code class="sql">explain select * from tb_user ignore index(idx_user_pro) where profession = &#39;软件工程&#39;; -- 提示SQL不要使用该索引
+</code></pre>
+<p>force index:</p>
+<pre><code class="sql">explain select * from tb_user force index(idx_user_pro) where profession = &#39;软件工程&#39;; -- 提示SQL必须使用该索引
+</code></pre>
+<h3 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h3><p>主要针对select后的字段部分</p>
+<p>尽量使用覆盖索引(查询使用索引,并需要返回的列,在该索引中已经全部能够找到),减少使用select *</p>
+<p>using index condition: 查找使用了索引,但是需要回表查询(性能较低)</p>
+<p>using where,using index: 查找使用索引,但需要的数据都在索引列中能够找到,不需要回表查询(性能高)</p>
+<pre><code class="sql">explain select id,profession from tb_user where profession = &#39;软件工程&#39; and age = 31 and status = &#39;0&#39;;
+explain select id,profession,age,status from tb_user where profession = &#39;软件工程&#39; and age = 31 and status = &#39;0&#39;; -- using where ,using index
+explain select id,profession,age,status,name from tb_user where profession = &#39;软件工程&#39; and age = 31 and status = &#39;0&#39;; -- using index condition
+explain select * from tb_user where profession = &#39;软件工程&#39; and age = 31 and status = &#39;0&#39;;
+</code></pre>
+<p>思考:</p>
+<p>一张表四个字段(id,username,password,status),由于数据量大,需要对以下SQL语句优化,如何优化?</p>
+<pre><code class="sql">select id,username,password from tb_user where username = &#39;itcast&#39;;
+</code></pre>
+<p>解决方案:</p>
+<p>建立联合索引,则不需要回表查询</p>
+<pre><code class="sql">create index idx_username_password on tb_user(username,password);
+select id,username,password from tb_user where username = &#39;itcast&#39;;
+</code></pre>
+<h3 id="前缀索引"><a href="#前缀索引" class="headerlink" title="前缀索引"></a>前缀索引</h3><p>当字段类型为字符串时,有时需要索引很长的字符串,会使得索引变得很大;查询时,浪费大量磁盘IO,影响查询效率.此时可以只将字符串一部分前缀建立索引,大大节约索引空间提升效率</p>
+<p>语法:</p>
+<pre><code class="sql">create index idx_xxx on table_name(column(n)); -- n表前缀的字符串长度
+</code></pre>
+<p>前缀长度:</p>
+<p>可以根据索引的选择性决定</p>
+<p>(选择性指不重复的索引值(基数)和数据表记录总数的比值,索引选择性越高则查询效率越高,唯一索引选择性为1,最好的索引选择性,性能也最好)</p>
+<p>选择性 &#x3D; 不重复索引值 &#x2F; 总数</p>
+<pre><code class="sql">select count(distinct email) / count(*) from tb_user; -- 获取选择性
+select count(distinct substring(email,1,5)) / count(*) from tb_user -- 获取选取一定字串后的选择性
+</code></pre>
+<h3 id="单列索引与联合索引的选择"><a href="#单列索引与联合索引的选择" class="headerlink" title="单列索引与联合索引的选择"></a>单列索引与联合索引的选择</h3><p>在业务场景中,如果存在多个查询条件,若针对于查询字段建立索引时,建议建立联合索引,而非单列索引</p>
+<p>多个联合查询时,MySQL优化器会评估哪个字段的索引效率更高,并选择该索引完成查询</p>
+<h3 id="索引设计原则"><a href="#索引设计原则" class="headerlink" title="索引设计原则"></a>索引设计原则</h3><ol>
+<li><p>针对数据量较大,且查询比较频繁的表建立索引</p>
+</li>
+<li><p>针对常作为查询条件(where,order by,group by)建立索引</p>
+</li>
+<li><p>选择区分度高的列作为索引,尽量建立唯一索引.区分度越高,使用索引效率越高</p>
+</li>
+<li><p>若字符串类型,字段长度较长,建立前缀索引(通过计算选择性)</p>
+</li>
+<li><p>尽量选择联合索引,减少单列索引,查询时,联合索引可以覆盖单列索引,节省空间,避免回表</p>
+</li>
+<li><p>索引并非多多益善,索引越多,维护索引结构代价巨大,会影响增删改的效率</p>
+</li>
+<li><p>若索引列不能存储null时,创建表时用not null约束.当优化器知道每列是否包含NULL值时,可以更好确定哪个索引最有效用于查询</p>
+</li>
+</ol>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
+        </span>
+        
+    </div>
+    <a href="/2024/09/18/SQL%E5%AD%A6%E4%B9%A0-%E4%B8%83-%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E-%E7%B4%A2%E5%BC%95/" class="go-post">阅读全文</a>
 </div>
 
 <div class="post">
@@ -497,7 +997,7 @@ SET [SESSION|GLOBAL] TRANSACTION ISOLATION LEVEL [READ UNCOMMITTED|READ COMMITTE
         
         <span class="tag">
             
-            <a href="/tags/sql-%E4%BA%8B%E5%8A%A1-mysql-back-end/" style="color: #00a596">sql,事务,mysql,back end</a>
+            <a href="/tags/sql-%E4%BA%8B%E5%8A%A1-mysql-back-end/" style="color: #00bcd4">sql,事务,mysql,back end</a>
         </span>
         
     </div>
@@ -859,7 +1359,7 @@ alter table emp add constraint fk_emp_dept_id foreign key (dept_id) reference de
         
         <span class="tag">
             
-            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #ff7d73">sql,后端</a>
+            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #00a596">sql,后端</a>
         </span>
         
     </div>
@@ -1024,7 +1524,7 @@ select name, case address when &#39;北京&#39; then &#39;一线&#39; when &#39;
         
         <span class="tag">
             
-            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #03a9f4">sql,后端</a>
+            <a href="/tags/sql/" style="color: #00a596">sql</a>
         </span>
         
     </div>
@@ -1363,7 +1863,7 @@ select work_address,count(*) address_count from emp where age&lt;45 group by wor
         
         <span class="tag">
             
-            <a href="/tags/sql-%E5%90%8E%E7%AB%AF/" style="color: #ffa2c4">sql,后端</a>
+            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
         </span>
         
     </div>
@@ -1680,7 +2180,16 @@ varchar(50) -- 最多五十位
     </div>
     <div class="post-tags">
         
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
         
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
+        </span>
         
     </div>
     <a href="/2024/09/12/SQL%E5%AD%A6%E4%B9%A0-%E4%B8%80/" class="go-post">阅读全文</a>
@@ -1741,7 +2250,7 @@ varchar(50) -- 最多五十位
         
         <span class="tag">
             
-            <a href="/tags/HTML/" style="color: #03a9f4">HTML</a>
+            <a href="/tags/HTML/" style="color: #ff7d73">HTML</a>
         </span>
         
     </div>
@@ -1843,134 +2352,6 @@ varchar(50) -- 最多五十位
         
     </div>
     <a href="/2024/05/03/HTML%E5%AD%A6%E4%B9%A0-%E4%BA%8C/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/2024/04/27/Java%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/">
-        <h2 class="post-title">Java面向对象</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/4/27
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <h3 id="构造器"><a href="#构造器" class="headerlink" title="构造器"></a>构造器</h3><p>语法:<br>[修饰器] &lt;类名&gt;(参数列表){方法体}<br>用于构造对象时执行.<br>默认的类是有无参构造器的,但是如果一个类设定了一个构造器,比如:</p>
-<pre><code class="java">package cn.dancingby;
-
-public class C &#123;
-    C(String A)&#123;
-        ;
-    &#125;
-&#125;
-</code></pre>
-<p>那么这个C类就不会拥有一个无参构造器了.<br>比如<br>C a &#x3D; new C();是错误的.<br>继承后的类如果没有显式调用其父类的构造函数,则会某人调用其父类的无参构造函数.<br>因此,如下是错误的.</p>
-<pre><code class="java">public class C &#123;
-    C(String A)&#123;
-        ;
-    &#125;
-&#125;
-
-class D extends C&#123;&#125;
-</code></pre>
-<p>因为C类没有默认构造器,而D类的默认构造器需要调用其C类的构造器,因此会出现编译错误.<br>多个构造器的要求是其函数签名不得相同.<br># 函数签名:即public A(String a){}的”A(String a)”这一部分.不包括返回值和方法体.</p>
-<h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><p>使用extends关键字继承<br>能够使子类拥有父类使用protected&#x2F;public修饰的字段,</p>
-<h3 id="内部类"><a href="#内部类" class="headerlink" title="内部类"></a>内部类</h3><p>类里面可以再定义一个类<br>内部类有成员内部类,静态内部类和局部内部类</p>
-<h4 id="成员内部类"><a href="#成员内部类" class="headerlink" title="成员内部类"></a>成员内部类</h4><p>成员内部类相当于类的成员,可以用default,private,public修饰<br>成员内部类可以用static修饰.(因此被static修饰的类一定是内部类)<br>示例:</p>
-<pre><code class="java">class Outer &#123;
-    private int x;
-
-    class Inner &#123;
-        void display() &#123;
-            System.out.println(&quot;Value of x: &quot; + x); // 内部类直接访问外部类的私有字段
-        &#125;
-    &#125;
-&#125;
-</code></pre>
-<h5 id="静态成员内部类"><a href="#静态成员内部类" class="headerlink" title="静态成员内部类"></a>静态成员内部类</h5><p>使用static修饰的成员内部类<br>1.因为拥有static修饰符,因此不需要通过创建对象即可使用该类.<br>2.该类不得访问其外部类的非静态成员<br>3.该类可以创建static成员(也可以创建非静态成员)</p>
-<h5 id="非静态成员内部类"><a href="#非静态成员内部类" class="headerlink" title="非静态成员内部类"></a>非静态成员内部类</h5><p>不使用static修饰的成员内部类.<br>与静态成员内部类正好相反,它:<br>1.必须通过创建外部类的对象才可使用该类<br>2.可以访问其外部类的所有成员<br>3.不得创建static成员</p>
-<p>如果内部类的成员与外部类的成员重名,则外部类的成员会被隐藏,如果要访问它,就必须使用<br>外部类名.this.成员<br>进行访问,示例:</p>
-<pre><code class="java">public class Outer &#123;
-    private int x = 10;
-
-    class Inner &#123;
-        private int x = 20;
-
-        void display() &#123;
-            System.out.println(&quot;Inner x: &quot; + x); // 输出 Inner x: 20
-            System.out.println(&quot;Outer x: &quot; + Outer.this.x); // 输出 Outer x: 10
-        &#125;
-    &#125;
-
-    public static void main(String[] args) &#123;
-        Outer outer = new Outer();
-        Inner inner = outer.new Inner();
-        inner.display();
-    &#125;
-&#125;
-</code></pre>
-<p>Q:为什么不是super.成员?<br>A:不是继承.</p>
-<h5 id="成员类的访问"><a href="#成员类的访问" class="headerlink" title="成员类的访问"></a>成员类的访问</h5><p>对于静态成员类,如果仅访问其静态成员,只需要<br>外部类名.静态成员类名.静态成员名<br>即可<br>如果是非静态成员,则必须通过该类的实例来访问其成员.<br>示例:</p>
-<pre><code class="java">/**
- * @author dancingby
- */
-
-package cn.dancingby;
-
-public class Outer &#123;
-    static class StaticNestedClass &#123;
-        static void display() &#123;
-            System.out.println(&quot;Inside static nested class(Static method)&quot;);
-        &#125;
-        void display2()&#123;
-            System.out.println(&quot;Inside static nested class(Non-static method)&quot;);
-        &#125;
-    &#125;
-
-&#125;
-</code></pre>
-<pre><code class="java">package cn.dancingby;
-
-public class main &#123;
-    public static void main(String[] args)&#123;
-
-        Outer outer = new Outer();
-        Outer.StaticNestedClass nestedClass = new Outer.StaticNestedClass();
-        Outer.StaticNestedClass.display();
-        nestedClass.display();
-        nestedClass.display2();
-
-    &#125;
-&#125;
-</code></pre>
-<p>输出:<br>    Inside static nested class(Static method)<br>    Inside static nested class(Static method)<br>    Inside static nested class(Non-static method)</p>
-
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        <span class="icon">
-            <i class="fa-solid fa-tags fa-fw"></i>
-        </span>
-        
-        
-        
-        <span class="tag">
-            
-            <a href="/tags/Java-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="color: #ff7d73">Java,面向对象</a>
-        </span>
-        
-    </div>
-    <a href="/2024/04/27/Java%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" class="go-post">阅读全文</a>
 </div>
 
 
