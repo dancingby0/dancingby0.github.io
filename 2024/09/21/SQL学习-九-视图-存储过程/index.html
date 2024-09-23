@@ -1,0 +1,491 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <title>SQL学习(九)视图,存储过程,触发器 | dancingby&#39;s home</title>
+    <meta name="author" content="dancingby" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="blog" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.loli.net" />
+<link rel="preconnect" href="https://gstatic.loli.net" crossorigin />
+<link rel="stylesheet" href="https://fonts.loli.net/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" />
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.2.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>DANCINGBY&#39;S HOME</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;Home</span>
+        </a>
+        
+        <a href="/about">
+            <i class="fa-solid fa-id-card fa-fw"></i>
+            <span>&ensp;About</span>
+        </a>
+        
+        <a href="/archives">
+            <i class="fa-solid fa-box-archive fa-fw"></i>
+            <span>&ensp;Archives</span>
+        </a>
+        
+        <a href="/categories">
+            <i class="fa-solid fa-bookmark fa-fw"></i>
+            <span>&ensp;Categories</span>
+        </a>
+        
+        <a href="/tags">
+            <i class="fa-solid fa-tags fa-fw"></i>
+            <span>&ensp;Tags</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;DANCINGBY&#39;S HOME</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Home</div>
+                    </div>
+                </a>
+                
+                <a href="/about">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-id-card fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">About</div>
+                    </div>
+                </a>
+                
+                <a href="/archives">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-box-archive fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Archives</div>
+                    </div>
+                </a>
+                
+                <a href="/categories">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-bookmark fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Categories</div>
+                    </div>
+                </a>
+                
+                <a href="/tags">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-tags fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Tags</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>SQL学习(九)视图,存储过程,触发器</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/21
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <i class="fa-solid fa-tags fa-fw"></i>
+            </span>
+            
+            
+            <span class="tag">
+                
+                <a href="/tags/sql/" style="color: #00a596">sql</a>
+            </span>
+            
+            <span class="tag">
+                
+                <a href="/tags/back-end/" style="color: #03a9f4">back end</a>
+            </span>
+            
+        </span>
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <h1 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h1><p>视图(View)是一种虚拟存在的表,视图中的数据并不在数据库中实际存在.定义视图时的表是动态生成的,其原来的表称为基表</p>
+<p>即:视图只保存了查询的SQL逻辑,不保存查询结果.(将一堆sql语句整合成一个表使用)</p>
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><ul>
+<li>创建</li>
+</ul>
+<pre><code class="sql">create [or replace] view 视图名称[(列名列表)] AS SELECT语法 [WITH [CASCADED|LOCAL] CHECK OPTION];
+</code></pre>
+<ul>
+<li>查询</li>
+</ul>
+<pre><code class="sql">SHOW CREATE VIEW 视图名称; -- 查询创建视图语句
+SELECT * FROM 视图名称...; -- 查询视图数据
+</code></pre>
+<ul>
+<li>修改视图</li>
+</ul>
+<pre><code class="sql">create [or replace] view 视图名称[(列名列表)] AS SELECT语法 [WITH [CASCADED|LOCAL] CHECK OPTION]; -- 因为有or replace
+alter view 视图名称[(列名列表)] as select 语句 [WITH [CASCADED|LOCAL] CHECK OPTION];
+</code></pre>
+<ul>
+<li>删除</li>
+</ul>
+<pre><code class="sql">drop view [if exists] 视图名称 [,视图名称] ...;
+</code></pre>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">create or replace view stu_v1_1 as select id,name from student where id &lt;=10;
+select * from stu_v1_1 where id = 3;
+create or replace view stu_v_1 as select id,name,no from student where id &lt;= 10;
+alter view stu_v_1 as select id,name,no from student where id &lt;= 10;
+</code></pre>
+<h4 id="选项"><a href="#选项" class="headerlink" title="选项"></a>选项</h4><p>视图可以基于另一个视图创建</p>
+<p>如果直接执行insert语句,其插入到基表中,而非在视图中更新</p>
+<p>向视图插入数据时,则需要满足视图的要求(仅启用视图选项时需要遵守要求)</p>
+<pre><code class="sql">create or replace view stu_v_1 as select id,name,no from student where id &lt;= 10 with cascaded check option; -- 逐级检查选项,如果此后执行insert语句,若发现与视图的字段不匹配,将阻止插入
+</code></pre>
+<p>可以增加检查选项cascaded check option来实时更新视图,视图选项默认为cascaded(只有增加视图选项时才可)</p>
+<ul>
+<li>cascaded</li>
+</ul>
+<p>如果不加cascaded,进行修改时不受任何影响</p>
+<p>如果加上cascaded,修改时会受其影响,要求满足视图的要求</p>
+<pre><code class="sql">create view v1 as select id,name from student where id &lt;= 20; -- 可以在v1插入id大于20的数据
+
+create view v2 as select id,name from v2 where id &gt;=10 with cascaded check option; -- 会检查v1和v2的条件,只有两个条件都通过才可执行修改操作
+</code></pre>
+<p>如:v1无视图选项,v2基于v1,v2为cascaded,v3基于v2,无视图选项,则基表插入数据时会检查v1,v2,不会检查v3</p>
+<ul>
+<li>local</li>
+</ul>
+<p>local即只检查当前视图选项,校验过程从v2到v1,判断v1是否有选项,无则跳过,有则校验</p>
+<h2 id="视图更新"><a href="#视图更新" class="headerlink" title="视图更新"></a>视图更新</h2><p>要使视图可更新,视图的行与基础表中行之间必须存在一对一关系.如果包含任何一项,则不可更新(即不可以向视图插入数据):</p>
+<p>聚合函数(不是一对一)</p>
+<p>DISTINCT(合并了)</p>
+<p>GROUP BY(分组,也合并了)</p>
+<p>HAVING(基于分组)</p>
+<p>UNION <a href="%E5%90%88%E5%B9%B6%E8%A7%86%E5%9B%BE%E4%BA%86">ALL</a></p>
+<h2 id="视图作用"><a href="#视图作用" class="headerlink" title="视图作用"></a>视图作用</h2><ol>
+<li>简单</li>
+</ol>
+<p>视图简化用户对数据的理解,并且简化他们的操作.经常使用的操作定义为视图</p>
+<ol start="2">
+<li>安全</li>
+</ol>
+<p>数据库可以授权,但无法授权至指定行与列;通过视图用户只能查询和修改他们所看到的数据</p>
+<pre><code class="sql">create user &#39;username&#39;@&#39;host&#39; identified by &#39;password&#39;;
+revoke all privileges on database.table from &#39;username&#39;@&#39;host&#39;; -- 避免用户直接操作基表
+grant select,insert,update,delete on database.view to &#39;username&#39;@&#39;host&#39;;
+flush privileges; -- 刷新权限
+</code></pre>
+<ol start="3">
+<li>数据独立</li>
+</ol>
+<p>…</p>
+<h2 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h2><ol>
+<li>为保证数据库表的安全性,在操作tb_user表时,只能看到用户基本字段,屏蔽手机号和邮箱两个字段</li>
+</ol>
+<pre><code class="sql">create or replace view tb_user_v_1 as select id,name from tb_user local check option;
+revoke all privileges on itcast.tb_user from &#39;username&#39;@&#39;host&#39;;
+grant select,update,delete,insert on itcast.tb_user to &#39;username&#39;@&#39;host&#39;;
+flush privileges; -- 刷新权限
+</code></pre>
+<ol start="2">
+<li>查询每个学生所选修的课程.为简化操作定义一个视图</li>
+</ol>
+<pre><code class="sql">create or replace view stu_course_v_1 as select s.id,s.name,c.name from student s, course c, student_course sc where s.id = sc.stu_id and c.id = sc.course_id;
+</code></pre>
+<h1 id="存储过程"><a href="#存储过程" class="headerlink" title="存储过程"></a>存储过程</h1><p>存储过程是在数据库服务器上执行各种复杂业务逻辑,而<strong>无需多次发送单个SQL查询</strong>.</p>
+<p>优点:</p>
+<p>性能提升:减少网络交互(最显著优点)</p>
+<p>安全</p>
+<p>缺点:</p>
+<p>调试复杂</p>
+<p>版本控制困难</p>
+<p>数据库负载增加:把业务逻辑放在数据库服务器中实现,会影响数据库性能</p>
+<p>现阶段存储过程一般禁用</p>
+<h2 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h2><p>创建</p>
+<pre><code class="sql">CREATE PROCEDURE 存储过程名称[(参数列表)] -- 相当于函数定义
+BEGIN
+    SQL语句 -- 所有逻辑都在里面
+END;
+</code></pre>
+<p>调用</p>
+<pre><code class="sql">CALL 名称([参数])
+</code></pre>
+<p>查看</p>
+<pre><code class="sql">SELECT * FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA = &#39;xxx&#39;; -- 查询指定数据库的存储过程及状态信息,xxx填数据库名称(即该数据库中有什么存储过程)
+-- INFORMATION_SCHEMA系统自己的数据库,ROUTINES是该数据库自带的表
+
+SHOW CREATE PROCEDURE 存储过程名称; -- 查看某个存储过程定义
+</code></pre>
+<p>删除</p>
+<pre><code class="sql">DROP PROCEDURE [IF EXISTS] 存储过程名称;
+</code></pre>
+<p>在命令行中,执行创建存储过程的SQL中,需要通过关键字delimiter指定SQL语句的结束符(否则分号会作为存储过程的结尾)</p>
+<pre><code class="sql">delimiter $$;
+</code></pre>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">create procedure p1()
+begin
+    select count(*) from student;
+end; -- 在命令行中会报错
+
+call p1();
+
+delimiter $$
+create procedure p1()
+begin
+    select count(*) from student;
+end$$ -- 成功执行
+delimiter ; -- 恢复分隔符
+</code></pre>
+<h2 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h2><h3 id="系统变量"><a href="#系统变量" class="headerlink" title="系统变量"></a>系统变量</h3><p>系统变量: 由MYSQL服务器提供,属于服务器层面;分为全局变量(GLOBAL)与会话变量(SESSION)</p>
+<p>查看系统变量</p>
+<pre><code class="sql">SHOW [SESSION|GLOBAL] VARIABLES; -- 查看所有系统变量
+SHOW [SESSION|GLOBAL] VARIABLES LIKE &#39;...&#39;; -- 通过like可以进行模糊匹配
+SELECT @@[SESSION.|GLOBAL.]系统变量名; -- 查看指定变量值
+</code></pre>
+<p>设置变量值</p>
+<pre><code class="sql">SET [SESSION|GLOBAL] 系统变量名 = 值;
+SET @@[SESSION.|GLOBAL.]系统变量名 = 值;
+</code></pre>
+<p>如果没有指定SESSION&#x2F;GLOBAL,默认SESSION</p>
+<p>mysql重新启动后,所设置的全局参数会失效,需要在&#x2F;etc&#x2F;my.cnf中配置,则不会失效</p>
+<p>示例:</p>
+<pre><code class="sql">select @@session.autocommit;
+set session autocommit = 0;
+</code></pre>
+<h3 id="用户自定义变量"><a href="#用户自定义变量" class="headerlink" title="用户自定义变量"></a>用户自定义变量</h3><p>用户根据需要自己定义的变量,无需提前声明,只需@变量名即可.作用域为当前连接</p>
+<ul>
+<li>赋值</li>
+</ul>
+<pre><code class="sql">SET @var_name = expr [,@var_name=expr...]; -- 因为比较相等也是用=,容易混淆
+SET @var_name := expr ... ; -- 推荐使用这个
+select @var_name := expr ...;
+select 字段名 into @var_name FROM 表名;
+</code></pre>
+<ul>
+<li>使用</li>
+</ul>
+<pre><code class="sql">SELECT @var_name;
+</code></pre>
+<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">set @myname = &#39;itcast&#39;;
+set @myage := 10;
+set @mygender := &#39;男&#39;,@myhobby := &#39;java&#39;;
+
+select @myname,@myage,@mygender,@myhobby;
+</code></pre>
+<h3 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h3><p>需要DECLARE声明,范围在BEGIN … END块内</p>
+<pre><code class="sql">DECLARE 变量名 变量类型 [DEFAULT ...]; -- DEFAULT 指定默认值
+</code></pre>
+<p>赋值:</p>
+<pre><code class="sql">set 变量名:=值; -- 也可=
+select field_name into 变量名 from 表名;
+</code></pre>
+<h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">create procedure p2()
+begin
+    declare stu_count int default 0;
+    select count(*) into stu_count from studemnt;
+    select stu_count; 
+end;
+
+call p2();
+</code></pre>
+<h3 id="if-判断"><a href="#if-判断" class="headerlink" title="if 判断"></a>if 判断</h3><p>语法:</p>
+<pre><code class="sql">IF condition1 THEN
+
+ELSEIF condition2 THEN
+
+ELSE
+...
+END IF;
+</code></pre>
+<h4 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">create procedure p4()
+begin
+    declare score int default 58;
+    declare result varchar(10);
+    if score &gt;= 85 then
+        set result := &#39;优秀&#39;;
+    elseif score &gt;= 60 then
+        set result := &#39;及格&#39;;
+    else
+        set result := &#39;不及格&#39;;
+    end if;
+end;
+</code></pre>
+<h3 id="参数类型"><a href="#参数类型" class="headerlink" title="参数类型"></a>参数类型</h3><p>in: 输入参数</p>
+<p>out: 输出参数,也就是可以作为返回值</p>
+<p>inout: 既可以作为输入也可以输出</p>
+<p>用法:</p>
+<pre><code class="sql">create procedure 存储过程名称([in/out/inout] 参数名 参数类型)
+begin
+    sql语句
+end;
+</code></pre>
+<h4 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h4><p>根据传入参数score,判定等级并返回</p>
+<pre><code class="sql">
+create procedure p4(in score int,out result varchar(10)) -- 返回result
+begin
+    if score &gt;= 85 then
+        set result := &#39;优秀&#39;;
+    elseif score &gt;= 60 then
+        set result := &#39;及格&#39;;
+    else
+        set result := &#39;不及格&#39;;
+    else if;
+end;
+
+call p4(68,@result);
+
+
+create procedure p5(inout score double)
+begin
+    set score := score * 0.5
+end;
+
+set @score = 50;
+call p5(@score); -- 会更改@score
+select @score
+</code></pre>
+<h1 id="触发器"><a href="#触发器" class="headerlink" title="触发器"></a>触发器</h1><p>触发器是与表有关的数据库对象,即在insert&#x2F;update&#x2F;delete之前或之后触发并执行触发器中定义的SQL语句集合</p>
+<p>用于数据库保证数据完整性,日志记录,数据校验等操作</p>
+<p>使用OLD或NEW引用触发器中发生变化的记录内容.现触发器还只支持行级触发,不支持语句级触发</p>
+<p>触发器类型:</p>
+<p>INSERT型触发器:NEW表示将要或已经新增的数据</p>
+<p>UPDATE型触发器:OLD表示修改之前数据,NEW表示将要或已修改的数据</p>
+<p>DELETE型触发器:OLD表示将要或已经删除的数据</p>
+<h2 id="insert触发器"><a href="#insert触发器" class="headerlink" title="insert触发器"></a>insert触发器</h2><p>语法:</p>
+<p>创建:</p>
+<pre><code class="sql">CREATE TRIGGER trigger_name
+BEFORE/AFTER INSERT/UPDATE/DELETE
+ON table_name FOR EACH ROW -- 行级触发器
+BEGIN
+    trigger_stmt;
+END;
+</code></pre>
+<p>查看:</p>
+<pre><code class="sql">SHOW TRIGGERS;
+</code></pre>
+<p>删除触发器:</p>
+<pre><code class="sql">DROP TRIGGER [schema_name.]trigger_name; -- 如果出不指定schema_name,默认当前数据库
+</code></pre>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2024 - 2024 dancingby&#39;s home
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;dancingby
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+</body>
+</html>

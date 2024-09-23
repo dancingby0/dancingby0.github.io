@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8" />
-    <title>Tags: 前端 | dancingby&#39;s home</title>
+    <title>MyBatis学习(一) | dancingby&#39;s home</title>
     <meta name="author" content="dancingby" />
     <meta name="description" content="" />
     <meta name="keywords" content="blog" />
@@ -31,6 +31,10 @@
 
 
 <script src="/js/lib/preview.js"></script>
+
+
+
+
 
 
 
@@ -144,144 +148,74 @@
 </transition>
 
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
-            <div id="archives">
-    
-    <div class="categories-tags">
-        
-        
-        
-        <span>
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="background: linear-gradient(120deg, #9abbf7 0%, #ffbbf4 100%)">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                前端
-            </a>
-        </span>
-        
-        
-        
-        
-        
-        <span>
-            <a href="/tags/HTML/" style="background: #00bcd4">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                HTML
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/tags/Java/" style="background: #00a596">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                Java
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/tags/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="background: #03a9f4">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                面向对象
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/tags/sql/" style="background: #ff7d73">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                sql
-            </a>
-        </span>
-        
-        
-        
-        <span>
-            <a href="/tags/back-end/" style="background: #00a596">
-                <span class="icon">
-                    <i class="fa-solid fa-tags fa-fw"></i>
-                </span>
-                back end
-            </a>
+            <div class="article">
+    <div>
+        <h1>MyBatis学习(一)</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/21
         </span>
         
         
     </div>
     
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2024/5/3</div>
-            <a href="/2024/05/03/HTML%E5%AD%A6%E4%B9%A0-%E4%B8%80/">
-                <h3>HTML学习(一)</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <i class="fa-solid fa-tags fa-fw"></i>
-                    </span>
-                    
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ff7d73">前端</a>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/HTML/" style="color: #00a596">HTML</a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
+    <div class="content" v-pre>
+        <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>MyBatis是优秀的持久层框架,用于简化JDBC开发</p>
+<p>本身是Apache的开源项目iBatis</p>
+<h2 id="持久层"><a href="#持久层" class="headerlink" title="持久层"></a>持久层</h2><ul>
+<li><p>负责将数据保存到数据库的那一层代码</p>
+</li>
+<li><p>JavaEE三层架构: 表现层,业务层,持久层</p>
+</li>
+</ul>
+<p>表现层: 进行页面展示</p>
+<p>业务层: 处理业务逻辑</p>
+<p>持久层: 将数据持久化(即存储数据)</p>
+<h2 id="框架"><a href="#框架" class="headerlink" title="框架"></a>框架</h2><p>框架就是半成品软件,可重用,通用,软件基础代码模型</p>
+<p>框架基础上构建软件编写更有效,规范,通用,可拓展</p>
+<h2 id="JDBC缺点"><a href="#JDBC缺点" class="headerlink" title="JDBC缺点"></a>JDBC缺点</h2><ol>
+<li>硬编码</li>
+</ol>
+<p>直接将字符串写入代码内部</p>
+<ol start="2">
+<li>操作繁琐</li>
+</ol>
+<h2 id="MyBatis优化"><a href="#MyBatis优化" class="headerlink" title="MyBatis优化"></a>MyBatis优化</h2><p>将硬编码转化到配置文件中</p>
+<p>操作繁琐则自动完成</p>
+<p>相关持久层框架: Spring Data JPA, MyBatis-Plus…</p>
+<p>术语:</p>
+<p>POJO(Plain Old Java Object),普通java对象</p>
+<h1 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h1><p>步骤:</p>
+<ol>
+<li><p>创建数据表,添加数据</p>
+</li>
+<li><p>创建项目模块,导入坐标</p>
+</li>
+<li><p>编写MyBatis核心配置文件,替换数据库连接信息</p>
+</li>
+<li><p>编写SQL映射文件,统一管理sql语句,解决硬编码问题</p>
+</li>
+<li><p>编码</p>
+<ol>
+<li>定义POLO类</li>
+<li>加载核心配置文件,获取SqlSessionFactory对象</li>
+<li>获取SqlSession对象,执行SQL语句</li>
+<li>释放资源</li>
+</ol>
+</li>
+</ol>
+
     </div>
     
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2024/5/3</div>
-            <a href="/2024/05/03/HTML%E5%AD%A6%E4%B9%A0-%E4%BA%8C/">
-                <h3>HTML学习(二)</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <i class="fa-solid fa-tags fa-fw"></i>
-                    </span>
-                    
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #03a9f4">前端</a>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/HTML/" style="color: #00bcd4">HTML</a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
-    </div>
+    
+    
+    
+    
+    
     
 </div>
 
@@ -313,6 +247,12 @@
         
     </div>
     <script src="/js/main.js"></script>
+    
+    
+
+
+
+
     
 </body>
 </html>
