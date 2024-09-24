@@ -1,0 +1,457 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <title>Lombok,Junit,反射,注解 | dancingby&#39;s home</title>
+    <meta name="author" content="dancingby" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="blog" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.loli.net" />
+<link rel="preconnect" href="https://gstatic.loli.net" crossorigin />
+<link rel="stylesheet" href="https://fonts.loli.net/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" />
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.2.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>DANCINGBY&#39;S HOME</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;Home</span>
+        </a>
+        
+        <a href="/about">
+            <i class="fa-solid fa-id-card fa-fw"></i>
+            <span>&ensp;About</span>
+        </a>
+        
+        <a href="/archives">
+            <i class="fa-solid fa-box-archive fa-fw"></i>
+            <span>&ensp;Archives</span>
+        </a>
+        
+        <a href="/categories">
+            <i class="fa-solid fa-bookmark fa-fw"></i>
+            <span>&ensp;Categories</span>
+        </a>
+        
+        <a href="/tags">
+            <i class="fa-solid fa-tags fa-fw"></i>
+            <span>&ensp;Tags</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;DANCINGBY&#39;S HOME</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Home</div>
+                    </div>
+                </a>
+                
+                <a href="/about">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-id-card fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">About</div>
+                    </div>
+                </a>
+                
+                <a href="/archives">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-box-archive fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Archives</div>
+                    </div>
+                </a>
+                
+                <a href="/categories">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-bookmark fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Categories</div>
+                    </div>
+                </a>
+                
+                <a href="/tags">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-tags fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Tags</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>Lombok,Junit,反射,注解</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/24
+        </span>
+        
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <h1 id="Junit"><a href="#Junit" class="headerlink" title="Junit"></a>Junit</h1><p>进行代码测试,即进行白箱测试</p>
+<p>建议:</p>
+<ol>
+<li>测试类名: CalculatorTest</li>
+<li>包名: xxx.xxx.xxx.xx.test cn.itcast.test</li>
+</ol>
+<p>定义测试方法:</p>
+<p>可以独立运行</p>
+<ol>
+<li>方法名: test测试方法名 testAdd</li>
+<li>返回值 void</li>
+<li>形参列表 空</li>
+<li>加上@Test注解</li>
+</ol>
+<p>判定结果 红色成功,绿色失败;一般使用断言操作处理操作</p>
+<p>在测试方法中进行断言,断言结果为需要的结果,如果断言失败,则说明程序有问题</p>
+<pre><code class="java">Assert.assertEquals(a+b,result); // 如果与期望的值不同,则报错
+</code></pre>
+<p>常见注解:</p>
+<p>@Test 表明该方法是测试方法</p>
+<pre><code class="java">public class CalculatorTest&#123;
+    @Before // 说明在所有测试方法执行前都会调用该方法(用于申请资源)
+    public void init()&#123;
+        System.out.println(&quot;init...&quot;);
+    &#125;
+    @After // 在所有测试方法执行后都会调用该方法(用于释放资源)
+    public void close()&#123;
+        System.out.println(&quot;close...&quot;);
+    &#125;
+
+    @Test
+    public void testAdd()&#123;
+        Calculator c = new Calculator();
+        int result = c.sub(1,2);
+        Assert.assertEquals(3,result); // 即便失败,还是会执行close方法
+    &#125;
+&#125;
+</code></pre>
+<h1 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h1><p>框架设计的灵魂</p>
+<p>框架: 半成品软件(简化编码)</p>
+<p>反射:将类的各个组成部分</p>
+<p>好处:</p>
+<ol>
+<li><p>在程序运行中,可以操作这些对象</p>
+</li>
+<li><p>可以解耦,提高程序的可拓展性</p>
+</li>
+</ol>
+<p>获取class对象(字节码对象)的方式</p>
+<ol>
+<li><p>Class.forName(“全类名”): 将字节码文件加载进内存,返回class对象 (源代码阶段) 多用于配置文件,将类名定义于配置文件中,读取文件加载类</p>
+</li>
+<li><p>类名.class : 通过类名的属性获取 (类对象阶段) 多用于参数传递</p>
+</li>
+<li><p>对象.getClass() : getClass()方法在Object类中定义 (Runtime时阶段) 多用于对象获取字节码方式</p>
+</li>
+</ol>
+<p>结论: 同一个字节码文件(*.class)在一次程序运行过程中,只会被加载一次; <strong>不管使用什么方式加载,都是同一个对象</strong></p>
+<p>&#x2F;&#x2F; java.lang.ClassNotFoundException: 无法找到类(类名可能写错了)</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="Class对象功能"><a href="#Class对象功能" class="headerlink" title="Class对象功能:"></a>Class对象功能:</h3><p>获取功能:</p>
+<ol>
+<li>成员变量们<ul>
+<li>Field[] getFields() &#x2F;&#x2F; 获取可访问的公共字段(public),包括父类</li>
+<li>Field getField(String name) &#x2F;&#x2F; 获取指定名称的公共字段,</li>
+<li>Field[] getDeclaredFields() &#x2F;&#x2F; 获取可访问的所有字段(不考虑修饰符),不包括父类</li>
+<li>Field getDeclaredField(String name) &#x2F;&#x2F;</li>
+</ul>
+</li>
+<li>构造方法们</li>
+</ol>
+<p>同上,详见文档</p>
+<ol start="3">
+<li><p>获取成员方法们</p>
+</li>
+<li><p>类名等</p>
+</li>
+</ol>
+<pre><code class="java">Field[] fields = personClass.getFields();
+</code></pre>
+<h3 id="字段功能"><a href="#字段功能" class="headerlink" title="字段功能"></a>字段功能</h3><p>Field 成员变量</p>
+<ol>
+<li>设置值</li>
+</ol>
+<p>void set(Object obj, Object value) &#x2F;&#x2F; 对于特定obj的字段设置value值</p>
+<ol start="2">
+<li>获取值</li>
+</ol>
+<ul>
+<li>get(Object obj)</li>
+</ul>
+<ol start="3">
+<li>忽略访问权限修饰符安全检查<br>setAccessible(true): 暴力反射(忽略了private这种,破坏封装)</li>
+</ol>
+<h3 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h3><p>创建对象</p>
+<pre><code class="java">Constructor&lt;T&gt; getConstructor(类&lt;?&gt;... parameterTypes) // 获取特定的构造方法 同理,declared可以获取私有的构造器,但也需要调用构造器的setAccessible进行暴力反射
+
+T newInstance(Object... initargs)// 通过构造方法创建实例
+</code></pre>
+<p>如果使用空参,操作可以简化:Class对象的newInstance方法</p>
+<h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><p>Method: 方法对象</p>
+<p>Object invoke(Object obj, Object… args) &#x2F;&#x2F; 对obj执行特定方法</p>
+<p>获取方法名称:</p>
+<p>String getName() &#x2F;&#x2F; 获取方法名</p>
+<pre><code class="java">// 获取指定名称方法
+Method eat_method = personClass.getMethod(&quot;eat&quot;);
+Person p = new Person();
+eat_method.invoke(p); // 空参方法
+
+Method[] methods = personClass.getMethods();
+for(Method method : methods)&#123;
+    System.out.println(method.getName());
+&#125;
+</code></pre>
+<p>示例:</p>
+<pre><code class="java">Constructor constructor = personClass.getConstructor(String.class,int.class);
+Object person = constructor.Instance(&quot;张三&quot;,23);
+Object person1 = personClass.newInstance();
+</code></pre>
+<h2 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h2><p>需求:</p>
+<p>创建框架,可以帮我们创建任意类的对象,并执行其中任意方法</p>
+<p>实现:</p>
+<ol>
+<li><p>配置文件</p>
+</li>
+<li><p>反射</p>
+</li>
+</ol>
+<p>步骤:</p>
+<ol>
+<li><p>将需要创建的对象全类名和需要执行的方法定义在配置文件中</p>
+</li>
+<li><p>在程序中加载读取配置文件</p>
+</li>
+<li><p>使用反射技术加载类文件进入内存,创建对象,执行方法</p>
+</li>
+</ol>
+<pre><code class="ini">className=cn.itcast.domain.Person
+methodName=eat
+</code></pre>
+<pre><code class="java">public class ReflectTest&#123;
+    public static void main(String[] args) throws Exception&#123;
+        Properties pro = new Properties();
+        ClassLoader classLoader = ReflectTest.class.getClassLoader(); // 获取class目录下类加载器
+        InputSteam is =  classLoader.getResourceAsStream(&quot;pro.properties&quot;);
+        pro.load(is);
+        String className = pro.getProperty(&quot;className&quot;);
+        String methodName = pro.getProperty(&quot;methodName&quot;);
+
+        Class cls = Class.forName(className);
+        Object obj = cls.newInstance();
+
+        Method method = cls.getMethod(methodName);
+
+        method.invoke(obj);
+    &#125;
+&#125;
+</code></pre>
+<h1 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h1><p>概念:</p>
+<p>用文字描述程序,给程序员看的;JDK1.5之后才有</p>
+<p>使用@注解名称</p>
+<p>作用分类:</p>
+<ol>
+<li><p>编写文档(生成doc文档)</p>
+</li>
+<li><p>代码分析(使用反射)</p>
+</li>
+<li><p>编译检查(Override),让编译器能够实现基本的编译检查</p>
+</li>
+</ol>
+<pre><code class="java">/**
+ * @author test
+ * @since 1.5
+ */
+public class Demo1&#123;
+
+    /**
+     * 计算两数和
+     * @param a 整数
+     * @param b 整数
+     * @return 两数和
+     */
+    public int add(int a,int b)&#123;
+        return a + b;
+    &#125;
+&#125;
+</code></pre>
+<pre><code class="bash">javadoc Demo1.java # 生成java文档
+</code></pre>
+<h2 id="JDK预定义注解"><a href="#JDK预定义注解" class="headerlink" title="JDK预定义注解"></a>JDK预定义注解</h2><ul>
+<li>@Override: 检测该注解标注的方法是否继承自父类(父接口)</li>
+<li>@Deprecated: 将该注解标注的内容,表示已过时</li>
+<li>@SuppressWarnings: 压制警告</li>
+</ul>
+<h2 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h2><p>格式:</p>
+<p>元注解<br>public @interface 注解名称()</p>
+<p>本质:</p>
+<p>注解本质上就是一个接口,默认继承自Annotation包(通过反编译得到) 因此操作和接口相同</p>
+<p>public interface MyAnno extends java.lang.annotation.Annotation{}</p>
+<p>属性:</p>
+<p>接口可以定义的成员方法</p>
+<p>要求:</p>
+<p>返回值类型:</p>
+<ol>
+<li><p>基本数据类型</p>
+</li>
+<li><p>String</p>
+</li>
+<li><p>枚举</p>
+</li>
+<li><p>注解</p>
+</li>
+<li><p>以上类型的数组</p>
+</li>
+</ol>
+<p>定义了属性(抽象方法),在使用时需要给属性赋值</p>
+<p>使用default关键字给属性默认初始化值,则使用注解时可以不赋值</p>
+<p>如果只有一个属性需要赋值,且名称是value,则名称可以省略,@SuppressWarnings(‘all’),这个all就是给value赋值</p>
+<p>数组赋值时,需要用大括号;如果只有一个值,大括号可以省略</p>
+<p>元注解:</p>
+<p>用于描述注解的 注解(就是一个注解,但是它用来描述注解)</p>
+<p>@Target: 描述注解能够作用的位置</p>
+<p>@Retention: 描述注解被保留的阶段(有三个阶段,源码,Class,Runtime阶段)</p>
+<p>@Documented: 描述注解是否被抽取至api文档中</p>
+<p>@Inherited: 描述注解是否被子类继承</p>
+<h2 id="使用-解析-注解"><a href="#使用-解析-注解" class="headerlink" title="使用(解析)注解"></a>使用(解析)注解</h2><pre><code class="java">@SuppressWarnings(&quot;all&quot;) // 需要传参,一般传all
+
+public @interface MyAnno&#123;
+    public abstract String show();
+    int show1();
+    String show2() default &quot;张三&quot;; // 默认张三
+    Person per(); // 返回枚举类型
+
+    String[] strs()
+
+    int value();
+
+&#125;
+
+@MyAnno(show1 = 1,show2 = &quot;2&quot;,per = Person.p1,strs = &#123;&quot;aaa&quot;,&quot;bbb&quot;&#125; ) // 使用时像属性,需要赋值
+</code></pre>
+<h1 id="Lombok"><a href="#Lombok" class="headerlink" title="Lombok"></a>Lombok</h1><p>简介:</p>
+<p>Lombok是一个Java库,能够自动插入编辑器并构建工具,简化Java开发</p>
+<p>他用注解进行提高代码可读性和开发效率(即只需要在Java类上添加相应注解,不需要手动编写相应代码)</p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2024 - 2024 dancingby&#39;s home
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;dancingby
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+</body>
+</html>

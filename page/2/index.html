@@ -167,6 +167,176 @@
         
 
 <div class="post">
+    <a href="/2024/09/15/SQL%E5%AD%A6%E4%B9%A0-%E4%B8%89/">
+        <h2 class="post-title">SQL学习(三)</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/15
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h2 id="DCL语句"><a href="#DCL语句" class="headerlink" title="DCL语句"></a>DCL语句</h2><p>DCL, Data Control Language,用于管理数据库用户,访问权限</p>
+<h3 id="管理用户"><a href="#管理用户" class="headerlink" title="管理用户"></a>管理用户</h3><h4 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h4><ol>
+<li>查询用户</li>
+</ol>
+<pre><code class="sql">USE mysql; -- 系统数据库
+SELECT * FROM user; -- 用户表
+</code></pre>
+<ol start="2">
+<li>创建用户</li>
+</ol>
+<pre><code class="sql">CREATE USER &#39;用户名&#39;@&#39;主机名&#39; IDENTIFIED BY &#39;密码&#39;;
+</code></pre>
+<ol start="3">
+<li>修改用户密码</li>
+</ol>
+<pre><code class="sql">ALTER USER &#39;用户名&#39;@&#39;主机名&#39; IDENTIFIED WITH mysql_native_password BY &#39;新密码&#39;;
+</code></pre>
+<ol start="4">
+<li>删除用户</li>
+</ol>
+<pre><code class="sql">DROP USER &#39;用户名&#39;@&#39;主机名&#39;;
+</code></pre>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>创建用户itcast,只能在当前主机localhost访问,密码123456</p>
+<pre><code class="sql">use mysql;
+select * from user;
+create user &#39;itcast&#39;@&#39;localhost&#39; identified by &#39;123456&#39;;
+</code></pre>
+<p>创建用户heima,可在任意主机上访问数据库,密码123456</p>
+<pre><code class="sql">use mysql;
+select * from user;
+create user &#39;heima&#39;@&#39;%&#39; identified by &#39;123456&#39;;
+</code></pre>
+<p>修改用户heima的访问密码为1234</p>
+<pre><code class="sql">use mysql;
+select * from user;
+alter user &#39;heima&#39;@&#39;%&#39; identified with mysql_native_password &#39;1234&#39;;
+</code></pre>
+<p>删除itcast的localhost主机用户</p>
+<pre><code class="sql">use mysql;
+select * from user;
+drop user &#39;itcast&#39;@&#39;localhost&#39;;
+</code></pre>
+<h3 id="权限控制"><a href="#权限控制" class="headerlink" title="权限控制"></a>权限控制</h3><p>ALL,ALL PRIVILEGES 所有权限</p>
+<p>SELECT 查</p>
+<p>INSERT 插</p>
+<p>UPDATE 修改数据</p>
+<p>DELETE 删</p>
+<p>ALTER 修改表</p>
+<p>DROP 删库,表,视图</p>
+<p>CREATE 创</p>
+<h4 id="用法-1"><a href="#用法-1" class="headerlink" title="用法"></a>用法</h4><ol>
+<li>查询权限</li>
+</ol>
+<pre><code class="sql">SHOW GRANTS FOR &#39;用户名&#39;@&#39;主机名&#39;;
+</code></pre>
+<ol start="2">
+<li>授予权限</li>
+</ol>
+<pre><code class="sql">GRANT 权限列表 ON 数据库名.表名 TO &#39;用户名&#39;@&#39;主机名&#39;;
+</code></pre>
+<ol start="3">
+<li>撤销权限</li>
+</ol>
+<pre><code class="sql">REVOKE 权限列表 ON 数据库名.表名 FROM &#39;用户名&#39;@&#39;主机名&#39;;
+</code></pre>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>多个权限用逗号隔开</p>
+<p>数据库名,表名可以用*表示</p>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">GRANT SELECT ON itcast.* TO &#39;heima&#39;@&#39;%&#39;;
+</code></pre>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><h3 id="字符串函数"><a href="#字符串函数" class="headerlink" title="字符串函数"></a>字符串函数</h3><pre><code class="sql">CONCAT(s1,s2..) -- 拼接字符串
+LOWER(str) -- 将str中全部转为小写
+UPPER(str) -- 将str中全部转为大写
+LPAD(str,n,pad) -- 左填充,用字符串pad对str左侧进行填充,直到达到n字符串长度
+RPAD(str,n,pad) -- 右填充
+TRIM(str) -- 去掉字符串头尾空格
+SUBSTRING(str,start,len) -- 返回从start起len长度的字符串,注意!索引从1开始!
+</code></pre>
+<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><ol>
+<li>企业员工工号统一为5位数,不是五位数的前面补0</li>
+</ol>
+<pre><code class="sql">update emp set work_number = LPAD(work_number,5,&#39;0&#39;);
+</code></pre>
+<h3 id="数值函数"><a href="#数值函数" class="headerlink" title="数值函数"></a>数值函数</h3><pre><code class="sql">SEIL(x) -- 向上取整
+FLOOR(x) -- 向下取整
+MOD(x,y) -- 返回x/y的模
+RAND() -- 返回0-1的随机数
+ROUND(x,y) -- 求参数x的四舍五入值,保留y位小数
+</code></pre>
+<h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><p>生成六位数的随机验证码</p>
+<pre><code class="sql">select LPAD(round(rand()*1000000,0),6,0); -- 若不足六位,补0
+</code></pre>
+<h3 id="日期函数"><a href="#日期函数" class="headerlink" title="日期函数"></a>日期函数</h3><pre><code class="sql">CURDATE() -- 当前日期,current date
+CURTIME() -- 当前时间
+NOW() -- 当前日期时间
+YEAR(date) -- 获取指定date年
+MONTH(date)
+DAY(date)
+DATE_ADD(date,INTERVAL expr type) -- 返回一个日期/时间 加上时间间隔expr后的时间值
+DATEDIFF(date1,date2) -- 返回date1-date2的天数
+</code></pre>
+<h4 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h4><p>date_add</p>
+<pre><code class="sql">select date_add(now(),INTERVAL 70 day); -- 第二个参数写法固定为 interval value 类型
+select date_add(now(),interval 70 year);
+</code></pre>
+<p>datediff</p>
+<pre><code class="sql">select datediff(&#39;2012-01-01&#39;,&#39;2021-10-01&#39;);
+</code></pre>
+<p>查询所有员工入职天数,并倒序排序</p>
+<pre><code class="sql">select name,datediff(CURDATE(),entry_date) &#39;entry_days&#39; from emp order by entry_days desc; -- 别名的字符串可以省略,后面order by则不能加引号
+</code></pre>
+<h3 id="流程控制函数"><a href="#流程控制函数" class="headerlink" title="流程控制函数"></a>流程控制函数</h3><p>实现条件筛选</p>
+<pre><code class="sql">IF(condition,t,f) -- 如果condition为true,则返回t,否则f
+IFNULL(value1,value2) -- 如果value1为空,则返回value2,否则返回value1
+CASE WHEN [val1] THEN [res1] ... ELSE [default] END -- 如果val1为true,返回res1,... 否则返回default默认值
+CASE [expr] WHEN [val1] THEN [res1],... ELSE[default] END -- 如果expr的值与val1相等,返回res1,..否则返回default
+</code></pre>
+<h4 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h4><p>查询emp表姓名和工作地址(北京,上海)一线,其他二线</p>
+<pre><code class="sql">select name,case when address in(&#39;北京&#39;,&#39;上海&#39;) THEN &#39;一线&#39; ELSE &#39;二线&#39; &#39;工作地址&#39; from emp;
+select name, case address when &#39;北京&#39; then &#39;一线&#39; when &#39;上海&#39; then &#39;一线&#39; else &#39;二线&#39; as &#39;工作地址&#39; from emp;
+</code></pre>
+<p>统计各个学员成绩,</p>
+<p>&gt;&#x3D;85 优秀</p>
+<p>&gt;&#x3D;60 及格</p>
+<p>否则不及格</p>
+<pre><code class="sql">select name,case when score &gt;= 85 then &#39;优秀&#39; when score &gt;= 60 then &#39;及格&#39; else &#39;不及格&#39; from emp
+</code></pre>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
+        </span>
+        
+        <span class="tag">
+            
+            <a href="/tags/back-end/" style="color: #00a596">back end</a>
+        </span>
+        
+    </div>
+    <a href="/2024/09/15/SQL%E5%AD%A6%E4%B9%A0-%E4%B8%89/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/2024/09/14/sql%E5%AD%A6%E4%B9%A0-%E4%BA%8C/">
         <h2 class="post-title">sql学习(二)</h2>
     </a>
@@ -498,12 +668,12 @@ select work_address,count(*) address_count from emp where age&lt;45 group by wor
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
+            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #ff7d73">back end</a>
+            <a href="/tags/back-end/" style="color: #00bcd4">back end</a>
         </span>
         
     </div>
@@ -828,12 +998,12 @@ varchar(50) -- 最多五十位
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #00a596">sql</a>
+            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #ffa2c4">back end</a>
+            <a href="/tags/back-end/" style="color: #03a9f4">back end</a>
         </span>
         
     </div>
@@ -890,12 +1060,12 @@ varchar(50) -- 最多五十位
         
         <span class="tag">
             
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #00a596">前端</a>
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ffa2c4">前端</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/HTML/" style="color: #ff7d73">HTML</a>
+            <a href="/tags/HTML/" style="color: #00bcd4">HTML</a>
         </span>
         
     </div>
@@ -987,12 +1157,12 @@ varchar(50) -- 最多五十位
         
         <span class="tag">
             
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #00bcd4">前端</a>
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #00a596">前端</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/HTML/" style="color: #03a9f4">HTML</a>
+            <a href="/tags/HTML/" style="color: #00bcd4">HTML</a>
         </span>
         
     </div>
@@ -1120,12 +1290,12 @@ public class main &#123;
         
         <span class="tag">
             
-            <a href="/tags/Java/" style="color: #ffa2c4">Java</a>
+            <a href="/tags/Java/" style="color: #00bcd4">Java</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="color: #00bcd4">面向对象</a>
+            <a href="/tags/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" style="color: #ffa2c4">面向对象</a>
         </span>
         
     </div>
@@ -1227,7 +1397,7 @@ class Animal&#123;
         
         <span class="tag">
             
-            <a href="/tags/Java/" style="color: #03a9f4">Java</a>
+            <a href="/tags/Java/" style="color: #ffa2c4">Java</a>
         </span>
         
     </div>

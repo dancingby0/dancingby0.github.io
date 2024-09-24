@@ -167,6 +167,279 @@
         
 
 <div class="post">
+    <a href="/2024/09/24/Lombok-Junit-%E5%8F%8D%E5%B0%84-%E6%B3%A8%E8%A7%A3/">
+        <h2 class="post-title">Lombok,Junit,反射,注解</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/24
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h1 id="Junit"><a href="#Junit" class="headerlink" title="Junit"></a>Junit</h1><p>进行代码测试,即进行白箱测试</p>
+<p>建议:</p>
+<ol>
+<li>测试类名: CalculatorTest</li>
+<li>包名: xxx.xxx.xxx.xx.test cn.itcast.test</li>
+</ol>
+<p>定义测试方法:</p>
+<p>可以独立运行</p>
+<ol>
+<li>方法名: test测试方法名 testAdd</li>
+<li>返回值 void</li>
+<li>形参列表 空</li>
+<li>加上@Test注解</li>
+</ol>
+<p>判定结果 红色成功,绿色失败;一般使用断言操作处理操作</p>
+<p>在测试方法中进行断言,断言结果为需要的结果,如果断言失败,则说明程序有问题</p>
+<pre><code class="java">Assert.assertEquals(a+b,result); // 如果与期望的值不同,则报错
+</code></pre>
+<p>常见注解:</p>
+<p>@Test 表明该方法是测试方法</p>
+<pre><code class="java">public class CalculatorTest&#123;
+    @Before // 说明在所有测试方法执行前都会调用该方法(用于申请资源)
+    public void init()&#123;
+        System.out.println(&quot;init...&quot;);
+    &#125;
+    @After // 在所有测试方法执行后都会调用该方法(用于释放资源)
+    public void close()&#123;
+        System.out.println(&quot;close...&quot;);
+    &#125;
+
+    @Test
+    public void testAdd()&#123;
+        Calculator c = new Calculator();
+        int result = c.sub(1,2);
+        Assert.assertEquals(3,result); // 即便失败,还是会执行close方法
+    &#125;
+&#125;
+</code></pre>
+<h1 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h1><p>框架设计的灵魂</p>
+<p>框架: 半成品软件(简化编码)</p>
+<p>反射:将类的各个组成部分</p>
+<p>好处:</p>
+<ol>
+<li><p>在程序运行中,可以操作这些对象</p>
+</li>
+<li><p>可以解耦,提高程序的可拓展性</p>
+</li>
+</ol>
+<p>获取class对象(字节码对象)的方式</p>
+<ol>
+<li><p>Class.forName(“全类名”): 将字节码文件加载进内存,返回class对象 (源代码阶段) 多用于配置文件,将类名定义于配置文件中,读取文件加载类</p>
+</li>
+<li><p>类名.class : 通过类名的属性获取 (类对象阶段) 多用于参数传递</p>
+</li>
+<li><p>对象.getClass() : getClass()方法在Object类中定义 (Runtime时阶段) 多用于对象获取字节码方式</p>
+</li>
+</ol>
+<p>结论: 同一个字节码文件(*.class)在一次程序运行过程中,只会被加载一次; <strong>不管使用什么方式加载,都是同一个对象</strong></p>
+<p>&#x2F;&#x2F; java.lang.ClassNotFoundException: 无法找到类(类名可能写错了)</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="Class对象功能"><a href="#Class对象功能" class="headerlink" title="Class对象功能:"></a>Class对象功能:</h3><p>获取功能:</p>
+<ol>
+<li>成员变量们<ul>
+<li>Field[] getFields() &#x2F;&#x2F; 获取可访问的公共字段(public),包括父类</li>
+<li>Field getField(String name) &#x2F;&#x2F; 获取指定名称的公共字段,</li>
+<li>Field[] getDeclaredFields() &#x2F;&#x2F; 获取可访问的所有字段(不考虑修饰符),不包括父类</li>
+<li>Field getDeclaredField(String name) &#x2F;&#x2F;</li>
+</ul>
+</li>
+<li>构造方法们</li>
+</ol>
+<p>同上,详见文档</p>
+<ol start="3">
+<li><p>获取成员方法们</p>
+</li>
+<li><p>类名等</p>
+</li>
+</ol>
+<pre><code class="java">Field[] fields = personClass.getFields();
+</code></pre>
+<h3 id="字段功能"><a href="#字段功能" class="headerlink" title="字段功能"></a>字段功能</h3><p>Field 成员变量</p>
+<ol>
+<li>设置值</li>
+</ol>
+<p>void set(Object obj, Object value) &#x2F;&#x2F; 对于特定obj的字段设置value值</p>
+<ol start="2">
+<li>获取值</li>
+</ol>
+<ul>
+<li>get(Object obj)</li>
+</ul>
+<ol start="3">
+<li>忽略访问权限修饰符安全检查<br>setAccessible(true): 暴力反射(忽略了private这种,破坏封装)</li>
+</ol>
+<h3 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h3><p>创建对象</p>
+<pre><code class="java">Constructor&lt;T&gt; getConstructor(类&lt;?&gt;... parameterTypes) // 获取特定的构造方法 同理,declared可以获取私有的构造器,但也需要调用构造器的setAccessible进行暴力反射
+
+T newInstance(Object... initargs)// 通过构造方法创建实例
+</code></pre>
+<p>如果使用空参,操作可以简化:Class对象的newInstance方法</p>
+<h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><p>Method: 方法对象</p>
+<p>Object invoke(Object obj, Object… args) &#x2F;&#x2F; 对obj执行特定方法</p>
+<p>获取方法名称:</p>
+<p>String getName() &#x2F;&#x2F; 获取方法名</p>
+<pre><code class="java">// 获取指定名称方法
+Method eat_method = personClass.getMethod(&quot;eat&quot;);
+Person p = new Person();
+eat_method.invoke(p); // 空参方法
+
+Method[] methods = personClass.getMethods();
+for(Method method : methods)&#123;
+    System.out.println(method.getName());
+&#125;
+</code></pre>
+<p>示例:</p>
+<pre><code class="java">Constructor constructor = personClass.getConstructor(String.class,int.class);
+Object person = constructor.Instance(&quot;张三&quot;,23);
+Object person1 = personClass.newInstance();
+</code></pre>
+<h2 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h2><p>需求:</p>
+<p>创建框架,可以帮我们创建任意类的对象,并执行其中任意方法</p>
+<p>实现:</p>
+<ol>
+<li><p>配置文件</p>
+</li>
+<li><p>反射</p>
+</li>
+</ol>
+<p>步骤:</p>
+<ol>
+<li><p>将需要创建的对象全类名和需要执行的方法定义在配置文件中</p>
+</li>
+<li><p>在程序中加载读取配置文件</p>
+</li>
+<li><p>使用反射技术加载类文件进入内存,创建对象,执行方法</p>
+</li>
+</ol>
+<pre><code class="ini">className=cn.itcast.domain.Person
+methodName=eat
+</code></pre>
+<pre><code class="java">public class ReflectTest&#123;
+    public static void main(String[] args) throws Exception&#123;
+        Properties pro = new Properties();
+        ClassLoader classLoader = ReflectTest.class.getClassLoader(); // 获取class目录下类加载器
+        InputSteam is =  classLoader.getResourceAsStream(&quot;pro.properties&quot;);
+        pro.load(is);
+        String className = pro.getProperty(&quot;className&quot;);
+        String methodName = pro.getProperty(&quot;methodName&quot;);
+
+        Class cls = Class.forName(className);
+        Object obj = cls.newInstance();
+
+        Method method = cls.getMethod(methodName);
+
+        method.invoke(obj);
+    &#125;
+&#125;
+</code></pre>
+<h1 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h1><p>概念:</p>
+<p>用文字描述程序,给程序员看的;JDK1.5之后才有</p>
+<p>使用@注解名称</p>
+<p>作用分类:</p>
+<ol>
+<li><p>编写文档(生成doc文档)</p>
+</li>
+<li><p>代码分析(使用反射)</p>
+</li>
+<li><p>编译检查(Override),让编译器能够实现基本的编译检查</p>
+</li>
+</ol>
+<pre><code class="java">/**
+ * @author test
+ * @since 1.5
+ */
+public class Demo1&#123;
+
+    /**
+     * 计算两数和
+     * @param a 整数
+     * @param b 整数
+     * @return 两数和
+     */
+    public int add(int a,int b)&#123;
+        return a + b;
+    &#125;
+&#125;
+</code></pre>
+<pre><code class="bash">javadoc Demo1.java # 生成java文档
+</code></pre>
+<h2 id="JDK预定义注解"><a href="#JDK预定义注解" class="headerlink" title="JDK预定义注解"></a>JDK预定义注解</h2><ul>
+<li>@Override: 检测该注解标注的方法是否继承自父类(父接口)</li>
+<li>@Deprecated: 将该注解标注的内容,表示已过时</li>
+<li>@SuppressWarnings: 压制警告</li>
+</ul>
+<h2 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h2><p>格式:</p>
+<p>元注解<br>public @interface 注解名称()</p>
+<p>本质:</p>
+<p>注解本质上就是一个接口,默认继承自Annotation包(通过反编译得到) 因此操作和接口相同</p>
+<p>public interface MyAnno extends java.lang.annotation.Annotation{}</p>
+<p>属性:</p>
+<p>接口可以定义的成员方法</p>
+<p>要求:</p>
+<p>返回值类型:</p>
+<ol>
+<li><p>基本数据类型</p>
+</li>
+<li><p>String</p>
+</li>
+<li><p>枚举</p>
+</li>
+<li><p>注解</p>
+</li>
+<li><p>以上类型的数组</p>
+</li>
+</ol>
+<p>定义了属性(抽象方法),在使用时需要给属性赋值</p>
+<p>使用default关键字给属性默认初始化值,则使用注解时可以不赋值</p>
+<p>如果只有一个属性需要赋值,且名称是value,则名称可以省略,@SuppressWarnings(‘all’),这个all就是给value赋值</p>
+<p>数组赋值时,需要用大括号;如果只有一个值,大括号可以省略</p>
+<p>元注解:</p>
+<p>用于描述注解的 注解(就是一个注解,但是它用来描述注解)</p>
+<p>@Target: 描述注解能够作用的位置</p>
+<p>@Retention: 描述注解被保留的阶段(有三个阶段,源码,Class,Runtime阶段)</p>
+<p>@Documented: 描述注解是否被抽取至api文档中</p>
+<p>@Inherited: 描述注解是否被子类继承</p>
+<h2 id="使用-解析-注解"><a href="#使用-解析-注解" class="headerlink" title="使用(解析)注解"></a>使用(解析)注解</h2><pre><code class="java">@SuppressWarnings(&quot;all&quot;) // 需要传参,一般传all
+
+public @interface MyAnno&#123;
+    public abstract String show();
+    int show1();
+    String show2() default &quot;张三&quot;; // 默认张三
+    Person per(); // 返回枚举类型
+
+    String[] strs()
+
+    int value();
+
+&#125;
+
+@MyAnno(show1 = 1,show2 = &quot;2&quot;,per = Person.p1,strs = &#123;&quot;aaa&quot;,&quot;bbb&quot;&#125; ) // 使用时像属性,需要赋值
+</code></pre>
+<h1 id="Lombok"><a href="#Lombok" class="headerlink" title="Lombok"></a>Lombok</h1><p>简介:</p>
+<p>Lombok是一个Java库,能够自动插入编辑器并构建工具,简化Java开发</p>
+<p>他用注解进行提高代码可读性和开发效率(即只需要在Java类上添加相应注解,不需要手动编写相应代码)</p>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2024/09/24/Lombok-Junit-%E5%8F%8D%E5%B0%84-%E6%B3%A8%E8%A7%A3/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/2024/09/22/JAVA-JDBC%E5%AD%A6%E4%B9%A0-%E4%B8%80/">
         <h2 class="post-title">JAVA JDBC学习(一)</h2>
     </a>
@@ -884,7 +1157,7 @@ END;
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
+            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
         </span>
         
         <span class="tag">
@@ -1066,12 +1339,12 @@ update student set no = &#39;2000100105&#39; where name = &#39;韦一笑&#39;;
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
+            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #00a596">back end</a>
+            <a href="/tags/back-end/" style="color: #03a9f4">back end</a>
         </span>
         
     </div>
@@ -1571,12 +1844,12 @@ select count(distinct substring(email,1,5)) / count(*) from tb_user -- 获取选
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #00a596">sql</a>
+            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #ffa2c4">back end</a>
+            <a href="/tags/back-end/" style="color: #ff7d73">back end</a>
         </span>
         
     </div>
@@ -1742,7 +2015,7 @@ SET [SESSION|GLOBAL] TRANSACTION ISOLATION LEVEL [READ UNCOMMITTED|READ COMMITTE
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #00bcd4">back end</a>
+            <a href="/tags/back-end/" style="color: #ffa2c4">back end</a>
         </span>
         
     </div>
@@ -2008,12 +2281,12 @@ select avg(e.salary) from emp e,dept,d where e.dept_id = d.id and d.name = &#39;
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
+            <a href="/tags/sql/" style="color: #03a9f4">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #00a596">back end</a>
+            <a href="/tags/back-end/" style="color: #00bcd4">back end</a>
         </span>
         
     </div>
@@ -2109,177 +2382,7 @@ alter table emp add constraint fk_emp_dept_id foreign key (dept_id) reference de
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #03a9f4">sql</a>
-        </span>
-        
-        <span class="tag">
-            
-            <a href="/tags/back-end/" style="color: #ff7d73">back end</a>
-        </span>
-        
-    </div>
-    <a href="/2024/09/16/SQL%E5%AD%A6%E4%B9%A0-%E5%9B%9B/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/2024/09/15/SQL%E5%AD%A6%E4%B9%A0-%E4%B8%89/">
-        <h2 class="post-title">SQL学习(三)</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/9/15
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <h2 id="DCL语句"><a href="#DCL语句" class="headerlink" title="DCL语句"></a>DCL语句</h2><p>DCL, Data Control Language,用于管理数据库用户,访问权限</p>
-<h3 id="管理用户"><a href="#管理用户" class="headerlink" title="管理用户"></a>管理用户</h3><h4 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h4><ol>
-<li>查询用户</li>
-</ol>
-<pre><code class="sql">USE mysql; -- 系统数据库
-SELECT * FROM user; -- 用户表
-</code></pre>
-<ol start="2">
-<li>创建用户</li>
-</ol>
-<pre><code class="sql">CREATE USER &#39;用户名&#39;@&#39;主机名&#39; IDENTIFIED BY &#39;密码&#39;;
-</code></pre>
-<ol start="3">
-<li>修改用户密码</li>
-</ol>
-<pre><code class="sql">ALTER USER &#39;用户名&#39;@&#39;主机名&#39; IDENTIFIED WITH mysql_native_password BY &#39;新密码&#39;;
-</code></pre>
-<ol start="4">
-<li>删除用户</li>
-</ol>
-<pre><code class="sql">DROP USER &#39;用户名&#39;@&#39;主机名&#39;;
-</code></pre>
-<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>创建用户itcast,只能在当前主机localhost访问,密码123456</p>
-<pre><code class="sql">use mysql;
-select * from user;
-create user &#39;itcast&#39;@&#39;localhost&#39; identified by &#39;123456&#39;;
-</code></pre>
-<p>创建用户heima,可在任意主机上访问数据库,密码123456</p>
-<pre><code class="sql">use mysql;
-select * from user;
-create user &#39;heima&#39;@&#39;%&#39; identified by &#39;123456&#39;;
-</code></pre>
-<p>修改用户heima的访问密码为1234</p>
-<pre><code class="sql">use mysql;
-select * from user;
-alter user &#39;heima&#39;@&#39;%&#39; identified with mysql_native_password &#39;1234&#39;;
-</code></pre>
-<p>删除itcast的localhost主机用户</p>
-<pre><code class="sql">use mysql;
-select * from user;
-drop user &#39;itcast&#39;@&#39;localhost&#39;;
-</code></pre>
-<h3 id="权限控制"><a href="#权限控制" class="headerlink" title="权限控制"></a>权限控制</h3><p>ALL,ALL PRIVILEGES 所有权限</p>
-<p>SELECT 查</p>
-<p>INSERT 插</p>
-<p>UPDATE 修改数据</p>
-<p>DELETE 删</p>
-<p>ALTER 修改表</p>
-<p>DROP 删库,表,视图</p>
-<p>CREATE 创</p>
-<h4 id="用法-1"><a href="#用法-1" class="headerlink" title="用法"></a>用法</h4><ol>
-<li>查询权限</li>
-</ol>
-<pre><code class="sql">SHOW GRANTS FOR &#39;用户名&#39;@&#39;主机名&#39;;
-</code></pre>
-<ol start="2">
-<li>授予权限</li>
-</ol>
-<pre><code class="sql">GRANT 权限列表 ON 数据库名.表名 TO &#39;用户名&#39;@&#39;主机名&#39;;
-</code></pre>
-<ol start="3">
-<li>撤销权限</li>
-</ol>
-<pre><code class="sql">REVOKE 权限列表 ON 数据库名.表名 FROM &#39;用户名&#39;@&#39;主机名&#39;;
-</code></pre>
-<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>多个权限用逗号隔开</p>
-<p>数据库名,表名可以用*表示</p>
-<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">GRANT SELECT ON itcast.* TO &#39;heima&#39;@&#39;%&#39;;
-</code></pre>
-<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><h3 id="字符串函数"><a href="#字符串函数" class="headerlink" title="字符串函数"></a>字符串函数</h3><pre><code class="sql">CONCAT(s1,s2..) -- 拼接字符串
-LOWER(str) -- 将str中全部转为小写
-UPPER(str) -- 将str中全部转为大写
-LPAD(str,n,pad) -- 左填充,用字符串pad对str左侧进行填充,直到达到n字符串长度
-RPAD(str,n,pad) -- 右填充
-TRIM(str) -- 去掉字符串头尾空格
-SUBSTRING(str,start,len) -- 返回从start起len长度的字符串,注意!索引从1开始!
-</code></pre>
-<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><ol>
-<li>企业员工工号统一为5位数,不是五位数的前面补0</li>
-</ol>
-<pre><code class="sql">update emp set work_number = LPAD(work_number,5,&#39;0&#39;);
-</code></pre>
-<h3 id="数值函数"><a href="#数值函数" class="headerlink" title="数值函数"></a>数值函数</h3><pre><code class="sql">SEIL(x) -- 向上取整
-FLOOR(x) -- 向下取整
-MOD(x,y) -- 返回x/y的模
-RAND() -- 返回0-1的随机数
-ROUND(x,y) -- 求参数x的四舍五入值,保留y位小数
-</code></pre>
-<h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><p>生成六位数的随机验证码</p>
-<pre><code class="sql">select LPAD(round(rand()*1000000,0),6,0); -- 若不足六位,补0
-</code></pre>
-<h3 id="日期函数"><a href="#日期函数" class="headerlink" title="日期函数"></a>日期函数</h3><pre><code class="sql">CURDATE() -- 当前日期,current date
-CURTIME() -- 当前时间
-NOW() -- 当前日期时间
-YEAR(date) -- 获取指定date年
-MONTH(date)
-DAY(date)
-DATE_ADD(date,INTERVAL expr type) -- 返回一个日期/时间 加上时间间隔expr后的时间值
-DATEDIFF(date1,date2) -- 返回date1-date2的天数
-</code></pre>
-<h4 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h4><p>date_add</p>
-<pre><code class="sql">select date_add(now(),INTERVAL 70 day); -- 第二个参数写法固定为 interval value 类型
-select date_add(now(),interval 70 year);
-</code></pre>
-<p>datediff</p>
-<pre><code class="sql">select datediff(&#39;2012-01-01&#39;,&#39;2021-10-01&#39;);
-</code></pre>
-<p>查询所有员工入职天数,并倒序排序</p>
-<pre><code class="sql">select name,datediff(CURDATE(),entry_date) &#39;entry_days&#39; from emp order by entry_days desc; -- 别名的字符串可以省略,后面order by则不能加引号
-</code></pre>
-<h3 id="流程控制函数"><a href="#流程控制函数" class="headerlink" title="流程控制函数"></a>流程控制函数</h3><p>实现条件筛选</p>
-<pre><code class="sql">IF(condition,t,f) -- 如果condition为true,则返回t,否则f
-IFNULL(value1,value2) -- 如果value1为空,则返回value2,否则返回value1
-CASE WHEN [val1] THEN [res1] ... ELSE [default] END -- 如果val1为true,返回res1,... 否则返回default默认值
-CASE [expr] WHEN [val1] THEN [res1],... ELSE[default] END -- 如果expr的值与val1相等,返回res1,..否则返回default
-</code></pre>
-<h4 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h4><p>查询emp表姓名和工作地址(北京,上海)一线,其他二线</p>
-<pre><code class="sql">select name,case when address in(&#39;北京&#39;,&#39;上海&#39;) THEN &#39;一线&#39; ELSE &#39;二线&#39; &#39;工作地址&#39; from emp;
-select name, case address when &#39;北京&#39; then &#39;一线&#39; when &#39;上海&#39; then &#39;一线&#39; else &#39;二线&#39; as &#39;工作地址&#39; from emp;
-</code></pre>
-<p>统计各个学员成绩,</p>
-<p>&gt;&#x3D;85 优秀</p>
-<p>&gt;&#x3D;60 及格</p>
-<p>否则不及格</p>
-<pre><code class="sql">select name,case when score &gt;= 85 then &#39;优秀&#39; when score &gt;= 60 then &#39;及格&#39; else &#39;不及格&#39; from emp
-</code></pre>
-
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        <span class="icon">
-            <i class="fa-solid fa-tags fa-fw"></i>
-        </span>
-        
-        
-        
-        <span class="tag">
-            
-            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
+            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
         </span>
         
         <span class="tag">
@@ -2288,7 +2391,7 @@ select name, case address when &#39;北京&#39; then &#39;一线&#39; when &#39;
         </span>
         
     </div>
-    <a href="/2024/09/15/SQL%E5%AD%A6%E4%B9%A0-%E4%B8%89/" class="go-post">阅读全文</a>
+    <a href="/2024/09/16/SQL%E5%AD%A6%E4%B9%A0-%E5%9B%9B/" class="go-post">阅读全文</a>
 </div>
 
 
