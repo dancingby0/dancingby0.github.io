@@ -307,6 +307,176 @@ rollback(); // 回滚事务, 使用try catch,如果产生异常则回滚事务
 <pre><code class="sql">int executeUpdate(sql) // 执行DML,DDL语句;DML返回影响的行数,DDL执行成功也可能返回0;
 ResultSet executeQuery(sql) // 执行DQL语句,返回结果集对象
 </code></pre>
+<h2 id="ResultSet"><a href="#ResultSet" class="headerlink" title="ResultSet"></a>ResultSet</h2><p>作用:</p>
+<p>封装了DQL查询语句的结果</p>
+<p>ResultSet stmt.executeQuery(sql) : 执行SQL语句,返回ResultSet对象</p>
+<p>获取查询结果:</p>
+<pre><code class="java">boolean next() : 将光标向后移动一位;判断是否有效行
+
+返回true,则有效行,有数据
+xxx getXxx(参数): 获取数据
+
+如: int getInt(参数)
+
+参数: int 列的编号,从1开始;
+String 列的名称
+</code></pre>
+<p>使用方法:</p>
+<pre><code class="java">while(rs.next())&#123;
+    // 获取数据
+    int id = rs.getInt(1);
+    String name = rs.getString(2);
+    int money = rs.getInt(3);
+&#125;
+
+rs.close();
+</code></pre>
+<h2 id="PreparedStatement"><a href="#PreparedStatement" class="headerlink" title="PreparedStatement"></a>PreparedStatement</h2><p>继承自Statement,预编译,防止注入</p>
+<p>语法:</p>
+<pre><code class="java">// 1. 获取PreparedStatement对象
+// SQL语句中的参数值用?占位符替代
+String sql = &quot;select * from user where user_name = ? and password = ?&quot;;
+
+PreparedStatement pstmt = conn.prepareStatement(sql);
+
+// 2. 设置参数值
+// setXxx(?的编号,从1起,?的值)
+pstmt.setString(1,name);
+pstmt.setString(2,password);
+
+// 3. 执行sql语句
+
+executeUpdate(); // 不需要再传递sql
+executeQuery();
+</code></pre>
+<p>解决注入原理:<br>预编译SQL,性能更高</p>
+<p>对?的内容进行转义,而非单纯拼接字符串</p>
+<p>MYSQL接受SQL后,首先检查SQL语法,再编译SQL为可执行函数,最后执行SQL</p>
+<p>开启预编译功能:</p>
+<p>useServerPreStmts &#x3D; true &#x2F;&#x2F; 预编译默认关闭,需要先开启</p>
+<ol>
+<li>获取PreparedStatement对象时,将sql语句发送给mysql服务器进行检查,编译(很耗时)</li>
+</ol>
+<p>开启方法:</p>
+<pre><code class="java">String url = &quot;jdbc:mysql://localhost:3306/db1?useSSL=false&amp;useServerPreStmts=true&quot;;
+</code></pre>
+<ol start="2">
+<li><p>执行时则不需要再进行</p>
+</li>
+<li><p>如果sql模板一样,则只需要一次检查编译</p>
+</li>
+</ol>
+<p>如:</p>
+<pre><code class="java">sql = &quot;select * from user where user_name = ? and password = ?&quot;;
+PreparedStatement pstmt = conn.prepareStatement(sql);
+pstmt.set(1,name);
+pstmt.set(2,password);
+Result rs = pstmt.executeUpdate();
+// 只会预编译一次,提升性能
+pstmt.set(1,name);
+pstmt.set(2,password);
+rs = pstmt.executeUpdate();
+</code></pre>
+<p>配置MySQL执行日志:</p>
+<pre><code class="ini">log-output=FILE
+general-log=1
+general_log_file = &quot;D:\mysql.log&quot;
+slow-query-log = 1
+slow_query_log_file=&quot;D:\mysql_slow.log&quot;
+long_query_time = 2
+</code></pre>
+<h1 id="数据库连接池"><a href="#数据库连接池" class="headerlink" title="数据库连接池"></a>数据库连接池</h1><p>是个容器,负责分配,管理数据库连接</p>
+<p>允许应用程序重复使用一个现有的数据库连接,而非重新建立一个</p>
+<p>释放空闲时间超过最大空闲时间的数据库连接防止因为没有释放数据库连接而引起数据库连接遗漏 (即如果创建了数据库连接而太长时间不用,则会自动释放)</p>
+<p>好处:</p>
+<p>资源重用</p>
+<p>提升系统响应速度</p>
+<p>避免数据库连接遗漏</p>
+<p>实现:</p>
+<p>标准接口: DataSource</p>
+<p>SUN提供地数据库连接池标准接口,由第三方组织实现此接口</p>
+<p>功能:获取连接</p>
+<p>常用数据库连接池:</p>
+<p>DBCP,C3P0,Druid</p>
+<pre><code class="java">Connection getConnection();
+</code></pre>
+<h2 id="Druid"><a href="#Druid" class="headerlink" title="Druid"></a>Druid</h2><p>使用步骤:</p>
+<ol>
+<li><p>导入jar包</p>
+</li>
+<li><p>定义配置文件</p>
+</li>
+<li><p>加载配置文件</p>
+</li>
+<li><p>获取数据库连接池对象</p>
+</li>
+<li><p>获取连接</p>
+</li>
+</ol>
+<p>配置参数:</p>
+<p>名称: druid.properties</p>
+<p>driverClassName &#x3D; com.mysql.jdbc.Driver &#x2F;&#x2F; 驱动类名</p>
+<p>url &#x3D; jdbc:mysql:&#x2F;&#x2F;&#x2F;db1?useSSL&#x3D;false&amp;useServerPrepStmts&#x3D;true &#x2F;&#x2F; 启动预编译</p>
+<p>username&#x3D;root</p>
+<p>password&#x3D;1234</p>
+<p>initialSize&#x3D;5 &#x2F;&#x2F; 初始化连接数量</p>
+<p>maxActive &#x3D; 10 &#x2F;&#x2F; 最大连接数量</p>
+<p>maxWait&#x3D;3000 &#x2F;&#x2F; 最大等待时间(ms)</p>
+<h3 id="语法-1"><a href="#语法-1" class="headerlink" title="语法"></a>语法</h3><pre><code class="java">// 3. 加载配置文件
+Properties prop = new Properties();
+prop.load(new FileInputStream(&quot;jdbc-demo/src/druid.properties&quot;)); // 可能会报错,找不到路径
+
+// 4. 获取连接池对象
+DataSource dataSource =  DruidDataSourceFactory.createDataSource(prop);
+
+
+// 5. 获取数据库连接
+Connection conn = dataSource.getConnection();
+
+// 找不到路径解决方案:
+
+System.out.println(Statem.getProperty(&quot;user.dir&quot;)); // 打印用户目录,查看目前所在的路径
+</code></pre>
+<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>环境:</p>
+<p>数据库表 tb_brand; 实体类 Brand </p>
+<pre><code class="sql">drop table if exists tb_brand;
+create table tb_brand(
+    id int primary key auto_increment;
+    brand_name varchar(20),
+    company_name varchar(20),
+    ordered int,
+    description varchar(100),
+    status int
+);
+insert into tb_brand values (...)...
+</code></pre>
+<p>&#x2F;&#x2F; 在pojo中,尽可能使用其包装类型,因为其默认值为null,不会对业务产生影响</p>
+<pre><code class="java">// 把所有字段塞进去,塞入对应getter和setter,重写toString方法;(快捷键:Alt+Insert)
+</code></pre>
+<p>操作</p>
+<pre><code class="java">
+public class BrandTest&#123;
+
+    @Test
+    public void testSelectAll throws Exception()&#123;
+        Properties prop = new Properties()
+        prop.load(new FileInputStream(&quot;jdbc-demo/src/druid.properties&quot;));
+        DataSource dataSource = DruidDataSourceFactory.createDataSource(prop);
+        Connection conn=dataSource.getConnection();
+
+        String sql = &quot;select * from tb_brand&quot;;
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
+        while(rs.next())&#123;
+
+            Brand a = new Brand();
+            a.setId(rs.getInt(1));
+            ...
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>增删改同理</p>
 
             
         </div>
@@ -616,7 +786,7 @@ select field_name into 变量名 from 表名;
 <h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">create procedure p2()
 begin
     declare stu_count int default 0;
-    select count(*) into stu_count from studemnt;
+    select count(*) into stu_count from student;
     select stu_count; 
 end;
 
@@ -714,12 +884,12 @@ END;
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
+            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #00bcd4">back end</a>
+            <a href="/tags/back-end/" style="color: #00a596">back end</a>
         </span>
         
     </div>
@@ -896,12 +1066,12 @@ update student set no = &#39;2000100105&#39; where name = &#39;韦一笑&#39;;
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #00a596">sql</a>
+            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #00bcd4">back end</a>
+            <a href="/tags/back-end/" style="color: #00a596">back end</a>
         </span>
         
     </div>
@@ -1401,12 +1571,12 @@ select count(distinct substring(email,1,5)) / count(*) from tb_user -- 获取选
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
+            <a href="/tags/sql/" style="color: #00a596">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #03a9f4">back end</a>
+            <a href="/tags/back-end/" style="color: #ffa2c4">back end</a>
         </span>
         
     </div>
@@ -1567,12 +1737,12 @@ SET [SESSION|GLOBAL] TRANSACTION ISOLATION LEVEL [READ UNCOMMITTED|READ COMMITTE
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
+            <a href="/tags/sql/" style="color: #00a596">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #ffa2c4">back end</a>
+            <a href="/tags/back-end/" style="color: #00bcd4">back end</a>
         </span>
         
     </div>
@@ -1843,7 +2013,7 @@ select avg(e.salary) from emp e,dept,d where e.dept_id = d.id and d.name = &#39;
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #03a9f4">back end</a>
+            <a href="/tags/back-end/" style="color: #00a596">back end</a>
         </span>
         
     </div>
@@ -1939,12 +2109,12 @@ alter table emp add constraint fk_emp_dept_id foreign key (dept_id) reference de
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
+            <a href="/tags/sql/" style="color: #03a9f4">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #ffa2c4">back end</a>
+            <a href="/tags/back-end/" style="color: #ff7d73">back end</a>
         </span>
         
     </div>
@@ -2109,7 +2279,7 @@ select name, case address when &#39;北京&#39; then &#39;一线&#39; when &#39;
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
+            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
         </span>
         
         <span class="tag">
