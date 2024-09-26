@@ -167,6 +167,544 @@
         
 
 <div class="post">
+    <a href="/2024/09/18/SQL%E5%AD%A6%E4%B9%A0-%E5%85%AD-%E4%BA%8B%E5%8A%A1/">
+        <h2 class="post-title">SQL学习(六) 事务</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/18
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>一组操作的集合,不可分割.事务会将一组操作作为整体进行向系统提交或撤销请求.</p>
+<p>这些操作同时成功,或同时失败</p>
+<p>默认MYSQL的事务是自动提交的,当每执行一条DML语句,便隐式地提交事务</p>
+<p>每一个sql语句都是事务</p>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><p>操作方式:</p>
+<p>将事务提交改为手动提交,在完成一些操作后,如果正常运行,则进行commit提交,如果出错,进行回滚操作</p>
+<ul>
+<li>查看&#x2F;设置事务提交方式:</li>
+</ul>
+<pre><code class="sql">SELECT @@autocommit;
+SET @@autocommit = 0;
+</code></pre>
+<ul>
+<li>提交事务</li>
+</ul>
+<pre><code class="sql">COMMIT;
+</code></pre>
+<ul>
+<li>回滚事务</li>
+</ul>
+<pre><code class="sql">ROLLBACK;
+</code></pre>
+<ul>
+<li>开启事务</li>
+</ul>
+<pre><code class="sql">START TRANSACTION 或 BEGIN;
+</code></pre>
+<ul>
+<li>提交事务</li>
+</ul>
+<pre><code class="sql">COMMIT
+</code></pre>
+<ul>
+<li>回滚事务</li>
+</ul>
+<pre><code class="sql">ROLLBACK;
+</code></pre>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><p>完成转账操作:张三给李四转1000(自动提交事务)</p>
+<pre><code class="sql">select * from account where name = &#39;张三&#39;;
+update account set money = money - 1 where name = &#39;张三&#39;;
+update account set money = money + 1 where name = &#39;李四&#39;;
+</code></pre>
+<p>手动提交事务(方式一)</p>
+<pre><code class="sql">set @autocommit = 0; -- 设置为手动提交
+select * from account where name = &#39;张三&#39;;
+update account set money = money - 1 where name = &#39;张三&#39;;
+update account set money = money + 1 where name = &#39;李四&#39;;
+-- 此时数据并未更新
+commit; -- 提交事务,如果途中出错,则不会允许到commit,也就不会执行出错前的结果.
+
+rollback; -- 回滚事务,把之前操作取消了(因为如果出错的话,则原来的操作结果会在缓存内,如果不进行回滚,当执行其他语句时,这些缓存的操作结果会影响数据,因此必须回滚)
+</code></pre>
+<p>方式二</p>
+<pre><code class="sql">set @@autocommit = 1
+start transaction;
+select * from account where name = &#39;张三&#39;;
+update account set money = money - 1 where name = &#39;张三&#39;;
+update account set money = money + 1 where name = &#39;李四&#39;;
+
+commit; -- 如果没有异常
+rollback; -- 如果出现异常
+</code></pre>
+<h3 id="四大特性"><a href="#四大特性" class="headerlink" title="四大特性"></a>四大特性</h3><ul>
+<li><p>原子性(Atomicity): 事务不可分割最小单元, 要么全部成功,要么全部失败</p>
+</li>
+<li><p>一致性(Consistency): 事务完成时,必须使所有数据保持一致状态</p>
+</li>
+<li><p>隔离性(Isolation): 数据库提供隔离机制,保证事务不受外部并发操作影响</p>
+</li>
+<li><p>持久性(Durability): 事务一旦提交或回滚,则它对数据库数据改变是永久的</p>
+</li>
+</ul>
+<h3 id="并发事务问题"><a href="#并发事务问题" class="headerlink" title="并发事务问题"></a>并发事务问题</h3><p>问题如下:</p>
+<ol>
+<li><p>脏读: 一个事务读到另一个事务还没有提交的数据(如果那个事务失败了,则会出现问题)</p>
+</li>
+<li><p>不可重复读: 一个事务先后读取同一条记录,但两次读取数据不同(数据在两次读取期间被改了)</p>
+</li>
+<li><p>幻读: 一个事务按照条件查询数据时,没有对应数据行,但插入数据时,又发现这条数据已经存在,好像出现幻影(即查询时数据未存在,而到插入数据之前,数据被插入到表中)</p>
+</li>
+</ol>
+<h3 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h3><p>√ 表示会出现问题</p>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Read uncommitted()</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>Read committed</td>
+<td>x</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>Repeatable Read(默认)</td>
+<td>x</td>
+<td>x</td>
+<td>√</td>
+</tr>
+<tr>
+<td>Serializable</td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+</tr>
+</tbody></table>
+<p>从上至下性能下降</p>
+<pre><code class="sql">-- 查看事务隔离级别
+SELECT @@TRANSACTION_ISOLATION; 
+-- 设置事务隔离级别(SESSION表当前会话,即当前客户端窗口,GLOBAL全局)
+SET [SESSION|GLOBAL] TRANSACTION ISOLATION LEVEL [READ UNCOMMITTED|READ COMMITTED|REPEATABLE READ|SERIALIZABLE];
+</code></pre>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
+        </span>
+        
+        <span class="tag">
+            
+            <a href="/tags/back-end/" style="color: #00bcd4">back end</a>
+        </span>
+        
+    </div>
+    <a href="/2024/09/18/SQL%E5%AD%A6%E4%B9%A0-%E5%85%AD-%E4%BA%8B%E5%8A%A1/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2024/09/17/SQL%E5%AD%A6%E4%B9%A0-%E4%BA%94-%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/">
+        <h2 class="post-title">SQL学习(五) 多表查询</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/17
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h2 id="多表查询"><a href="#多表查询" class="headerlink" title="多表查询"></a>多表查询</h2><p>属于data query language</p>
+<h3 id="多表关系"><a href="#多表关系" class="headerlink" title="多表关系"></a>多表关系</h3><p>多个表关系:</p>
+<p>一对多(多对一)</p>
+<p>多对多</p>
+<p>一对一</p>
+<h4 id="一对多"><a href="#一对多" class="headerlink" title="一对多"></a>一对多</h4><p>案例:部门与员工关系</p>
+<p>关系:一:部门 多:员工</p>
+<p>实现:多的一方建立外键,指向一的一方</p>
+<h4 id="多对多"><a href="#多对多" class="headerlink" title="多对多"></a>多对多</h4><p>案例:学生与课程关系</p>
+<p>关系: 多:学生 多:课程</p>
+<p>实现:</p>
+<p>建立一张中间表,至少包含两个外键,分别关联两方主键</p>
+<h4 id="一对一"><a href="#一对一" class="headerlink" title="一对一"></a>一对一</h4><p>案例: 用户与用户详情的关系</p>
+<p>关系: 一对一关系,多用于单表拆分,将基础字段放在一张表中,详情字段放在另一张中,以提升操作效率</p>
+<p>实现:</p>
+<p>在任意一方加入外键,关联另一方主键,设置外键为唯一的(UNIQUE)</p>
+<p>多表查询:</p>
+<p>从多表中查询数据</p>
+<h4 id="分类"><a href="#分类" class="headerlink" title="分类:"></a>分类:</h4><ul>
+<li>连接查询<ul>
+<li>内连接:查询A,B交集部分数据</li>
+<li>外连接:<ul>
+<li>左外连接: 查询左表所有数据,以及两表交集</li>
+<li>右外连接: 查询右表所有数据,以及交集</li>
+</ul>
+</li>
+<li>自连接: 当前表与自身连接查询,子链接必须使用表别名</li>
+</ul>
+</li>
+<li>子查询</li>
+</ul>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>设有emp表10个数据,dept表5个数据</p>
+<pre><code class="sql">select * from emp,dept; -- 多表查询,会得到10*5=50条数据,每一个对应进行穷举得到,即笛卡尔积,即A集合与B集合所有组合情况
+
+select * from emp,dept where emp.dept_id = dept.id;
+</code></pre>
+<h3 id="内连接"><a href="#内连接" class="headerlink" title="内连接"></a>内连接</h3><p>查询交集部分</p>
+<p>隐式内连接</p>
+<pre><code class="sql">SELECT 字段列表 FROM 表1,表2 WHERE 条件;
+</code></pre>
+<p>显式内连接</p>
+<pre><code class="sql">SELECT 字段列表 FROM 表1 [INNER] JOIN 表2 ON 连接条件;
+</code></pre>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><ol>
+<li>查询每一个员工姓名以及关联部门名称</li>
+</ol>
+<pre><code class="sql">select emp.name,dept.name from emp,dept where emp.dept_id = dept.id;-- 隐式内连接
+select e.name,d.name from emp e,dept d where e.dept_id = d.id; -- 如果为表起了别名,则不可以使用原名
+
+select emp.name,dept.name from emp e inner join dept d on e.dept_id = d.id; -- 显式外连接
+</code></pre>
+<h3 id="外连接"><a href="#外连接" class="headerlink" title="外连接"></a>外连接</h3><p>包含一张表所有内容以及交集部分</p>
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT field_list FROM table1 LEFT [OUTER] JOIN table2 ON condition...; -- 左外连接
+
+SELECT field_list FROM table1 RIGHT [OUTER] JOIN table2 ON condition...; -- 右外连接
+</code></pre>
+<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><p>查询emp表所有数据和相对应部门信息</p>
+<pre><code class="sql">select e.*, d.name from emp e left outer join dept d on e.dept = d.id; -- 左外查询(包含未分配部门的信息)
+
+select e.*,d.name from emp e right outer join dept d on e.dept = d.id; -- 右外查询(包含未分配员工的部门的信息)
+</code></pre>
+<h3 id="自连接"><a href="#自连接" class="headerlink" title="自连接"></a>自连接</h3><h4 id="语法-1"><a href="#语法-1" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT field_list FROM tableA aliasA [INNER] JOIN tableA aliasB ON condition;
+
+SELECT field_list FROM tableA aliasA,tableA aliasB WHERE condition;
+SELECT field_list FROM tableA aliasA RIGHT|LEFT [OUTER] JOIN tableA aliasB ON condition...
+</code></pre>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>自连接既可以使用内连接,也可以使用外连接</p>
+<p>自连接时,把一张表看作是两张表</p>
+<p>如果查询内容出现null值,则需要使用外连接</p>
+<h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><ol>
+<li>查询员工及其编号所属领导名字</li>
+</ol>
+<pre><code class="sql">select e.name,m.name from emp e inner join emp m on e.manager_id = m.id;
+</code></pre>
+<ol start="2">
+<li>查询所有员工信息及其领导名字emp,若员工没有领导,也需要查询</li>
+</ol>
+<p>需要外连接</p>
+<pre><code class="sql">select e.name &#39;员工&#39;,m.name &#39;领导&#39; from emp e left outer join emp m on e.manager_id = m.id;
+</code></pre>
+<h3 id="联合查询"><a href="#联合查询" class="headerlink" title="联合查询"></a>联合查询</h3><p>即把多次查询结果合并起来,形成一个新的查询结果</p>
+<h4 id="语法-2"><a href="#语法-2" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT field_list FROM tableA ... -- 没有分号!
+UNION [ALL]
+SELECT field_list FROM tableB...; -- 这三行是一个语句!
+</code></pre>
+<h4 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a>注意事项</h4><p>union all: 直接将查询结果合并(会出现重复)</p>
+<p>union: 去重</p>
+<p>使用条件: 联合查询多张表的列数必须一致,字段类型也必须一致</p>
+<p>如:</p>
+<pre><code class="sql">select * from emp where salary &gt; 1
+union
+select name from emp where age &lt; 50; -- ERROR!字段不一致!
+</code></pre>
+<h4 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h4><p>将薪资低于5000的员工,和年龄大于50的员工查询出来(或逻辑)</p>
+<pre><code class="sql">select * from emp where salary &lt; 5000
+union all
+select * from emp where age &gt;50;
+</code></pre>
+<h3 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h3><p>SQL 语句中嵌套SELECT语句,又称嵌套查询</p>
+<p>分类:</p>
+<ul>
+<li>标量子查询 子查询结果为单个值</li>
+<li>列子查询 结果一个列</li>
+<li>行子查询 一个行</li>
+<li>表子查询 多行多列</li>
+</ul>
+<h4 id="语法-3"><a href="#语法-3" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT * FROM t1 WHERE column1 = (SELECT column1 FROM t2);
+</code></pre>
+<p>外部语句可以是 INSERT|UPDATE|DELETE|SELECT, DQL,DML</p>
+<p>位置可以是WHERE|FROM|SELECT</p>
+<p>标量子查询: 常用&gt; &lt; &#x3D; &gt;&#x3D; &lt;&#x3D;</p>
+<p>列子查询:常用 IN(在指定集合内) NOT IN ANY(子查询返回的列表中,任意一个满足即可) SOME(同ANY) ALL(必须全部满足)</p>
+<p>行子查询: 常用&#x3D; !&#x3D; IN NOT IN</p>
+<p>表子查询: 常用IN</p>
+<h4 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h4><ul>
+<li>标量子查询</li>
+</ul>
+<p>查询销售部所有员工信息</p>
+<pre><code class="sql">select * from emp where dept_id = (select id from dept where name = &#39;销售部&#39;);
+</code></pre>
+<p>查询”方东白”入职后员工信息</p>
+<pre><code class="sql">select * from emp where entry_date &gt; (select entry_date from emp where name = &#39;方东白&#39;);
+</code></pre>
+<ul>
+<li>列子查询</li>
+</ul>
+<ol>
+<li>查询”销售部”和”市场部”的所有员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp where dept in (select id from dept where name in (&#39;销售部&#39;,&#39;市场部&#39;));
+</code></pre>
+<ol start="2">
+<li>查询比财务部所有人工资都高的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp where salary &gt; all(select salary from emp where dept_id = (select id from dept where name = &#39;财务部&#39;)) -- where比聚合函数先执行
+</code></pre>
+<ol start="3">
+<li>查询比研发部任意一人工资都高的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp where salary &gt; any(select salary from emp where dept_id = (select id from dept where name = &#39;研发部&#39;));
+</code></pre>
+<ul>
+<li>行子查询</li>
+</ul>
+<p>查询与”张无忌”的薪资及其直属领导 相同的员工信息</p>
+<pre><code class="sql">select * from emp where salary = (select salary from emp where name = &#39;张无忌&#39;) and manager_id = (select id from emp where name = &#39;张无忌&#39;);
+
+select * from emp where (salary,manager_id) = (select salary,id from emp where name = &#39;张无忌&#39;);
+</code></pre>
+<ul>
+<li>表子查询</li>
+</ul>
+<ol>
+<li>查询与”a”,”b”的职位与薪资相同的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp where (dept_id,salary) in (select dept_id,salary from emp where name in(&#39;a&#39;,&#39;b&#39;));
+</code></pre>
+<ol start="2">
+<li>查询入职日期为’2006-01-01’之后员工信息及其部门信息</li>
+</ol>
+<pre><code class="sql">select e.*,d.* from (select * from emp where entry_date &gt; &#39;2006-01-01&#39;) e left join dept d on d.id = e.dept_id; -- select后也可以直接写*
+</code></pre>
+<h3 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h3><ol>
+<li>查询员工姓名,年龄,职位,部门信息(隐式内连接)</li>
+</ol>
+<pre><code class="sql">select e.name,e.age,e.position,d.name from emp e, dept d where d.id = e.dept_id;
+</code></pre>
+<ol start="2">
+<li>查询年龄小于30岁员工姓名,年龄,职位,部门信息(显式内连接)</li>
+</ol>
+<pre><code class="sql">select e.name,e.age,e.position,d.name from emp e inner join dept d where e.age&lt;30 on e.dept_id = d.id; 
+</code></pre>
+<ol start="3">
+<li>查询拥有员工的部门(id,名称)</li>
+</ol>
+<pre><code class="sql">select distinct d.* from emp e join dept d on e.dept_id = d.id;
+</code></pre>
+<ol start="4">
+<li>查询所有年龄大于40岁的员工,及其归属部门名称,如果员工没有分配部门,也需要展示</li>
+</ol>
+<pre><code class="sql">select e.*,d.name from emp e left join dept d on e.dept_id = d.id where e.age&gt;40;
+</code></pre>
+<ol start="5">
+<li>查询所有员工工资等级</li>
+</ol>
+<p>设有sal_grade表,有losal和hisal(分别是最低工资与最高工资)两列,有grade表示薪资水平</p>
+<pre><code class="sql">select e.name,s.grade from emp e, salary s where e.salary between s.losal and s.hisal;
+</code></pre>
+<ol start="6">
+<li>查询 “研发部” 所有员工信息及工资等级</li>
+</ol>
+<pre><code class="sql">select e.*,s.grade from emp e,salary s where e.dept_id = (select id from dept where name = &#39;研发部&#39;) and e.salary between s.losal and s.hisal;
+</code></pre>
+<ol start="7">
+<li>查询 “研发部” 平均工资</li>
+</ol>
+<pre><code class="sql">select avg(e.salary) from emp e where e.dept_id = (select id from dept where name = &#39;研发部&#39;);
+
+select avg(e.salary) from emp e,dept,d where e.dept_id = d.id and d.name = &#39;研发部&#39;;
+</code></pre>
+<ol start="8">
+<li>查询工资比 ‘a’ 高的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp e where e.salary &gt; (select salary from emp where name = &#39;a&#39;);
+</code></pre>
+<ol start="9">
+<li>查询比平均薪资高的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp e where e.salary &gt; (select avg(salary) from emp);
+</code></pre>
+<ol start="10">
+<li>查询比本部门平均薪资低的员工信息</li>
+</ol>
+<pre><code class="sql">select * from emp e1 where e1.salary &lt;(select avg(salary) from emp e2 where e1.dept_id = e2.dept_id);
+</code></pre>
+<ol start="11">
+<li>查询所有部门信息并统计部门的员工人数</li>
+</ol>
+<pre><code class="sql">select d.*,(select count(*) from emp e where e.dept_id = d.id) &#39;人数&#39; from dept d;
+</code></pre>
+<ol start="12">
+<li>查询所有学生选课情况,显示出学生名称,学号,课程名称</li>
+</ol>
+<p>表: student, course, student_course</p>
+<p>连接条件: student.id &#x3D; student_course.student_id, course.id &#x3D; student_course.course_id</p>
+<pre><code class="sql">select s.name,s.number,c.name from student s, student_course sc , course c where sc.student_id = s.id and sc.course_id = course.id;
+</code></pre>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
+        </span>
+        
+        <span class="tag">
+            
+            <a href="/tags/back-end/" style="color: #00a596">back end</a>
+        </span>
+        
+    </div>
+    <a href="/2024/09/17/SQL%E5%AD%A6%E4%B9%A0-%E4%BA%94-%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2024/09/16/SQL%E5%AD%A6%E4%B9%A0-%E5%9B%9B/">
+        <h2 class="post-title">SQL学习(四)</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/16
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h2 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h2><p>作用于字段上的规则,限制存储于表中的数据</p>
+<pre><code class="sql">NOT NULL -- 非空约束
+UNIQUE -- 唯一约束 所有数据均唯一
+PRIMARY KEY -- 主键约束 主键是一行数据的唯一标识,非空且唯一
+DEFAULT -- 默认约束,如果保存数据时,未指定该字段的值,则采用默认值
+CHECK -- 检查约束,8.0.16版本后,保证字段满足某条件
+FOREIGN KEY -- 外键约束, 让两张表建立起连接,保证数据一致性
+</code></pre>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>需求:<br>id ID唯一标识 name 非空唯一 age 大于0且小于120 status 若不指定,默认1 gender 无</p>
+<pre><code class="sql">create table user(
+    id int primary key auto_increment comment &#39;主键&#39;, -- auto_increment 自动增长
+    name varchar(10) unique not null comment &#39;姓名&#39;,
+    age tinyint check (age&gt;0 and age&lt;120) comment &#39;年龄&#39;,
+    status char(1) default &#39;1&#39; comment &#39;状态&#39;,
+    gender char(1)
+)comment &#39;用户表&#39;;
+
+insert into user(name,age,status,gender) values (&#39;Tom&#39;,10,&#39;2&#39;,&#39;男&#39;);
+insert into user(name,age,status,gender) values (&#39;Tom&#39;,10,null,&#39;男&#39;);
+</code></pre>
+<h3 id="外键约束"><a href="#外键约束" class="headerlink" title="外键约束"></a>外键约束</h3><p>具有外键的称为子表(从表),外键被关联的称为父表(主表)</p>
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">-- 添加外键
+CREATE TABLE 表名(
+    field_name type,
+    ...
+    [CONSTRAINT] [外键名称] FOREIGN KEY (外键字段名) REFERENCES 主表(主表列名)
+)
+ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY (外键字段名) REFERENCES 主表(主表列名) [ON UPDATE/DELETE 外键约束];
+
+-- 删除外键
+ALTER TABLE 表名 DROP FOREIGN KEY 外键字段名;
+</code></pre>
+<p>外键约束:</p>
+<p>NO ACTION 当父表中更新&#x2F;删除时,首先检查是否有外键关联.有则不允许,同RESTRICT</p>
+<p>RESTRICT 当父表中更新&#x2F;删除时,首先检查是否有外键关联.有则不允许,同NO ACTION</p>
+<p>CASCADE 当删除&#x2F;更新对应记录时,若有对应外键,则也删除&#x2F;更新对应记录(cascade 级联的,逐级的)</p>
+<p>SET NULL 当删除对应记录时,若有对应外键,设为NULL(要求该外键允许取NULL)</p>
+<p>SET DEFAULT 父表变更时,子表将外键设置为默认值(Innodb不支持)</p>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>如果被外键关联,则父表中不可直接删除关联字段,除非解除关联</p>
+<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">-- 数据准备
+create table debt(
+    id int auto_increment comment &#39;ID&#39; primary key,
+    name varchar(50) not null comment &#39;部门名称&#39;
+)comment &#39;部门表&#39;;
+
+insert into dept (id,name) values(1,&#39;研发部&#39;),(2,&#39;市场部&#39;),(3,&#39;财务部&#39;),(4,&#39;销售部&#39;),(5,&#39;总经办&#39;);
+
+create table emp(
+    id int auto_increment comment &#39;ID&#39; primary key,
+    name varchar(10) not null comment &#39;姓名&#39;,
+    job varchar(20) comment &#39;职位&#39;,
+    dept_id int comment &#39;部门ID&#39;
+)comment &#39;员工表&#39;;
+
+-- 添加外键
+alter table emp add constraint fk_emp_dept_id foreign key (dept_id) reference dept(id) on update cascade on delete no action; -- 为本来的字段添加外键
+</code></pre>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <i class="fa-solid fa-tags fa-fw"></i>
+        </span>
+        
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
+        </span>
+        
+        <span class="tag">
+            
+            <a href="/tags/back-end/" style="color: #00bcd4">back end</a>
+        </span>
+        
+    </div>
+    <a href="/2024/09/16/SQL%E5%AD%A6%E4%B9%A0-%E5%9B%9B/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/2024/09/15/SQL%E5%AD%A6%E4%B9%A0-%E4%B8%89/">
         <h2 class="post-title">SQL学习(三)</h2>
     </a>
@@ -324,12 +862,12 @@ select name, case address when &#39;北京&#39; then &#39;一线&#39; when &#39;
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
+            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #00a596">back end</a>
+            <a href="/tags/back-end/" style="color: #03a9f4">back end</a>
         </span>
         
     </div>
@@ -668,12 +1206,12 @@ select work_address,count(*) address_count from emp where age&lt;45 group by wor
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
+            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #00bcd4">back end</a>
+            <a href="/tags/back-end/" style="color: #ff7d73">back end</a>
         </span>
         
     </div>
@@ -998,7 +1536,7 @@ varchar(50) -- 最多五十位
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
+            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
         </span>
         
         <span class="tag">
@@ -1060,7 +1598,7 @@ varchar(50) -- 最多五十位
         
         <span class="tag">
             
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ffa2c4">前端</a>
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ff7d73">前端</a>
         </span>
         
         <span class="tag">
@@ -1157,12 +1695,12 @@ varchar(50) -- 最多五十位
         
         <span class="tag">
             
-            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #00a596">前端</a>
+            <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ff7d73">前端</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/HTML/" style="color: #00bcd4">HTML</a>
+            <a href="/tags/HTML/" style="color: #03a9f4">HTML</a>
         </span>
         
     </div>
@@ -1290,7 +1828,7 @@ public class main &#123;
         
         <span class="tag">
             
-            <a href="/tags/Java/" style="color: #00bcd4">Java</a>
+            <a href="/tags/Java/" style="color: #00a596">Java</a>
         </span>
         
         <span class="tag">
@@ -1397,54 +1935,11 @@ class Animal&#123;
         
         <span class="tag">
             
-            <a href="/tags/Java/" style="color: #ffa2c4">Java</a>
+            <a href="/tags/Java/" style="color: #00a596">Java</a>
         </span>
         
     </div>
     <a href="/2024/04/26/Java%E4%BF%AE%E9%A5%B0%E7%AC%A6%E4%B8%8E%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/2024/04/25/hello-world/">
-        <h2 class="post-title">Hello World</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/4/25
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <p>This is my first blog.</p>
-<p>我精通五种编程语言</p>
-<p>的hello world.</p>
-<h3 id="c"><a href="#c" class="headerlink" title="c"></a>c</h3><pre><code class="c">printf(&quot;hello world!&quot;);
-</code></pre>
-<h3 id="cpp"><a href="#cpp" class="headerlink" title="cpp"></a>cpp</h3><pre><code class="cpp">std::cout&lt;&lt; &quot;hello world!&quot;;
-</code></pre>
-<h3 id="java"><a href="#java" class="headerlink" title="java"></a>java</h3><pre><code class="java">system.out.println(&quot;hello world!&quot;);
-</code></pre>
-<h3 id="python"><a href="#python" class="headerlink" title="python"></a>python</h3><pre><code class="python">print(&quot;hello world!&quot;)
-</code></pre>
-<h3 id="csharp"><a href="#csharp" class="headerlink" title="csharp"></a>csharp</h3><pre><code class="csharp">Console.Writeline(&quot;hello world!&quot;);
-</code></pre>
-
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        
-        
-    </div>
-    <a href="/2024/04/25/hello-world/" class="go-post">阅读全文</a>
 </div>
 
 
@@ -1458,8 +1953,14 @@ class Animal&#123;
     
     <span class="current">2</span>
     
+    <a class="page-num" href="/page/3">3</a>
     
     
+    
+    
+    <a class="page-num" href="/page/3/">
+        <i class="fa-solid fa-caret-right fa-fw"></i>
+    </a>
     
 </div>
 

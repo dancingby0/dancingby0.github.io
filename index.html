@@ -167,6 +167,371 @@
         
 
 <div class="post">
+    <a href="/2024/09/25/Web-%E4%B8%80/">
+        <h2 class="post-title">Web(一)</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/25
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h1 id="快速启动"><a href="#快速启动" class="headerlink" title="快速启动"></a>快速启动</h1><p>使用SpringBoot开发一个web应用,当浏览器发起&#x2F;hello后,给浏览器返回字符串”hello world”</p>
+<p>步骤</p>
+<ol>
+<li>创建springboot工程</li>
+</ol>
+<p>选择SpringInitializr</p>
+<p>选定Spring Web</p>
+<ol start="2">
+<li>定义HelloController类,添加hello,并添加注解</li>
+</ol>
+<pre><code class="java">@RestController
+public class HelloController&#123;
+
+    @RequestMapping(&quot;/hello&quot;)
+    public String hello()&#123;
+        System.out.println(&quot;hello world&quot;);
+        return &quot;hello world&quot;;
+    &#125;
+&#125;
+</code></pre>
+<p>springboot启动类和controller包需要在同一个目录下</p>
+<ol start="3">
+<li>运行测试</li>
+</ol>
+<h2 id="HTTP协议概述"><a href="#HTTP协议概述" class="headerlink" title="HTTP协议概述"></a>HTTP协议概述</h2><p>规定浏览器和服务器之间数据传输的规则</p>
+<ol>
+<li><p>基于TCP;面向连接,安全(三次握手)</p>
+</li>
+<li><p>基于请求-响应模型: 一次请求对应一次相应</p>
+</li>
+<li><p>HTTP是无状态协议: 对于事物处理没有记忆能力.每次请求-响应都是独立</p>
+</li>
+</ol>
+<p>缺点: 多次请求间不能共享数据</p>
+<p>优点: 速度快</p>
+<h3 id="HTTP请求数据格式"><a href="#HTTP请求数据格式" class="headerlink" title="HTTP请求数据格式"></a>HTTP请求数据格式</h3><p>请求行+ 请求头</p>
+<p>GET &#x2F;brand&#x2F;findAll?name&#x3D;OPPO&amp;status&#x3D;1 HTTP&#x2F;1.1 请求行</p>
+<p>请求方式: GET&#x2F;POST<br>资源路径<br>协议 HTTP&#x2F;1.1</p>
+<p>请求头:</p>
+<p>第二行开始,格式key:value</p>
+<p>Host:  请求主机名</p>
+<p>User-Agent: 浏览器版本</p>
+<p>Accept: 能接受的资源类型</p>
+<p>Accept-Language: 表示浏览器偏好语言</p>
+<p>Accept-Encoding: 浏览器偏好语言</p>
+<p>Content-Type: 请求主体数据类型</p>
+<p>Content-Length: 请求主体大小</p>
+<p>用于兼容性处理</p>
+<p>GET: 请求参数在请求行中,大小有限制</p>
+<p>POST: 请求参数在请求体中,POST请求大小没有限制</p>
+<h3 id="HTTP相应数据格式"><a href="#HTTP相应数据格式" class="headerlink" title="HTTP相应数据格式"></a>HTTP相应数据格式</h3><p>响应行: 响应数据第一行(协议,状态码,描述)</p>
+<p>响应头: 第二行开始: key: value</p>
+<p>响应体: 最后一部分,存放响应数据</p>
+<pre><code class="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Tue, 10 May 2022 07:51:07 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+
+[&#123;id:1,brandName:&quot;Alibaba&quot;,companyName:&quot;腾讯公司&quot;&#125;]
+</code></pre>
+<p>状态码:</p>
+<p>1xx 响应中-临时状态码,</p>
+<p>2xx 成功</p>
+<p>3xx 重定向-重定向至其他地方,让客户端再发起一次请求完成整个处理</p>
+<p>4xx 客户端错误 责任在客户端,如禁止访问,客户端未被授权,请求不存在的资源</p>
+<p>5xx 服务器错误 责任在服务端,如程序抛出异常</p>
+<p>Content-Type: 相应内容类型</p>
+<p>Content-Length: 响应内容长度</p>
+<p>Content-Encoding: 该响应压缩算法</p>
+<p>Cache-Control: 客户端应当如何缓存,如max-age&#x3D;300表示最多缓存300s</p>
+<p>Set-Cookie: 告诉浏览器为当前页面所在的域设置cookie</p>
+<h3 id="解析数据"><a href="#解析数据" class="headerlink" title="解析数据"></a>解析数据</h3><pre><code class="java">public class Server&#123;
+    public static void main(String[] args) throws IOException&#123;
+        ServerSocket ss = new ServerSocket(8080); // 监听指定端口
+        While(true)&#123;
+            Socket sock = ss.accept(); // 接受客户端请求
+            System.out.println(&quot;connect from&quot; + sock.getRemoteSocketAddress());
+
+            // 开启线程处理请求
+            Thread t = new Handler(sock);
+            t.start();
+        &#125;
+    &#125;
+&#125;
+
+class Handler extends Thread&#123;
+    Socket sock;
+
+    public void run()&#123;
+        try(
+            InputStream input = this.sock.getInputStream(); // 获取输入流
+            OutputStream output = this.sock.getOutputStream(); // 获取输出流
+            handle(input,output);
+        )
+        catch(Exception e)&#123;
+            try&#123;
+                this.sock.close();
+            &#125;
+            catch (IOException ioe)&#123;
+
+            &#125;
+        &#125;
+    &#125;
+    private void handle(InputStream input,OutputStream output) throws IOException&#123;
+        // 对输入流和输出流进行包装
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input,StandardCharsets.UTF-8));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output,StandardCharsets.UTF-8));
+
+        // 读取HTTP请求
+        boolean requestOk = false;
+        String first = reader.readLine(); // 请求行
+        if(first.startWith(&quot;GET / HTTP/1.&quot;))&#123;
+            requestOk = true;
+        &#125;
+
+        while(true)&#123;
+            String header = reader.readLine();
+            if(header.isEmpty())&#123;
+                break; // 读完了
+            &#125;
+        &#125;
+
+        if(!requestOk)&#123;
+            // 错误响应
+            writer.write(&quot;HTTP/1.0 404 NotFound\r\n&quot;);
+            ...
+        &#125;else&#123;
+            // 成功响应
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>如果完全自己去解析,非常繁琐</p>
+<p>Tomcat WebLogic等都是为了封装简化这些操作产生的</p>
+<h2 id="Web服务器"><a href="#Web服务器" class="headerlink" title="Web服务器"></a>Web服务器</h2><p>是一个软件程序,对HTTP协议操作进行封装,程序员则不需要对协议进行操作,让Web开发更加便捷</p>
+<p>起步依赖:</p>
+<p>spring-boot-starter-web: 包含web应用开发所需要的常见依赖</p>
+<p>spring-boot-starter-test: 包含单元测试所需要的常见依赖</p>
+<p>官方提供的starter</p>
+<p>所有springboot都继承自父工程</p>
+<p>Tomcat是servlet容器,它识别servlet;而DispatcherServlet实现了Servlet接口(即tomcat可以识别DispatcherServlet);</p>
+<p>从客户端传来的请求都会经过DispatcherServlet ,再给XxxController处理,处理完毕后再把响应传给DispatcherServlet,再给客户端</p>
+<p>DispatcherServlet在Springboot中是核心控制器&#x2F;前端控制器</p>
+<p>解析的所有信息都封装入HttpServletRequest对象中(请求对象)</p>
+<p>响应的信息封装入HttpServletResponse对象中(响应对象)</p>
+<p>请求:</p>
+<h3 id="依赖注入和控制反转"><a href="#依赖注入和控制反转" class="headerlink" title="依赖注入和控制反转"></a>依赖注入和控制反转</h3><p>一般后端分为三层架构:</p>
+<h4 id="Controller层"><a href="#Controller层" class="headerlink" title="Controller层:"></a>Controller层:</h4><p>控制层:直接与客户端进行交互,用于接收请求和响应</p>
+<ol>
+<li><p>接收,解析请求</p>
+</li>
+<li><p>调用服务层</p>
+</li>
+<li><p>返回响应</p>
+</li>
+<li><p>处理异常</p>
+</li>
+</ol>
+<p>在Spring框架中，控制层通常使用@Controller或@RestController注解。@Controller用于返回视图页面，而@RestController是@Controller和@ResponseBody的组合，主要用于RESTful API开发，返回的是JSON或XML数据。</p>
+<pre><code class="java">@RestController
+@RequestMapping(&quot;/users&quot;)
+public class UserController &#123;
+    @Autowired
+    private UserService userService;
+ 
+    @GetMapping(&quot;/&#123;id&#125;&quot;)
+    public ResponseEntity&lt;User&gt; getUserById(@PathVariable Integer id) &#123;//id为路径参数
+        User user = userService.getUserById(id);//调用服务层获取用户信息
+        return Result.success(user); //返回json格式数据和用户信息
+    &#125;
+ 
+    @PostMapping
+    public ResponseEntity&lt;User&gt; createUser(@RequestBody User user) &#123;
+        User newUser = userService.saveUser(user);//调用服务层创建新用户
+        return Result.success(newUser);//返回json格式数据和新用户信息
+    &#125;
+    //负责进行异常处理
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity&lt;String&gt; handleUserNotFound(UserNotFoundException ex) &#123;
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    &#125;
+&#125;
+</code></pre>
+<p>其中,Result类是用来统一返回类的:</p>
+<pre><code class="java">@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Result &#123;
+    private Integer code;//响应码，1 代表成功; 0 代表失败
+    private String msg;  //响应信息 描述字符串
+    private Object data; //返回的数据
+    //增删改 成功响应
+    public static Result success()&#123;
+        return new Result(1,&quot;success&quot;,null);
+    &#125;
+    //查询 成功响应
+    public static Result success(Object data)&#123;
+        return new Result(1,&quot;success&quot;,data);
+    &#125;
+    //失败响应
+    public static Result error(String msg)&#123;
+        return new Result(0,msg,null);
+    &#125;
+&#125;
+</code></pre>
+<h4 id="Service层"><a href="#Service层" class="headerlink" title="Service层"></a>Service层</h4><p>服务层（Service）是整个应用程序的核心部分，负责处理所有的业务逻辑。它在控制层和数据访问层之间起到中介作用，封装了业务流程，并协调DAO层的数据访问操作。</p>
+<p>1.业务逻辑实现：将业务需求转化为可执行的逻辑操作，包括数据的校验、转换、计算等。</p>
+<p>2.事务管理：在处理涉及多个数据库操作的业务时，确保这些操作要么全部成功，要么全部失败（即事务的原子性）。<br>3.调用DAO层：与数据访问层（DAO层）交互，完成数据的增删改查等各种操作。</p>
+<p>4.封装复杂逻辑：将复杂的业务流程封装在服务层，控制层只需要调用相应的服务方法，而不关心其内部实现细节。</p>
+<p>5.集成其他服务：在大型系统中，服务层可能还负责与外部服务的集成，例如调用其他微服务、消息队列、第三方API等。</p>
+<p>典型的服务层类通常包含多个业务方法，这些方法通过注入DAO层对象（通过注解@Autowired 和 @Resource实现</p>
+<pre><code class="java">@Service
+public class UserService &#123;
+    @Autowired
+    private UserDao userDao;
+ 
+    @Transactional
+    public User getUserById(Integer id) &#123;
+        return userDao.getById(id);//调用Dao层通过ID查找用户
+    &#125;
+ 
+    @Transactional
+    public User saveUser(User user) &#123;
+        //业务逻辑部分代码：如检查用户名是否已存在，设置用户创建时间等
+        return userDao.save(user);
+    &#125;
+ 
+    //其他处理方法代码
+&#125;
+</code></pre>
+<h4 id="DAO层"><a href="#DAO层" class="headerlink" title="DAO层"></a>DAO层</h4><p>1.CRUD 操作：提供增删改查数据库记录的操作。</p>
+<p>2.数据库连接管理：管理与数据库的连接以及连接池的使用（在现代框架中，这通常由ORM工具或框架自动管理）。</p>
+<p>3.数据转换：将数据库中的数据转换为应用程序中的对象（DTO，Data Transfer Object），以及将对象转换为适合存储在数据库中的格式。</p>
+<p>4.查询封装：将复杂的数据库查询封装为易于调用的方法，因此控制层(Controller)和服务层(Service)不会直接接触SQL语句，即不必关心具体的数据库实现。</p>
+<p>DAO层通常使用@Repository注解，并且依赖于ORM（如Hibernate或JPA）来简化数据访问。DAO层可以直接使用JPA的JpaRepository接口，或者自定义查询方法。</p>
+<pre><code class="java">@Repository
+public interface UserDao extends JpaRepository&lt;User, Long&gt; &#123;
+    // 继承JpaRepository后，自动获得基本的CRUD操作
+    // 自定义查询方法
+    User getById(Integer id);
+ 
+     // 自定义的JPQL或Native SQL查询
+    @Query(&quot;SELECT u FROM User u WHERE u.email = ?1&quot;)
+    User findByEmail(String email);
+&#125;
+</code></pre>
+<p>Controller 层– &gt;Service 层– &gt;DAO 层：</p>
+<p>控制层负责接收客户端请求并传递给服务层，服务层在处理业务逻辑后，可能需要访问数据，于是调用DAO层进行数据库操作。</p>
+<p>DAO 层–&gt;Service 层– &gt; Controller 层：</p>
+<p>DAO层将数据返回给服务层，服务层进行必要的处理后，将结果返回给控制层，最终控制层将响应发送给客户端。</p>
+<h4 id="IOC容器"><a href="#IOC容器" class="headerlink" title="IOC容器"></a>IOC容器</h4><p>IOC—Inversion of Control，即“控制反转”，不是什么技术，而是一种设计思想</p>
+<p><strong>控制</strong>：IOC意味着将你设计好的对象交给IOC容器控制，而不是传统的在你的对象内部直接控制；</p>
+<p>IOC是有专门一个容器来创建这些对象，即由IOC容器来控制对象的创建；</p>
+<p>谁控制谁？当然是IOC容器控制了对象；控制什么？那就是主要控制了外部资源获取（不只是对象包括比如文件等）。</p>
+<p><strong>反转</strong>：传统应用程序是由我们自己在对象中主动控制去直接获取依赖对象，也就是正转；</p>
+<p>反转则是由IOC容器来帮忙创建及注入依赖对象；</p>
+<p>由容器帮我们查找及注入依赖对象，对象只是被动的接受依赖对象，所以是反转；哪些方面反转了？依赖对象的获取被反转了。</p>
+<p>@Component 声明bean的基础注解 不属于三层中时,使用</p>
+<p>@Controller 标注在控制器类上</p>
+<p>@Service 标注在业务类上</p>
+<p>@Repository 标注在数据访问类上(因为有mybatis,用的少)</p>
+<h4 id="Bean组件扫描"><a href="#Bean组件扫描" class="headerlink" title="Bean组件扫描"></a>Bean组件扫描</h4><p>声明Bean的四个注解,若想要生效则要被组件扫描注解@ComponentScan扫描</p>
+<p>@ComponentScan注解虽然没有被显示配置,但已经包含在启动类声明注解@SpringBootApplication中,默认扫描范围是启动类所在包及其子包</p>
+<h3 id="DI"><a href="#DI" class="headerlink" title="DI"></a>DI</h3><p>@Autowired注解,默认按照类型进行: 如果存在多个相同类型的bean,就会报错(如有两个IdDao父类的bean)</p>
+<p>解决方案:</p>
+<p>@Primary</p>
+<p>加上这个,如果存在多个bean,则只会令有@Primary注解的bean生效</p>
+<p>@Qualifier</p>
+<p>在@Autowired注解的位置加上@Qualifier,指定要添加的bean,如@Qualifier(“empServiceA”)</p>
+<p>@Resource<br>或者直接不用@Autowired,而直接使用@Resorce(name&#x3D;”empServiceB”)即可</p>
+<p>@Resource与@Autowired区别:</p>
+<p>@Autowired是spring提供的,而@Resource是JDK提供的</p>
+<p>@Autowired是按照类型注入,@Resource是按照名称注入</p>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2024/09/25/Web-%E4%B8%80/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2024/09/25/Java%E6%9D%82%E9%A1%B9-%E4%B8%80/">
+        <h2 class="post-title">Java杂项(一)</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/25
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2024/09/25/Java%E6%9D%82%E9%A1%B9-%E4%B8%80/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2024/09/25/JUC%E5%AD%A6%E4%B9%A0-%E4%B8%80/">
+        <h2 class="post-title">JUC学习(一)</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/25
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2024/09/25/JUC%E5%AD%A6%E4%B9%A0-%E4%B8%80/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/2024/09/24/Lombok-Junit-%E5%8F%8D%E5%B0%84-%E6%B3%A8%E8%A7%A3/">
         <h2 class="post-title">Lombok,Junit,反射,注解</h2>
     </a>
@@ -376,6 +741,7 @@ public class Demo1&#123;
 <li>@Override: 检测该注解标注的方法是否继承自父类(父接口)</li>
 <li>@Deprecated: 将该注解标注的内容,表示已过时</li>
 <li>@SuppressWarnings: 压制警告</li>
+<li>@Generated: 表示该代码是由工具自动生成的</li>
 </ul>
 <h2 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h2><p>格式:</p>
 <p>元注解<br>public @interface 注解名称()</p>
@@ -405,7 +771,17 @@ public class Demo1&#123;
 <p>元注解:</p>
 <p>用于描述注解的 注解(就是一个注解,但是它用来描述注解)</p>
 <p>@Target: 描述注解能够作用的位置</p>
+<p>仅有value属性, 设置ElementType枚举(查看源代码即可)</p>
+<p>取值:</p>
+<ul>
+<li>ElementType.TYPE: 类上</li>
+<li>ElementType.METHOD: 作用于方法上</li>
+<li>ElementType.FIELD: 作用于成员变量上</li>
+</ul>
 <p>@Retention: 描述注解被保留的阶段(有三个阶段,源码,Class,Runtime阶段)</p>
+<ul>
+<li>一般自定义注解取RUNTIME</li>
+</ul>
 <p>@Documented: 描述注解是否被抽取至api文档中</p>
 <p>@Inherited: 描述注解是否被子类继承</p>
 <h2 id="使用-解析-注解"><a href="#使用-解析-注解" class="headerlink" title="使用(解析)注解"></a>使用(解析)注解</h2><pre><code class="java">@SuppressWarnings(&quot;all&quot;) // 需要传参,一般传all
@@ -424,9 +800,53 @@ public @interface MyAnno&#123;
 
 @MyAnno(show1 = 1,show2 = &quot;2&quot;,per = Person.p1,strs = &#123;&quot;aaa&quot;,&quot;bbb&quot;&#125; ) // 使用时像属性,需要赋值
 </code></pre>
+<pre><code class="java">
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+
+</code></pre>
 <h1 id="Lombok"><a href="#Lombok" class="headerlink" title="Lombok"></a>Lombok</h1><p>简介:</p>
 <p>Lombok是一个Java库,能够自动插入编辑器并构建工具,简化Java开发</p>
 <p>他用注解进行提高代码可读性和开发效率(即只需要在Java类上添加相应注解,不需要手动编写相应代码)</p>
+<h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><h3 id="Getter和-Setter"><a href="#Getter和-Setter" class="headerlink" title="@Getter和@Setter"></a>@Getter和@Setter</h3><p>自动生成类的getter和setter(在源代码时)</p>
+<p>@Getter在类时,给所有生成getter</p>
+<p>@Getter在属性时,给该字段生成getter </p>
+<p>布尔类型的getter为isXxx</p>
+<p>可以设置AccessLevel设置访问权限</p>
+<p>如果想要让某个字段不设置getter,则@Getter(AccessLevel.NONE)</p>
+<p>可以给getter等加上自定义注解</p>
+<p>@Getter(onMethod_ &#x3D; { @Deprecated }) &#x2F;&#x2F; 为getter加上自定义注解</p>
+<p>lazy: 懒初始化</p>
+<p>如<br>@Getter(lazy &#x3D; true)<br>private final String name &#x3D; “小明”; &#x2F;&#x2F; 如果懒初始化,则说明尽可能晚地赋值,即只有需要get时才会赋值, 即懒汉式单例模式</p>
+<p>lazy使用场景:</p>
+<p>一个字段通过initValue赋予,但是不希望该方法在类创建时就执行</p>
+<p>此外,如果自行编写了相应的getter或setter(根据命名规则判定),则不会被注解覆盖,也不会生成</p>
+<h3 id="构造方法相关"><a href="#构造方法相关" class="headerlink" title="构造方法相关"></a>构造方法相关</h3><p>@AllArgsConstructor</p>
+<p>全参构造器,加在类上</p>
+<p>staticName 生成静态构造方法(即该构造方法被private,需要通过该静态方法进行调用) (单例)</p>
+<p>onConstructor 用于添加其他注解</p>
+<p>access 访问级别</p>
+<p>@NoArgsConstructor</p>
+<p>无参构造器</p>
+<p>如果存在final变量,则需要force &#x3D; true(直接赋值默认值)</p>
+<p>@RequiredArgsConstructor</p>
+<p>生成需要部分生成的构造</p>
+<p>为所有需要final的字段生成构造方法</p>
+<h3 id="ToString"><a href="#ToString" class="headerlink" title="ToString"></a>ToString</h3><p>@ToString</p>
+<p>includeFieldNames 是否打印字段名字</p>
+<p>callSuper 不仅生成当前类的,并且使用父类的toString拼接</p>
+<p>doNotUseGetters 默认尽可能使用get获取字段值</p>
+<p>onlyExplicitlyIncluded(rank &#x3D; 1) 白名单模式,开启后则只为加上@ToString.Include注解的内容生成,rank为优先级,越大优先级越高</p>
+<p>@ToString.Exclude 注解里的注解(因为接口可以套接口),黑名单模式,排除</p>
+<p>同时可以对方法生效</p>
+<h3 id="HashCode"><a href="#HashCode" class="headerlink" title="HashCode"></a>HashCode</h3><p>@EqualsAndHashCode &#x2F;&#x2F; 自动生成equals重写</p>
+<p>重写equals时必须重写hashCode,因为集合中使用哈希</p>
+<p>cacheStrategy</p>
+<p>可能每次调用时都要重复计算哈希值,浪费性能,因此缓存hash码,默认不启用(但如果其中字段值可能发生变化,则不建议使用,因为它只计算一次,后续是返回第一次计算的哈希码)</p>
+<p>@EqualsAndHashCode.Include(replaces &#x3D; 属性名) &#x2F;&#x2F; 加在方法前,比较时比较该方法</p>
+<p>其他看源代码即可</p>
+<h3 id="Data"><a href="#Data" class="headerlink" title="Data"></a>Data</h3><p>@Data:</p>
+<p>等同于之前所有的注解加在类上(用于将数据库中的数据)</p>
 
             
         </div>
@@ -1157,12 +1577,12 @@ END;
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
+            <a href="/tags/sql/" style="color: #03a9f4">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #00a596">back end</a>
+            <a href="/tags/back-end/" style="color: #00bcd4">back end</a>
         </span>
         
     </div>
@@ -1339,12 +1759,12 @@ update student set no = &#39;2000100105&#39; where name = &#39;韦一笑&#39;;
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
+            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
         </span>
         
         <span class="tag">
             
-            <a href="/tags/back-end/" style="color: #03a9f4">back end</a>
+            <a href="/tags/back-end/" style="color: #ff7d73">back end</a>
         </span>
         
     </div>
@@ -1844,7 +2264,7 @@ select count(distinct substring(email,1,5)) / count(*) from tb_user -- 获取选
         
         <span class="tag">
             
-            <a href="/tags/sql/" style="color: #ffa2c4">sql</a>
+            <a href="/tags/sql/" style="color: #00bcd4">sql</a>
         </span>
         
         <span class="tag">
@@ -1856,544 +2276,6 @@ select count(distinct substring(email,1,5)) / count(*) from tb_user -- 获取选
     <a href="/2024/09/18/SQL%E5%AD%A6%E4%B9%A0-%E4%B8%83-%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E-%E7%B4%A2%E5%BC%95/" class="go-post">阅读全文</a>
 </div>
 
-<div class="post">
-    <a href="/2024/09/18/SQL%E5%AD%A6%E4%B9%A0-%E5%85%AD-%E4%BA%8B%E5%8A%A1/">
-        <h2 class="post-title">SQL学习(六) 事务</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/9/18
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>一组操作的集合,不可分割.事务会将一组操作作为整体进行向系统提交或撤销请求.</p>
-<p>这些操作同时成功,或同时失败</p>
-<p>默认MYSQL的事务是自动提交的,当每执行一条DML语句,便隐式地提交事务</p>
-<p>每一个sql语句都是事务</p>
-<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><p>操作方式:</p>
-<p>将事务提交改为手动提交,在完成一些操作后,如果正常运行,则进行commit提交,如果出错,进行回滚操作</p>
-<ul>
-<li>查看&#x2F;设置事务提交方式:</li>
-</ul>
-<pre><code class="sql">SELECT @@autocommit;
-SET @@autocommit = 0;
-</code></pre>
-<ul>
-<li>提交事务</li>
-</ul>
-<pre><code class="sql">COMMIT;
-</code></pre>
-<ul>
-<li>回滚事务</li>
-</ul>
-<pre><code class="sql">ROLLBACK;
-</code></pre>
-<ul>
-<li>开启事务</li>
-</ul>
-<pre><code class="sql">START TRANSACTION 或 BEGIN;
-</code></pre>
-<ul>
-<li>提交事务</li>
-</ul>
-<pre><code class="sql">COMMIT
-</code></pre>
-<ul>
-<li>回滚事务</li>
-</ul>
-<pre><code class="sql">ROLLBACK;
-</code></pre>
-<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><p>完成转账操作:张三给李四转1000(自动提交事务)</p>
-<pre><code class="sql">select * from account where name = &#39;张三&#39;;
-update account set money = money - 1 where name = &#39;张三&#39;;
-update account set money = money + 1 where name = &#39;李四&#39;;
-</code></pre>
-<p>手动提交事务(方式一)</p>
-<pre><code class="sql">set @autocommit = 0; -- 设置为手动提交
-select * from account where name = &#39;张三&#39;;
-update account set money = money - 1 where name = &#39;张三&#39;;
-update account set money = money + 1 where name = &#39;李四&#39;;
--- 此时数据并未更新
-commit; -- 提交事务,如果途中出错,则不会允许到commit,也就不会执行出错前的结果.
-
-rollback; -- 回滚事务,把之前操作取消了(因为如果出错的话,则原来的操作结果会在缓存内,如果不进行回滚,当执行其他语句时,这些缓存的操作结果会影响数据,因此必须回滚)
-</code></pre>
-<p>方式二</p>
-<pre><code class="sql">set @@autocommit = 1
-start transaction;
-select * from account where name = &#39;张三&#39;;
-update account set money = money - 1 where name = &#39;张三&#39;;
-update account set money = money + 1 where name = &#39;李四&#39;;
-
-commit; -- 如果没有异常
-rollback; -- 如果出现异常
-</code></pre>
-<h3 id="四大特性"><a href="#四大特性" class="headerlink" title="四大特性"></a>四大特性</h3><ul>
-<li><p>原子性(Atomicity): 事务不可分割最小单元, 要么全部成功,要么全部失败</p>
-</li>
-<li><p>一致性(Consistency): 事务完成时,必须使所有数据保持一致状态</p>
-</li>
-<li><p>隔离性(Isolation): 数据库提供隔离机制,保证事务不受外部并发操作影响</p>
-</li>
-<li><p>持久性(Durability): 事务一旦提交或回滚,则它对数据库数据改变是永久的</p>
-</li>
-</ul>
-<h3 id="并发事务问题"><a href="#并发事务问题" class="headerlink" title="并发事务问题"></a>并发事务问题</h3><p>问题如下:</p>
-<ol>
-<li><p>脏读: 一个事务读到另一个事务还没有提交的数据(如果那个事务失败了,则会出现问题)</p>
-</li>
-<li><p>不可重复读: 一个事务先后读取同一条记录,但两次读取数据不同(数据在两次读取期间被改了)</p>
-</li>
-<li><p>幻读: 一个事务按照条件查询数据时,没有对应数据行,但插入数据时,又发现这条数据已经存在,好像出现幻影(即查询时数据未存在,而到插入数据之前,数据被插入到表中)</p>
-</li>
-</ol>
-<h3 id="事务隔离级别"><a href="#事务隔离级别" class="headerlink" title="事务隔离级别"></a>事务隔离级别</h3><p>√ 表示会出现问题</p>
-<table>
-<thead>
-<tr>
-<th>隔离级别</th>
-<th>脏读</th>
-<th>不可重复读</th>
-<th>幻读</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Read uncommitted()</td>
-<td>√</td>
-<td>√</td>
-<td>√</td>
-</tr>
-<tr>
-<td>Read committed</td>
-<td>x</td>
-<td>√</td>
-<td>√</td>
-</tr>
-<tr>
-<td>Repeatable Read(默认)</td>
-<td>x</td>
-<td>x</td>
-<td>√</td>
-</tr>
-<tr>
-<td>Serializable</td>
-<td>x</td>
-<td>x</td>
-<td>x</td>
-</tr>
-</tbody></table>
-<p>从上至下性能下降</p>
-<pre><code class="sql">-- 查看事务隔离级别
-SELECT @@TRANSACTION_ISOLATION; 
--- 设置事务隔离级别(SESSION表当前会话,即当前客户端窗口,GLOBAL全局)
-SET [SESSION|GLOBAL] TRANSACTION ISOLATION LEVEL [READ UNCOMMITTED|READ COMMITTED|REPEATABLE READ|SERIALIZABLE];
-</code></pre>
-
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        <span class="icon">
-            <i class="fa-solid fa-tags fa-fw"></i>
-        </span>
-        
-        
-        
-        <span class="tag">
-            
-            <a href="/tags/sql/" style="color: #00a596">sql</a>
-        </span>
-        
-        <span class="tag">
-            
-            <a href="/tags/back-end/" style="color: #ffa2c4">back end</a>
-        </span>
-        
-    </div>
-    <a href="/2024/09/18/SQL%E5%AD%A6%E4%B9%A0-%E5%85%AD-%E4%BA%8B%E5%8A%A1/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/2024/09/17/SQL%E5%AD%A6%E4%B9%A0-%E4%BA%94-%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/">
-        <h2 class="post-title">SQL学习(五) 多表查询</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/9/17
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <h2 id="多表查询"><a href="#多表查询" class="headerlink" title="多表查询"></a>多表查询</h2><p>属于data query language</p>
-<h3 id="多表关系"><a href="#多表关系" class="headerlink" title="多表关系"></a>多表关系</h3><p>多个表关系:</p>
-<p>一对多(多对一)</p>
-<p>多对多</p>
-<p>一对一</p>
-<h4 id="一对多"><a href="#一对多" class="headerlink" title="一对多"></a>一对多</h4><p>案例:部门与员工关系</p>
-<p>关系:一:部门 多:员工</p>
-<p>实现:多的一方建立外键,指向一的一方</p>
-<h4 id="多对多"><a href="#多对多" class="headerlink" title="多对多"></a>多对多</h4><p>案例:学生与课程关系</p>
-<p>关系: 多:学生 多:课程</p>
-<p>实现:</p>
-<p>建立一张中间表,至少包含两个外键,分别关联两方主键</p>
-<h4 id="一对一"><a href="#一对一" class="headerlink" title="一对一"></a>一对一</h4><p>案例: 用户与用户详情的关系</p>
-<p>关系: 一对一关系,多用于单表拆分,将基础字段放在一张表中,详情字段放在另一张中,以提升操作效率</p>
-<p>实现:</p>
-<p>在任意一方加入外键,关联另一方主键,设置外键为唯一的(UNIQUE)</p>
-<p>多表查询:</p>
-<p>从多表中查询数据</p>
-<h4 id="分类"><a href="#分类" class="headerlink" title="分类:"></a>分类:</h4><ul>
-<li>连接查询<ul>
-<li>内连接:查询A,B交集部分数据</li>
-<li>外连接:<ul>
-<li>左外连接: 查询左表所有数据,以及两表交集</li>
-<li>右外连接: 查询右表所有数据,以及交集</li>
-</ul>
-</li>
-<li>自连接: 当前表与自身连接查询,子链接必须使用表别名</li>
-</ul>
-</li>
-<li>子查询</li>
-</ul>
-<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>设有emp表10个数据,dept表5个数据</p>
-<pre><code class="sql">select * from emp,dept; -- 多表查询,会得到10*5=50条数据,每一个对应进行穷举得到,即笛卡尔积,即A集合与B集合所有组合情况
-
-select * from emp,dept where emp.dept_id = dept.id;
-</code></pre>
-<h3 id="内连接"><a href="#内连接" class="headerlink" title="内连接"></a>内连接</h3><p>查询交集部分</p>
-<p>隐式内连接</p>
-<pre><code class="sql">SELECT 字段列表 FROM 表1,表2 WHERE 条件;
-</code></pre>
-<p>显式内连接</p>
-<pre><code class="sql">SELECT 字段列表 FROM 表1 [INNER] JOIN 表2 ON 连接条件;
-</code></pre>
-<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><ol>
-<li>查询每一个员工姓名以及关联部门名称</li>
-</ol>
-<pre><code class="sql">select emp.name,dept.name from emp,dept where emp.dept_id = dept.id;-- 隐式内连接
-select e.name,d.name from emp e,dept d where e.dept_id = d.id; -- 如果为表起了别名,则不可以使用原名
-
-select emp.name,dept.name from emp e inner join dept d on e.dept_id = d.id; -- 显式外连接
-</code></pre>
-<h3 id="外连接"><a href="#外连接" class="headerlink" title="外连接"></a>外连接</h3><p>包含一张表所有内容以及交集部分</p>
-<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT field_list FROM table1 LEFT [OUTER] JOIN table2 ON condition...; -- 左外连接
-
-SELECT field_list FROM table1 RIGHT [OUTER] JOIN table2 ON condition...; -- 右外连接
-</code></pre>
-<h4 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h4><p>查询emp表所有数据和相对应部门信息</p>
-<pre><code class="sql">select e.*, d.name from emp e left outer join dept d on e.dept = d.id; -- 左外查询(包含未分配部门的信息)
-
-select e.*,d.name from emp e right outer join dept d on e.dept = d.id; -- 右外查询(包含未分配员工的部门的信息)
-</code></pre>
-<h3 id="自连接"><a href="#自连接" class="headerlink" title="自连接"></a>自连接</h3><h4 id="语法-1"><a href="#语法-1" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT field_list FROM tableA aliasA [INNER] JOIN tableA aliasB ON condition;
-
-SELECT field_list FROM tableA aliasA,tableA aliasB WHERE condition;
-SELECT field_list FROM tableA aliasA RIGHT|LEFT [OUTER] JOIN tableA aliasB ON condition...
-</code></pre>
-<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>自连接既可以使用内连接,也可以使用外连接</p>
-<p>自连接时,把一张表看作是两张表</p>
-<p>如果查询内容出现null值,则需要使用外连接</p>
-<h4 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h4><ol>
-<li>查询员工及其编号所属领导名字</li>
-</ol>
-<pre><code class="sql">select e.name,m.name from emp e inner join emp m on e.manager_id = m.id;
-</code></pre>
-<ol start="2">
-<li>查询所有员工信息及其领导名字emp,若员工没有领导,也需要查询</li>
-</ol>
-<p>需要外连接</p>
-<pre><code class="sql">select e.name &#39;员工&#39;,m.name &#39;领导&#39; from emp e left outer join emp m on e.manager_id = m.id;
-</code></pre>
-<h3 id="联合查询"><a href="#联合查询" class="headerlink" title="联合查询"></a>联合查询</h3><p>即把多次查询结果合并起来,形成一个新的查询结果</p>
-<h4 id="语法-2"><a href="#语法-2" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT field_list FROM tableA ... -- 没有分号!
-UNION [ALL]
-SELECT field_list FROM tableB...; -- 这三行是一个语句!
-</code></pre>
-<h4 id="注意事项-1"><a href="#注意事项-1" class="headerlink" title="注意事项"></a>注意事项</h4><p>union all: 直接将查询结果合并(会出现重复)</p>
-<p>union: 去重</p>
-<p>使用条件: 联合查询多张表的列数必须一致,字段类型也必须一致</p>
-<p>如:</p>
-<pre><code class="sql">select * from emp where salary &gt; 1
-union
-select name from emp where age &lt; 50; -- ERROR!字段不一致!
-</code></pre>
-<h4 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h4><p>将薪资低于5000的员工,和年龄大于50的员工查询出来(或逻辑)</p>
-<pre><code class="sql">select * from emp where salary &lt; 5000
-union all
-select * from emp where age &gt;50;
-</code></pre>
-<h3 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h3><p>SQL 语句中嵌套SELECT语句,又称嵌套查询</p>
-<p>分类:</p>
-<ul>
-<li>标量子查询 子查询结果为单个值</li>
-<li>列子查询 结果一个列</li>
-<li>行子查询 一个行</li>
-<li>表子查询 多行多列</li>
-</ul>
-<h4 id="语法-3"><a href="#语法-3" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">SELECT * FROM t1 WHERE column1 = (SELECT column1 FROM t2);
-</code></pre>
-<p>外部语句可以是 INSERT|UPDATE|DELETE|SELECT, DQL,DML</p>
-<p>位置可以是WHERE|FROM|SELECT</p>
-<p>标量子查询: 常用&gt; &lt; &#x3D; &gt;&#x3D; &lt;&#x3D;</p>
-<p>列子查询:常用 IN(在指定集合内) NOT IN ANY(子查询返回的列表中,任意一个满足即可) SOME(同ANY) ALL(必须全部满足)</p>
-<p>行子查询: 常用&#x3D; !&#x3D; IN NOT IN</p>
-<p>表子查询: 常用IN</p>
-<h4 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h4><ul>
-<li>标量子查询</li>
-</ul>
-<p>查询销售部所有员工信息</p>
-<pre><code class="sql">select * from emp where dept_id = (select id from dept where name = &#39;销售部&#39;);
-</code></pre>
-<p>查询”方东白”入职后员工信息</p>
-<pre><code class="sql">select * from emp where entry_date &gt; (select entry_date from emp where name = &#39;方东白&#39;);
-</code></pre>
-<ul>
-<li>列子查询</li>
-</ul>
-<ol>
-<li>查询”销售部”和”市场部”的所有员工信息</li>
-</ol>
-<pre><code class="sql">select * from emp where dept in (select id from dept where name in (&#39;销售部&#39;,&#39;市场部&#39;));
-</code></pre>
-<ol start="2">
-<li>查询比财务部所有人工资都高的员工信息</li>
-</ol>
-<pre><code class="sql">select * from emp where salary &gt; all(select salary from emp where dept_id = (select id from dept where name = &#39;财务部&#39;)) -- where比聚合函数先执行
-</code></pre>
-<ol start="3">
-<li>查询比研发部任意一人工资都高的员工信息</li>
-</ol>
-<pre><code class="sql">select * from emp where salary &gt; any(select salary from emp where dept_id = (select id from dept where name = &#39;研发部&#39;));
-</code></pre>
-<ul>
-<li>行子查询</li>
-</ul>
-<p>查询与”张无忌”的薪资及其直属领导 相同的员工信息</p>
-<pre><code class="sql">select * from emp where salary = (select salary from emp where name = &#39;张无忌&#39;) and manager_id = (select id from emp where name = &#39;张无忌&#39;);
-
-select * from emp where (salary,manager_id) = (select salary,id from emp where name = &#39;张无忌&#39;);
-</code></pre>
-<ul>
-<li>表子查询</li>
-</ul>
-<ol>
-<li>查询与”a”,”b”的职位与薪资相同的员工信息</li>
-</ol>
-<pre><code class="sql">select * from emp where (dept_id,salary) in (select dept_id,salary from emp where name in(&#39;a&#39;,&#39;b&#39;));
-</code></pre>
-<ol start="2">
-<li>查询入职日期为’2006-01-01’之后员工信息及其部门信息</li>
-</ol>
-<pre><code class="sql">select e.*,d.* from (select * from emp where entry_date &gt; &#39;2006-01-01&#39;) e left join dept d on d.id = e.dept_id; -- select后也可以直接写*
-</code></pre>
-<h3 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h3><ol>
-<li>查询员工姓名,年龄,职位,部门信息(隐式内连接)</li>
-</ol>
-<pre><code class="sql">select e.name,e.age,e.position,d.name from emp e, dept d where d.id = e.dept_id;
-</code></pre>
-<ol start="2">
-<li>查询年龄小于30岁员工姓名,年龄,职位,部门信息(显式内连接)</li>
-</ol>
-<pre><code class="sql">select e.name,e.age,e.position,d.name from emp e inner join dept d where e.age&lt;30 on e.dept_id = d.id; 
-</code></pre>
-<ol start="3">
-<li>查询拥有员工的部门(id,名称)</li>
-</ol>
-<pre><code class="sql">select distinct d.* from emp e join dept d on e.dept_id = d.id;
-</code></pre>
-<ol start="4">
-<li>查询所有年龄大于40岁的员工,及其归属部门名称,如果员工没有分配部门,也需要展示</li>
-</ol>
-<pre><code class="sql">select e.*,d.name from emp e left join dept d on e.dept_id = d.id where e.age&gt;40;
-</code></pre>
-<ol start="5">
-<li>查询所有员工工资等级</li>
-</ol>
-<p>设有sal_grade表,有losal和hisal(分别是最低工资与最高工资)两列,有grade表示薪资水平</p>
-<pre><code class="sql">select e.name,s.grade from emp e, salary s where e.salary between s.losal and s.hisal;
-</code></pre>
-<ol start="6">
-<li>查询 “研发部” 所有员工信息及工资等级</li>
-</ol>
-<pre><code class="sql">select e.*,s.grade from emp e,salary s where e.dept_id = (select id from dept where name = &#39;研发部&#39;) and e.salary between s.losal and s.hisal;
-</code></pre>
-<ol start="7">
-<li>查询 “研发部” 平均工资</li>
-</ol>
-<pre><code class="sql">select avg(e.salary) from emp e where e.dept_id = (select id from dept where name = &#39;研发部&#39;);
-
-select avg(e.salary) from emp e,dept,d where e.dept_id = d.id and d.name = &#39;研发部&#39;;
-</code></pre>
-<ol start="8">
-<li>查询工资比 ‘a’ 高的员工信息</li>
-</ol>
-<pre><code class="sql">select * from emp e where e.salary &gt; (select salary from emp where name = &#39;a&#39;);
-</code></pre>
-<ol start="9">
-<li>查询比平均薪资高的员工信息</li>
-</ol>
-<pre><code class="sql">select * from emp e where e.salary &gt; (select avg(salary) from emp);
-</code></pre>
-<ol start="10">
-<li>查询比本部门平均薪资低的员工信息</li>
-</ol>
-<pre><code class="sql">select * from emp e1 where e1.salary &lt;(select avg(salary) from emp e2 where e1.dept_id = e2.dept_id);
-</code></pre>
-<ol start="11">
-<li>查询所有部门信息并统计部门的员工人数</li>
-</ol>
-<pre><code class="sql">select d.*,(select count(*) from emp e where e.dept_id = d.id) &#39;人数&#39; from dept d;
-</code></pre>
-<ol start="12">
-<li>查询所有学生选课情况,显示出学生名称,学号,课程名称</li>
-</ol>
-<p>表: student, course, student_course</p>
-<p>连接条件: student.id &#x3D; student_course.student_id, course.id &#x3D; student_course.course_id</p>
-<pre><code class="sql">select s.name,s.number,c.name from student s, student_course sc , course c where sc.student_id = s.id and sc.course_id = course.id;
-</code></pre>
-
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        <span class="icon">
-            <i class="fa-solid fa-tags fa-fw"></i>
-        </span>
-        
-        
-        
-        <span class="tag">
-            
-            <a href="/tags/sql/" style="color: #03a9f4">sql</a>
-        </span>
-        
-        <span class="tag">
-            
-            <a href="/tags/back-end/" style="color: #00bcd4">back end</a>
-        </span>
-        
-    </div>
-    <a href="/2024/09/17/SQL%E5%AD%A6%E4%B9%A0-%E4%BA%94-%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/2024/09/16/SQL%E5%AD%A6%E4%B9%A0-%E5%9B%9B/">
-        <h2 class="post-title">SQL学习(四)</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2024/9/16
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <h2 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h2><p>作用于字段上的规则,限制存储于表中的数据</p>
-<pre><code class="sql">NOT NULL -- 非空约束
-UNIQUE -- 唯一约束 所有数据均唯一
-PRIMARY KEY -- 主键约束 主键是一行数据的唯一标识,非空且唯一
-DEFAULT -- 默认约束,如果保存数据时,未指定该字段的值,则采用默认值
-CHECK -- 检查约束,8.0.16版本后,保证字段满足某条件
-FOREIGN KEY -- 外键约束, 让两张表建立起连接,保证数据一致性
-</code></pre>
-<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><p>需求:<br>id ID唯一标识 name 非空唯一 age 大于0且小于120 status 若不指定,默认1 gender 无</p>
-<pre><code class="sql">create table user(
-    id int primary key auto_increment comment &#39;主键&#39;, -- auto_increment 自动增长
-    name varchar(10) unique not null comment &#39;姓名&#39;,
-    age tinyint check (age&gt;0 and age&lt;120) comment &#39;年龄&#39;,
-    status char(1) default &#39;1&#39; comment &#39;状态&#39;,
-    gender char(1)
-)comment &#39;用户表&#39;;
-
-insert into user(name,age,status,gender) values (&#39;Tom&#39;,10,&#39;2&#39;,&#39;男&#39;);
-insert into user(name,age,status,gender) values (&#39;Tom&#39;,10,null,&#39;男&#39;);
-</code></pre>
-<h3 id="外键约束"><a href="#外键约束" class="headerlink" title="外键约束"></a>外键约束</h3><p>具有外键的称为子表(从表),外键被关联的称为父表(主表)</p>
-<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><pre><code class="sql">-- 添加外键
-CREATE TABLE 表名(
-    field_name type,
-    ...
-    [CONSTRAINT] [外键名称] FOREIGN KEY (外键字段名) REFERENCES 主表(主表列名)
-)
-ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY (外键字段名) REFERENCES 主表(主表列名) [ON UPDATE/DELETE 外键约束];
-
--- 删除外键
-ALTER TABLE 表名 DROP FOREIGN KEY 外键字段名;
-</code></pre>
-<p>外键约束:</p>
-<p>NO ACTION 当父表中更新&#x2F;删除时,首先检查是否有外键关联.有则不允许,同RESTRICT</p>
-<p>RESTRICT 当父表中更新&#x2F;删除时,首先检查是否有外键关联.有则不允许,同NO ACTION</p>
-<p>CASCADE 当删除&#x2F;更新对应记录时,若有对应外键,则也删除&#x2F;更新对应记录(cascade 级联的,逐级的)</p>
-<p>SET NULL 当删除对应记录时,若有对应外键,设为NULL(要求该外键允许取NULL)</p>
-<p>SET DEFAULT 父表变更时,子表将外键设置为默认值(Innodb不支持)</p>
-<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>如果被外键关联,则父表中不可直接删除关联字段,除非解除关联</p>
-<h4 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h4><pre><code class="sql">-- 数据准备
-create table debt(
-    id int auto_increment comment &#39;ID&#39; primary key,
-    name varchar(50) not null comment &#39;部门名称&#39;
-)comment &#39;部门表&#39;;
-
-insert into dept (id,name) values(1,&#39;研发部&#39;),(2,&#39;市场部&#39;),(3,&#39;财务部&#39;),(4,&#39;销售部&#39;),(5,&#39;总经办&#39;);
-
-create table emp(
-    id int auto_increment comment &#39;ID&#39; primary key,
-    name varchar(10) not null comment &#39;姓名&#39;,
-    job varchar(20) comment &#39;职位&#39;,
-    dept_id int comment &#39;部门ID&#39;
-)comment &#39;员工表&#39;;
-
--- 添加外键
-alter table emp add constraint fk_emp_dept_id foreign key (dept_id) reference dept(id) on update cascade on delete no action; -- 为本来的字段添加外键
-</code></pre>
-
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        <span class="icon">
-            <i class="fa-solid fa-tags fa-fw"></i>
-        </span>
-        
-        
-        
-        <span class="tag">
-            
-            <a href="/tags/sql/" style="color: #ff7d73">sql</a>
-        </span>
-        
-        <span class="tag">
-            
-            <a href="/tags/back-end/" style="color: #03a9f4">back end</a>
-        </span>
-        
-    </div>
-    <a href="/2024/09/16/SQL%E5%AD%A6%E4%B9%A0-%E5%9B%9B/" class="go-post">阅读全文</a>
-</div>
-
 
         <div class="page-current">
     
@@ -2401,6 +2283,8 @@ alter table emp add constraint fk_emp_dept_id foreign key (dept_id) reference de
     
     <a class="page-num" href="/page/2">2</a>
     
+    
+    <a class="page-num" href="/page/3">3</a>
     
     
     

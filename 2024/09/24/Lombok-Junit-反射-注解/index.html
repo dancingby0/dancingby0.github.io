@@ -356,6 +356,7 @@ public class Demo1&#123;
 <li>@Override: 检测该注解标注的方法是否继承自父类(父接口)</li>
 <li>@Deprecated: 将该注解标注的内容,表示已过时</li>
 <li>@SuppressWarnings: 压制警告</li>
+<li>@Generated: 表示该代码是由工具自动生成的</li>
 </ul>
 <h2 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h2><p>格式:</p>
 <p>元注解<br>public @interface 注解名称()</p>
@@ -385,7 +386,17 @@ public class Demo1&#123;
 <p>元注解:</p>
 <p>用于描述注解的 注解(就是一个注解,但是它用来描述注解)</p>
 <p>@Target: 描述注解能够作用的位置</p>
+<p>仅有value属性, 设置ElementType枚举(查看源代码即可)</p>
+<p>取值:</p>
+<ul>
+<li>ElementType.TYPE: 类上</li>
+<li>ElementType.METHOD: 作用于方法上</li>
+<li>ElementType.FIELD: 作用于成员变量上</li>
+</ul>
 <p>@Retention: 描述注解被保留的阶段(有三个阶段,源码,Class,Runtime阶段)</p>
+<ul>
+<li>一般自定义注解取RUNTIME</li>
+</ul>
 <p>@Documented: 描述注解是否被抽取至api文档中</p>
 <p>@Inherited: 描述注解是否被子类继承</p>
 <h2 id="使用-解析-注解"><a href="#使用-解析-注解" class="headerlink" title="使用(解析)注解"></a>使用(解析)注解</h2><pre><code class="java">@SuppressWarnings(&quot;all&quot;) // 需要传参,一般传all
@@ -404,9 +415,53 @@ public @interface MyAnno&#123;
 
 @MyAnno(show1 = 1,show2 = &quot;2&quot;,per = Person.p1,strs = &#123;&quot;aaa&quot;,&quot;bbb&quot;&#125; ) // 使用时像属性,需要赋值
 </code></pre>
+<pre><code class="java">
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+
+</code></pre>
 <h1 id="Lombok"><a href="#Lombok" class="headerlink" title="Lombok"></a>Lombok</h1><p>简介:</p>
 <p>Lombok是一个Java库,能够自动插入编辑器并构建工具,简化Java开发</p>
 <p>他用注解进行提高代码可读性和开发效率(即只需要在Java类上添加相应注解,不需要手动编写相应代码)</p>
+<h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><h3 id="Getter和-Setter"><a href="#Getter和-Setter" class="headerlink" title="@Getter和@Setter"></a>@Getter和@Setter</h3><p>自动生成类的getter和setter(在源代码时)</p>
+<p>@Getter在类时,给所有生成getter</p>
+<p>@Getter在属性时,给该字段生成getter </p>
+<p>布尔类型的getter为isXxx</p>
+<p>可以设置AccessLevel设置访问权限</p>
+<p>如果想要让某个字段不设置getter,则@Getter(AccessLevel.NONE)</p>
+<p>可以给getter等加上自定义注解</p>
+<p>@Getter(onMethod_ &#x3D; { @Deprecated }) &#x2F;&#x2F; 为getter加上自定义注解</p>
+<p>lazy: 懒初始化</p>
+<p>如<br>@Getter(lazy &#x3D; true)<br>private final String name &#x3D; “小明”; &#x2F;&#x2F; 如果懒初始化,则说明尽可能晚地赋值,即只有需要get时才会赋值, 即懒汉式单例模式</p>
+<p>lazy使用场景:</p>
+<p>一个字段通过initValue赋予,但是不希望该方法在类创建时就执行</p>
+<p>此外,如果自行编写了相应的getter或setter(根据命名规则判定),则不会被注解覆盖,也不会生成</p>
+<h3 id="构造方法相关"><a href="#构造方法相关" class="headerlink" title="构造方法相关"></a>构造方法相关</h3><p>@AllArgsConstructor</p>
+<p>全参构造器,加在类上</p>
+<p>staticName 生成静态构造方法(即该构造方法被private,需要通过该静态方法进行调用) (单例)</p>
+<p>onConstructor 用于添加其他注解</p>
+<p>access 访问级别</p>
+<p>@NoArgsConstructor</p>
+<p>无参构造器</p>
+<p>如果存在final变量,则需要force &#x3D; true(直接赋值默认值)</p>
+<p>@RequiredArgsConstructor</p>
+<p>生成需要部分生成的构造</p>
+<p>为所有需要final的字段生成构造方法</p>
+<h3 id="ToString"><a href="#ToString" class="headerlink" title="ToString"></a>ToString</h3><p>@ToString</p>
+<p>includeFieldNames 是否打印字段名字</p>
+<p>callSuper 不仅生成当前类的,并且使用父类的toString拼接</p>
+<p>doNotUseGetters 默认尽可能使用get获取字段值</p>
+<p>onlyExplicitlyIncluded(rank &#x3D; 1) 白名单模式,开启后则只为加上@ToString.Include注解的内容生成,rank为优先级,越大优先级越高</p>
+<p>@ToString.Exclude 注解里的注解(因为接口可以套接口),黑名单模式,排除</p>
+<p>同时可以对方法生效</p>
+<h3 id="HashCode"><a href="#HashCode" class="headerlink" title="HashCode"></a>HashCode</h3><p>@EqualsAndHashCode &#x2F;&#x2F; 自动生成equals重写</p>
+<p>重写equals时必须重写hashCode,因为集合中使用哈希</p>
+<p>cacheStrategy</p>
+<p>可能每次调用时都要重复计算哈希值,浪费性能,因此缓存hash码,默认不启用(但如果其中字段值可能发生变化,则不建议使用,因为它只计算一次,后续是返回第一次计算的哈希码)</p>
+<p>@EqualsAndHashCode.Include(replaces &#x3D; 属性名) &#x2F;&#x2F; 加在方法前,比较时比较该方法</p>
+<p>其他看源代码即可</p>
+<h3 id="Data"><a href="#Data" class="headerlink" title="Data"></a>Data</h3><p>@Data:</p>
+<p>等同于之前所有的注解加在类上(用于将数据库中的数据)</p>
 
     </div>
     

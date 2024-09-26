@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8" />
-    <title>HTML学习(二) | dancingby&#39;s home</title>
+    <title>dancingby&#39;s home</title>
     <meta name="author" content="dancingby" />
     <meta name="description" content="" />
     <meta name="keywords" content="blog" />
@@ -36,9 +36,7 @@
 
 
 
-
-
-
+<script src="/js/lib/home.js"></script>
 
 <link rel="stylesheet" href="/css/main.css" />
 
@@ -148,101 +146,120 @@
 </transition>
 
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
-            <div class="article">
-    <div>
-        <h1>HTML学习(二)</h1>
+            <div id="home-head">
+    <div id="home-background" ref="homeBackground" data-images="/images/background.jpg"></div>
+    <div id="home-info" @click="homeClick">
+        <span class="loop"></span>
+        <span class="loop"></span>
+        <span class="loop"></span>
+        <span class="loop"></span>
+        <span class="info">
+            <div class="wrap">
+                <h1>dancingby&#39;s home</h1>
+                <h3>dancingbyのblogs</h3>
+                <h5></h5>
+            </div>
+        </span>
     </div>
-    <div class="info">
+</div>
+<div id="home-posts-wrap" true ref="homePostsWrap">
+    <div id="home-posts">
+        
+
+<div class="post">
+    <a href="/2024/04/25/hello-world/">
+        <h2 class="post-title">Hello World</h2>
+    </a>
+    <div class="category-and-date">
+        
         <span class="date">
             <span class="icon">
                 <i class="fa-solid fa-calendar fa-fw"></i>
             </span>
-            2024/5/3
+            2024/4/25
         </span>
         
-        
-        <span class="tags">
-            <span class="icon">
-                <i class="fa-solid fa-tags fa-fw"></i>
-            </span>
-            
-            
-            <span class="tag">
-                
-                <a href="/tags/%E5%89%8D%E7%AB%AF/" style="color: #ffa2c4">前端</a>
-            </span>
-            
-            <span class="tag">
-                
-                <a href="/tags/HTML/" style="color: #00a596">HTML</a>
-            </span>
-            
-        </span>
         
     </div>
-    
-    <div class="content" v-pre>
-        <h1 id="html元"><a href="#html元" class="headerlink" title="html元"></a>html元</h1><p>使用&lt;meta&gt;标签<br>示例:</p>
-<pre><code class="html">&lt;head&gt;
-    &lt;meta charset=&quot;utf-8&quot; /&gt;
-    &lt;!-- charset属性用于设定文字编码 --&gt;
-    &lt;meta name=&quot;author&quot; contents=&quot;dancingby&quot; /&gt;
-    &lt;meta name=&quot;description&quot; contents=&quot;here is the description of the website&quot; /&gt;
-    &lt;meta name=&quot;keywords&quot; contents=&quot;html&quot; /&gt;
-    &lt;!-- 这里是一些自定的网页的表述,同时,元里可以添加其他平台可解析的属性(如twitter与Facebook的) --&gt;
-&lt;/head&gt;
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <p>This is my first blog.</p>
+<p>我精通五种编程语言</p>
+<p>的hello world.</p>
+<h3 id="c"><a href="#c" class="headerlink" title="c"></a>c</h3><pre><code class="c">printf(&quot;hello world!&quot;);
 </code></pre>
-<h1 id="网页架构"><a href="#网页架构" class="headerlink" title="网页架构"></a>网页架构</h1><p>有&lt;header&gt;(页眉),&lt;nav&gt;(导航栏),&lt;article&gt;文章,&lt;main&gt;主要内容,&lt;aside&gt;侧边栏&lt;footer&gt;页尾部分.<br>示例:</p>
-<pre><code class="html">&lt;body&gt;
-    &lt;header&gt;&lt;h1&gt;
-        This is header.
-        &lt;/h1&gt;&lt;/header&gt;
-    &lt;nav&gt;
-    &lt;ul&gt;
-        &lt;li&gt;
-        主页&lt;/li&gt;
-        &lt;li&gt;
-        文章&lt;/li&gt;
-        &lt;/ul&gt;
-        &lt;form&gt;
-            &lt;input type=&quot;search&quot; name = &quot;s&quot; placeholder = &quot;Pleace type to search&quot; /&gt;
-            &lt;input type = &quot;submit&quot; value=&quot;search&quot; /&gt;
-        &lt;/form&gt;
-    &lt;/nav&gt;
-    &lt;main&gt;
-    &lt;article&gt;
-        文章主要内容
-        &lt;/article&gt;
-        &lt;aside&gt;
-        &lt;h2&gt;
-            相关链接
-            &lt;/h2&gt;
-        &lt;ul&gt;
-            &lt;li&gt;
-            &lt;a href=&quot;https://www.baidu.com&quot;&gt;百度&lt;/a&gt;&lt;/li&gt;
-            &lt;li&gt;
-            &lt;a href = &quot;https://dancingby0.github.io&quot;&gt;
-                dancingby&#39;s blog.
-                &lt;/a&gt;
-            &lt;/li&gt;
-            &lt;/ul&gt;
-        &lt;/aside&gt;
-    &lt;/main&gt;
-    &lt;footer&gt;
-    &lt;p&gt;
+<h3 id="cpp"><a href="#cpp" class="headerlink" title="cpp"></a>cpp</h3><pre><code class="cpp">std::cout&lt;&lt; &quot;hello world!&quot;;
+</code></pre>
+<h3 id="java"><a href="#java" class="headerlink" title="java"></a>java</h3><pre><code class="java">system.out.println(&quot;hello world!&quot;);
+</code></pre>
+<h3 id="python"><a href="#python" class="headerlink" title="python"></a>python</h3><pre><code class="python">print(&quot;hello world!&quot;)
+</code></pre>
+<h3 id="csharp"><a href="#csharp" class="headerlink" title="csharp"></a>csharp</h3><pre><code class="csharp">Console.Writeline(&quot;hello world!&quot;);
+</code></pre>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
         
-        all rights reserved.
-        &lt;/p&gt;&lt;/footer&gt;
-&lt;/body&gt;
-</code></pre>
+        
+        
+    </div>
+    <a href="/2024/04/25/hello-world/" class="go-post">阅读全文</a>
+</div>
+
+
+        <div class="page-current">
+    
+    <a class="page-num" href="/page/2/">
+        <i class="fa-solid fa-caret-left fa-fw"></i>
+    </a>
+    <a class="page-num" href="/">1</a>
+    <span class="page-omit">...</span>
+    
+    <span class="current">3</span>
+    
+    
+    
+    
+</div>
 
     </div>
     
-    
-    
-    
-    
-    
+    <div id="home-card">
+        <div id="card-style">
+    <div id="card-div">
+        <div class="avatar">
+            <img src="/images/avatar.jpg" alt="avatar" />
+        </div>
+        <div class="name">dancingby</div>
+        <div class="description">
+            <p>Description<br>dancingbyです！</p>
+
+        </div>
+        
+        
+        <div class="friend-links">
+            
+            <div class="friend-link">
+                <a target="_blank" rel="noopener" href="https://github.com/dancingby0">github</a>
+            </div>
+            
+            <div class="friend-link">
+                <a target="_blank" rel="noopener" href="https://afdian.net/a/dancingby">爱发电</a>
+            </div>
+            
+            <div class="friend-link">
+                <a target="_blank" rel="noopener" href="https://argvchs.github.io">Argvchs</a>
+            </div>
+            
+        </div>
+        
+    </div>
+</div>
+
+    </div>
     
 </div>
 
@@ -274,12 +291,6 @@
         
     </div>
     <script src="/js/main.js"></script>
-    
-    
-
-
-
-
     
 </body>
 </html>

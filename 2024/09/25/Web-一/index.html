@@ -1,0 +1,489 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <title>Web(一) | dancingby&#39;s home</title>
+    <meta name="author" content="dancingby" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="blog" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <link rel="icon" href="/images/avatar.jpg" />
+    <link rel="preconnect" href="https://s4.zstatic.net" />
+<script src="https://s4.zstatic.net/ajax/libs/vue/3.3.7/vue.global.prod.min.js"></script>
+<link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.loli.net" />
+<link rel="preconnect" href="https://gstatic.loli.net" crossorigin />
+<link rel="stylesheet" href="https://fonts.loli.net/css2?family=Fira+Code:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" />
+<script> const mixins = {}; </script>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+
+<script src="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://s4.zstatic.net/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<link
+    rel="stylesheet"
+    href="https://s4.zstatic.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+/>
+<script src="/js/lib/highlight.js"></script>
+
+
+
+<script src="/js/lib/preview.js"></script>
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css" />
+
+<meta name="generator" content="Hexo 7.2.0"></head>
+<body>
+    <div id="layout">
+        <transition name="fade">
+            <div id="loading" v-show="loading">
+                <div id="loading-circle">
+                    <h2>LOADING</h2>
+                    <p>加载过慢请开启缓存 浏览器默认开启</p>
+                    <img src="/images/loading.gif" />
+                </div>
+            </div>
+        </transition>
+        <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
+    <nav id="desktop-menu">
+        <a class="title" href="/">
+            <span>DANCINGBY&#39;S HOME</span>
+        </a>
+        
+        <a href="/">
+            <i class="fa-solid fa-house fa-fw"></i>
+            <span>&ensp;Home</span>
+        </a>
+        
+        <a href="/about">
+            <i class="fa-solid fa-id-card fa-fw"></i>
+            <span>&ensp;About</span>
+        </a>
+        
+        <a href="/archives">
+            <i class="fa-solid fa-box-archive fa-fw"></i>
+            <span>&ensp;Archives</span>
+        </a>
+        
+        <a href="/categories">
+            <i class="fa-solid fa-bookmark fa-fw"></i>
+            <span>&ensp;Categories</span>
+        </a>
+        
+        <a href="/tags">
+            <i class="fa-solid fa-tags fa-fw"></i>
+            <span>&ensp;Tags</span>
+        </a>
+        
+    </nav>
+    <nav id="mobile-menu">
+        <div class="title" @click="showMenuItems = !showMenuItems">
+            <i class="fa-solid fa-bars fa-fw"></i>
+            <span>&emsp;DANCINGBY&#39;S HOME</span>
+        </div>
+        <transition name="slide">
+            <div class="items" v-show="showMenuItems">
+                
+                <a href="/">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-house fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Home</div>
+                    </div>
+                </a>
+                
+                <a href="/about">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-id-card fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">About</div>
+                    </div>
+                </a>
+                
+                <a href="/archives">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-box-archive fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Archives</div>
+                    </div>
+                </a>
+                
+                <a href="/categories">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-bookmark fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Categories</div>
+                    </div>
+                </a>
+                
+                <a href="/tags">
+                    <div class="item">
+                        <div style="min-width: 20px; max-width: 50px; width: 10%">
+                            <i class="fa-solid fa-tags fa-fw"></i>
+                        </div>
+                        <div style="min-width: 100px; max-width: 150%; width: 20%">Tags</div>
+                    </div>
+                </a>
+                
+            </div>
+        </transition>
+    </nav>
+</div>
+<transition name="fade">
+    <div id="menu-curtain" @click="showMenuItems = !showMenuItems" v-show="showMenuItems"></div>
+</transition>
+
+        <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
+            <div class="article">
+    <div>
+        <h1>Web(一)</h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2024/9/25
+        </span>
+        
+        
+    </div>
+    
+    <div class="content" v-pre>
+        <h1 id="快速启动"><a href="#快速启动" class="headerlink" title="快速启动"></a>快速启动</h1><p>使用SpringBoot开发一个web应用,当浏览器发起&#x2F;hello后,给浏览器返回字符串”hello world”</p>
+<p>步骤</p>
+<ol>
+<li>创建springboot工程</li>
+</ol>
+<p>选择SpringInitializr</p>
+<p>选定Spring Web</p>
+<ol start="2">
+<li>定义HelloController类,添加hello,并添加注解</li>
+</ol>
+<pre><code class="java">@RestController
+public class HelloController&#123;
+
+    @RequestMapping(&quot;/hello&quot;)
+    public String hello()&#123;
+        System.out.println(&quot;hello world&quot;);
+        return &quot;hello world&quot;;
+    &#125;
+&#125;
+</code></pre>
+<p>springboot启动类和controller包需要在同一个目录下</p>
+<ol start="3">
+<li>运行测试</li>
+</ol>
+<h2 id="HTTP协议概述"><a href="#HTTP协议概述" class="headerlink" title="HTTP协议概述"></a>HTTP协议概述</h2><p>规定浏览器和服务器之间数据传输的规则</p>
+<ol>
+<li><p>基于TCP;面向连接,安全(三次握手)</p>
+</li>
+<li><p>基于请求-响应模型: 一次请求对应一次相应</p>
+</li>
+<li><p>HTTP是无状态协议: 对于事物处理没有记忆能力.每次请求-响应都是独立</p>
+</li>
+</ol>
+<p>缺点: 多次请求间不能共享数据</p>
+<p>优点: 速度快</p>
+<h3 id="HTTP请求数据格式"><a href="#HTTP请求数据格式" class="headerlink" title="HTTP请求数据格式"></a>HTTP请求数据格式</h3><p>请求行+ 请求头</p>
+<p>GET &#x2F;brand&#x2F;findAll?name&#x3D;OPPO&amp;status&#x3D;1 HTTP&#x2F;1.1 请求行</p>
+<p>请求方式: GET&#x2F;POST<br>资源路径<br>协议 HTTP&#x2F;1.1</p>
+<p>请求头:</p>
+<p>第二行开始,格式key:value</p>
+<p>Host:  请求主机名</p>
+<p>User-Agent: 浏览器版本</p>
+<p>Accept: 能接受的资源类型</p>
+<p>Accept-Language: 表示浏览器偏好语言</p>
+<p>Accept-Encoding: 浏览器偏好语言</p>
+<p>Content-Type: 请求主体数据类型</p>
+<p>Content-Length: 请求主体大小</p>
+<p>用于兼容性处理</p>
+<p>GET: 请求参数在请求行中,大小有限制</p>
+<p>POST: 请求参数在请求体中,POST请求大小没有限制</p>
+<h3 id="HTTP相应数据格式"><a href="#HTTP相应数据格式" class="headerlink" title="HTTP相应数据格式"></a>HTTP相应数据格式</h3><p>响应行: 响应数据第一行(协议,状态码,描述)</p>
+<p>响应头: 第二行开始: key: value</p>
+<p>响应体: 最后一部分,存放响应数据</p>
+<pre><code class="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Tue, 10 May 2022 07:51:07 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+
+[&#123;id:1,brandName:&quot;Alibaba&quot;,companyName:&quot;腾讯公司&quot;&#125;]
+</code></pre>
+<p>状态码:</p>
+<p>1xx 响应中-临时状态码,</p>
+<p>2xx 成功</p>
+<p>3xx 重定向-重定向至其他地方,让客户端再发起一次请求完成整个处理</p>
+<p>4xx 客户端错误 责任在客户端,如禁止访问,客户端未被授权,请求不存在的资源</p>
+<p>5xx 服务器错误 责任在服务端,如程序抛出异常</p>
+<p>Content-Type: 相应内容类型</p>
+<p>Content-Length: 响应内容长度</p>
+<p>Content-Encoding: 该响应压缩算法</p>
+<p>Cache-Control: 客户端应当如何缓存,如max-age&#x3D;300表示最多缓存300s</p>
+<p>Set-Cookie: 告诉浏览器为当前页面所在的域设置cookie</p>
+<h3 id="解析数据"><a href="#解析数据" class="headerlink" title="解析数据"></a>解析数据</h3><pre><code class="java">public class Server&#123;
+    public static void main(String[] args) throws IOException&#123;
+        ServerSocket ss = new ServerSocket(8080); // 监听指定端口
+        While(true)&#123;
+            Socket sock = ss.accept(); // 接受客户端请求
+            System.out.println(&quot;connect from&quot; + sock.getRemoteSocketAddress());
+
+            // 开启线程处理请求
+            Thread t = new Handler(sock);
+            t.start();
+        &#125;
+    &#125;
+&#125;
+
+class Handler extends Thread&#123;
+    Socket sock;
+
+    public void run()&#123;
+        try(
+            InputStream input = this.sock.getInputStream(); // 获取输入流
+            OutputStream output = this.sock.getOutputStream(); // 获取输出流
+            handle(input,output);
+        )
+        catch(Exception e)&#123;
+            try&#123;
+                this.sock.close();
+            &#125;
+            catch (IOException ioe)&#123;
+
+            &#125;
+        &#125;
+    &#125;
+    private void handle(InputStream input,OutputStream output) throws IOException&#123;
+        // 对输入流和输出流进行包装
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input,StandardCharsets.UTF-8));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output,StandardCharsets.UTF-8));
+
+        // 读取HTTP请求
+        boolean requestOk = false;
+        String first = reader.readLine(); // 请求行
+        if(first.startWith(&quot;GET / HTTP/1.&quot;))&#123;
+            requestOk = true;
+        &#125;
+
+        while(true)&#123;
+            String header = reader.readLine();
+            if(header.isEmpty())&#123;
+                break; // 读完了
+            &#125;
+        &#125;
+
+        if(!requestOk)&#123;
+            // 错误响应
+            writer.write(&quot;HTTP/1.0 404 NotFound\r\n&quot;);
+            ...
+        &#125;else&#123;
+            // 成功响应
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>如果完全自己去解析,非常繁琐</p>
+<p>Tomcat WebLogic等都是为了封装简化这些操作产生的</p>
+<h2 id="Web服务器"><a href="#Web服务器" class="headerlink" title="Web服务器"></a>Web服务器</h2><p>是一个软件程序,对HTTP协议操作进行封装,程序员则不需要对协议进行操作,让Web开发更加便捷</p>
+<p>起步依赖:</p>
+<p>spring-boot-starter-web: 包含web应用开发所需要的常见依赖</p>
+<p>spring-boot-starter-test: 包含单元测试所需要的常见依赖</p>
+<p>官方提供的starter</p>
+<p>所有springboot都继承自父工程</p>
+<p>Tomcat是servlet容器,它识别servlet;而DispatcherServlet实现了Servlet接口(即tomcat可以识别DispatcherServlet);</p>
+<p>从客户端传来的请求都会经过DispatcherServlet ,再给XxxController处理,处理完毕后再把响应传给DispatcherServlet,再给客户端</p>
+<p>DispatcherServlet在Springboot中是核心控制器&#x2F;前端控制器</p>
+<p>解析的所有信息都封装入HttpServletRequest对象中(请求对象)</p>
+<p>响应的信息封装入HttpServletResponse对象中(响应对象)</p>
+<p>请求:</p>
+<h3 id="依赖注入和控制反转"><a href="#依赖注入和控制反转" class="headerlink" title="依赖注入和控制反转"></a>依赖注入和控制反转</h3><p>一般后端分为三层架构:</p>
+<h4 id="Controller层"><a href="#Controller层" class="headerlink" title="Controller层:"></a>Controller层:</h4><p>控制层:直接与客户端进行交互,用于接收请求和响应</p>
+<ol>
+<li><p>接收,解析请求</p>
+</li>
+<li><p>调用服务层</p>
+</li>
+<li><p>返回响应</p>
+</li>
+<li><p>处理异常</p>
+</li>
+</ol>
+<p>在Spring框架中，控制层通常使用@Controller或@RestController注解。@Controller用于返回视图页面，而@RestController是@Controller和@ResponseBody的组合，主要用于RESTful API开发，返回的是JSON或XML数据。</p>
+<pre><code class="java">@RestController
+@RequestMapping(&quot;/users&quot;)
+public class UserController &#123;
+    @Autowired
+    private UserService userService;
+ 
+    @GetMapping(&quot;/&#123;id&#125;&quot;)
+    public ResponseEntity&lt;User&gt; getUserById(@PathVariable Integer id) &#123;//id为路径参数
+        User user = userService.getUserById(id);//调用服务层获取用户信息
+        return Result.success(user); //返回json格式数据和用户信息
+    &#125;
+ 
+    @PostMapping
+    public ResponseEntity&lt;User&gt; createUser(@RequestBody User user) &#123;
+        User newUser = userService.saveUser(user);//调用服务层创建新用户
+        return Result.success(newUser);//返回json格式数据和新用户信息
+    &#125;
+    //负责进行异常处理
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity&lt;String&gt; handleUserNotFound(UserNotFoundException ex) &#123;
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    &#125;
+&#125;
+</code></pre>
+<p>其中,Result类是用来统一返回类的:</p>
+<pre><code class="java">@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Result &#123;
+    private Integer code;//响应码，1 代表成功; 0 代表失败
+    private String msg;  //响应信息 描述字符串
+    private Object data; //返回的数据
+    //增删改 成功响应
+    public static Result success()&#123;
+        return new Result(1,&quot;success&quot;,null);
+    &#125;
+    //查询 成功响应
+    public static Result success(Object data)&#123;
+        return new Result(1,&quot;success&quot;,data);
+    &#125;
+    //失败响应
+    public static Result error(String msg)&#123;
+        return new Result(0,msg,null);
+    &#125;
+&#125;
+</code></pre>
+<h4 id="Service层"><a href="#Service层" class="headerlink" title="Service层"></a>Service层</h4><p>服务层（Service）是整个应用程序的核心部分，负责处理所有的业务逻辑。它在控制层和数据访问层之间起到中介作用，封装了业务流程，并协调DAO层的数据访问操作。</p>
+<p>1.业务逻辑实现：将业务需求转化为可执行的逻辑操作，包括数据的校验、转换、计算等。</p>
+<p>2.事务管理：在处理涉及多个数据库操作的业务时，确保这些操作要么全部成功，要么全部失败（即事务的原子性）。<br>3.调用DAO层：与数据访问层（DAO层）交互，完成数据的增删改查等各种操作。</p>
+<p>4.封装复杂逻辑：将复杂的业务流程封装在服务层，控制层只需要调用相应的服务方法，而不关心其内部实现细节。</p>
+<p>5.集成其他服务：在大型系统中，服务层可能还负责与外部服务的集成，例如调用其他微服务、消息队列、第三方API等。</p>
+<p>典型的服务层类通常包含多个业务方法，这些方法通过注入DAO层对象（通过注解@Autowired 和 @Resource实现</p>
+<pre><code class="java">@Service
+public class UserService &#123;
+    @Autowired
+    private UserDao userDao;
+ 
+    @Transactional
+    public User getUserById(Integer id) &#123;
+        return userDao.getById(id);//调用Dao层通过ID查找用户
+    &#125;
+ 
+    @Transactional
+    public User saveUser(User user) &#123;
+        //业务逻辑部分代码：如检查用户名是否已存在，设置用户创建时间等
+        return userDao.save(user);
+    &#125;
+ 
+    //其他处理方法代码
+&#125;
+</code></pre>
+<h4 id="DAO层"><a href="#DAO层" class="headerlink" title="DAO层"></a>DAO层</h4><p>1.CRUD 操作：提供增删改查数据库记录的操作。</p>
+<p>2.数据库连接管理：管理与数据库的连接以及连接池的使用（在现代框架中，这通常由ORM工具或框架自动管理）。</p>
+<p>3.数据转换：将数据库中的数据转换为应用程序中的对象（DTO，Data Transfer Object），以及将对象转换为适合存储在数据库中的格式。</p>
+<p>4.查询封装：将复杂的数据库查询封装为易于调用的方法，因此控制层(Controller)和服务层(Service)不会直接接触SQL语句，即不必关心具体的数据库实现。</p>
+<p>DAO层通常使用@Repository注解，并且依赖于ORM（如Hibernate或JPA）来简化数据访问。DAO层可以直接使用JPA的JpaRepository接口，或者自定义查询方法。</p>
+<pre><code class="java">@Repository
+public interface UserDao extends JpaRepository&lt;User, Long&gt; &#123;
+    // 继承JpaRepository后，自动获得基本的CRUD操作
+    // 自定义查询方法
+    User getById(Integer id);
+ 
+     // 自定义的JPQL或Native SQL查询
+    @Query(&quot;SELECT u FROM User u WHERE u.email = ?1&quot;)
+    User findByEmail(String email);
+&#125;
+</code></pre>
+<p>Controller 层– &gt;Service 层– &gt;DAO 层：</p>
+<p>控制层负责接收客户端请求并传递给服务层，服务层在处理业务逻辑后，可能需要访问数据，于是调用DAO层进行数据库操作。</p>
+<p>DAO 层–&gt;Service 层– &gt; Controller 层：</p>
+<p>DAO层将数据返回给服务层，服务层进行必要的处理后，将结果返回给控制层，最终控制层将响应发送给客户端。</p>
+<h4 id="IOC容器"><a href="#IOC容器" class="headerlink" title="IOC容器"></a>IOC容器</h4><p>IOC—Inversion of Control，即“控制反转”，不是什么技术，而是一种设计思想</p>
+<p><strong>控制</strong>：IOC意味着将你设计好的对象交给IOC容器控制，而不是传统的在你的对象内部直接控制；</p>
+<p>IOC是有专门一个容器来创建这些对象，即由IOC容器来控制对象的创建；</p>
+<p>谁控制谁？当然是IOC容器控制了对象；控制什么？那就是主要控制了外部资源获取（不只是对象包括比如文件等）。</p>
+<p><strong>反转</strong>：传统应用程序是由我们自己在对象中主动控制去直接获取依赖对象，也就是正转；</p>
+<p>反转则是由IOC容器来帮忙创建及注入依赖对象；</p>
+<p>由容器帮我们查找及注入依赖对象，对象只是被动的接受依赖对象，所以是反转；哪些方面反转了？依赖对象的获取被反转了。</p>
+<p>@Component 声明bean的基础注解 不属于三层中时,使用</p>
+<p>@Controller 标注在控制器类上</p>
+<p>@Service 标注在业务类上</p>
+<p>@Repository 标注在数据访问类上(因为有mybatis,用的少)</p>
+<h4 id="Bean组件扫描"><a href="#Bean组件扫描" class="headerlink" title="Bean组件扫描"></a>Bean组件扫描</h4><p>声明Bean的四个注解,若想要生效则要被组件扫描注解@ComponentScan扫描</p>
+<p>@ComponentScan注解虽然没有被显示配置,但已经包含在启动类声明注解@SpringBootApplication中,默认扫描范围是启动类所在包及其子包</p>
+<h3 id="DI"><a href="#DI" class="headerlink" title="DI"></a>DI</h3><p>@Autowired注解,默认按照类型进行: 如果存在多个相同类型的bean,就会报错(如有两个IdDao父类的bean)</p>
+<p>解决方案:</p>
+<p>@Primary</p>
+<p>加上这个,如果存在多个bean,则只会令有@Primary注解的bean生效</p>
+<p>@Qualifier</p>
+<p>在@Autowired注解的位置加上@Qualifier,指定要添加的bean,如@Qualifier(“empServiceA”)</p>
+<p>@Resource<br>或者直接不用@Autowired,而直接使用@Resorce(name&#x3D;”empServiceB”)即可</p>
+<p>@Resource与@Autowired区别:</p>
+<p>@Autowired是spring提供的,而@Resource是JDK提供的</p>
+<p>@Autowired是按照类型注入,@Resource是按照名称注入</p>
+
+    </div>
+    
+    
+    
+    
+    
+    
+    
+</div>
+
+            <footer id="footer">
+    <div id="footer-wrap">
+        <div>
+            &copy;
+            2024 - 2024 dancingby&#39;s home
+            <span id="footer-icon">
+                <i class="fa-solid fa-font-awesome fa-fw"></i>
+            </span>
+            &commat;dancingby
+        </div>
+        <div>
+            Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;
+            <a target="_blank" rel="noopener" href="https://github.com/theme-particlex/hexo-theme-particlex">ParticleX Theme</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+        
+        <transition name="fade">
+            <div id="preview" ref="preview" v-show="previewShow">
+                <img id="preview-content" ref="previewContent" />
+            </div>
+        </transition>
+        
+    </div>
+    <script src="/js/main.js"></script>
+    
+    
+
+
+
+
+    
+</body>
+</html>
